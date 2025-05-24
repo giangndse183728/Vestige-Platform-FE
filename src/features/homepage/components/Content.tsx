@@ -190,7 +190,7 @@ export default function NewspaperSlider() {
                     
                     <div className="p-6">
                       <div className="flex items-center mb-3 border-b border-black/10 pb-1">
-                        <span className="text-[#960000] mr-2">—</span>
+                        <span className="text-[var(--dark-red)] mr-2">—</span>
                         <span className="font-gothic text-xs uppercase tracking-wider text-black/80">
                           {product.category}
                         </span>
@@ -200,10 +200,10 @@ export default function NewspaperSlider() {
                       <p className="text-black/70 text-sm mb-5 font-serif">{product.description}</p>
                       
                       <div className="flex items-center justify-between border-t border-black/10 pt-3">
-                        <span className="font-metal text-[#960000]">{product.price}</span>
+                        <span className="font-metal text-[var(--dark-red)]">{product.price}</span>
                         <Link 
                           href={`/products/${product.id}`}
-                          className="group-hover:underline text-sm font-serif flex items-center hover:text-[#960000] transition-colors"
+                          className="group-hover:underline text-sm font-serif flex items-center hover:text-[var(--dark-red)] transition-colors"
                         >
                           View Details
                           <motion.span 
@@ -227,9 +227,9 @@ export default function NewspaperSlider() {
           <div className="flex items-center justify-between border-b-2 border-black p-4 bg-white mb-10">
             <button 
               onClick={() => handleDotClick((currentPage - 1 + totalPages) % totalPages)}
-              className="font-gothic text-sm uppercase flex items-center hover:text-[#960000] transition-colors group"
+              className="font-gothic text-sm uppercase flex items-center hover:text-[var(--dark-red)] transition-colors group"
             >
-              <span className="mr-2 w-8 h-8 flex items-center justify-center border border-black/40 group-hover:bg-[#960000]/5 transition-colors">←</span>
+              <span className="mr-2 w-8 h-8 flex items-center justify-center border border-black/40 group-hover:bg-[var(--dark-red)]/5 transition-colors">←</span>
               Previous
             </button>
             
@@ -253,10 +253,10 @@ export default function NewspaperSlider() {
             
             <button 
               onClick={() => handleDotClick((currentPage + 1) % totalPages)}
-              className="font-gothic text-sm uppercase flex items-center hover:text-[#960000] transition-colors group"
+              className="font-gothic text-sm uppercase flex items-center hover:text-[var(--dark-red)] transition-colors group"
             >
               Next
-              <span className="ml-2 w-8 h-8 flex items-center justify-center border border-black/40 group-hover:bg-[#960000]/5 transition-colors">→</span>
+              <span className="ml-2 w-8 h-8 flex items-center justify-center border border-black/40 group-hover:bg-[var(--dark-red)]/5 transition-colors">→</span>
             </button>
           </div>
         </FadeUp>

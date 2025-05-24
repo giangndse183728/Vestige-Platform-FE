@@ -20,6 +20,12 @@ body {
   color: #1a1a1a;
 }
 
+:root {
+  --dark-red: #960000;
+  --darker-red: #660000;
+}
+
+
 /* Font utility classes */
 .font-metal {
   font-family: var(--font-metal-mania), cursive;
@@ -28,3 +34,5 @@ body {
 .font-gothic {
   font-family: var(--font-cinzel), serif;
 }
+
+

@@ -1,6 +1,7 @@
 import HeroSection from "@/features/homepage/components/HeroSection";
 import SubHeroSection from "@/features/homepage/components/SubHeroSection";
 import NewspaperSlider from "@/features/homepage/components/Content";
+import NewspaperBentoGrid from "@/features/homepage/components/BrandCategory";
 import { generateSEOMetadata } from "@/libs/seo";
 
 
@@ -22,6 +23,7 @@ export default function Homepage() {
       <main>
         <HeroSection/>
         <SubHeroSection/>
+        <NewspaperBentoGrid  />
         <NewspaperSlider/>
       </main>
     </div>

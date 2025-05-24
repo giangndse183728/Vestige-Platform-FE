@@ -77,7 +77,7 @@ const HeroSectionClient = ({ featuredItems, heroSEOContent }: HeroSectionClientP
       </div>
       
       
-      {/* Main content container */}
+      {/* Main content */}
       <MotionDiv 
         className="relative z-10 w-full h-full flex items-center justify-center"
         variants={containerVariants}
@@ -159,7 +159,7 @@ const HeroSectionClient = ({ featuredItems, heroSEOContent }: HeroSectionClientP
                     >
                       <Link 
                         href={link.url} 
-                        className={`px-8 py-3 ${index === 0 ? 'bg-[#111] text-white hover:bg-[#ec1e1e]' : 'border-2 border-[#111] text-[#111] hover:bg-[#111] hover:text-white'} font-gothic text-sm uppercase tracking-widest transition-colors duration-300`}
+                        className={`px-8 py-3 ${index === 0 ? 'bg-[#111] text-white hover:bg-[var(--dark-red)]' : 'border-2 border-[var(--dark-red)] text-[#111] hover:bg-[var(--dark-red)] hover:text-white'} font-gothic text-sm uppercase tracking-widest transition-colors duration-300`}
                       >
                         {link.text}
                       </Link>
@@ -284,7 +284,6 @@ const HeroSectionClient = ({ featuredItems, heroSEOContent }: HeroSectionClientP
                 </motion.div>
               </AnimatePresence>
               
-              {/* Mobile navigation dots */}
               <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 flex gap-3 md:hidden">
                 {featuredItems.map((_, idx) => (
                   <button
