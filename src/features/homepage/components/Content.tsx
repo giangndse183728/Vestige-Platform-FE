@@ -141,7 +141,7 @@ export default function NewspaperSlider() {
         </FadeUp>
         
         
-        <div className="relative overflow-hidden border-2 border-black shadow-[0_10px_30px_-15px_rgba(0,0,0,0.2)] min-h-[600px] bg-white/95 ">
+        <div className="relative overflow-hidden border-2 border-black shadow-[0_10px_30px_-15px_rgba(0,0,0,0.2)] min-h-[550px] bg-white/95 ">
          
           {Array.from({ length: totalPages }).map((_, pageIndex) => {
             const startIdx = pageIndex * 4;
