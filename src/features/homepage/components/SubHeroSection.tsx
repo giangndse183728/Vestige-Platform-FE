@@ -229,7 +229,7 @@ const SubHeroSection = () => {
   
       </MotionDiv>
       <FadeUp delay={0.5}>
-          <div className="my-6 py-3 bg-black/10 backdrop-blur-sm">
+          <div className="my-6 py-1 bg-black/10 backdrop-blur-sm">
             <Marquee text="Avant-Garde • Minimalist • Contemporary • Sustainable • Limited Edition • Premium • Exclusive • Architectural •" />
           </div>
         </FadeUp>

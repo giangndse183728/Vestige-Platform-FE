@@ -165,7 +165,7 @@ export const Marquee = ({
   return (
     <div className={className}>
       <motion.div
-        className="flex absolute whitespace-nowrap"
+        className="flex  whitespace-nowrap"
         animate={{ x: ['0%', '-50%'] }}
         transition={{
           ease: 'linear',
