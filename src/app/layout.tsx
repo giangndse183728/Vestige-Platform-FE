@@ -8,7 +8,10 @@ import { Metal_Mania, Cinzel } from 'next/font/google';
 import Script from "next/script";
 import ChatSpeedDial from "@/features/chatbot/components/chat-speed-dial";
 import { usePathname } from 'next/navigation';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
+const queryClient = new QueryClient();
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -58,6 +61,7 @@ export default function RootLayout({
         <link rel="preload" href="/background.jpg" as="image" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} ${metalMania.variable} ${cinzel.variable} antialiased text-gray-900`}>
+      <QueryClientProvider client={queryClient}>
         {noLayout ? (
        
           <div className="flex flex-col min-h-screen relative">
@@ -100,6 +104,8 @@ export default function RootLayout({
             }
           `}
         </Script>
+        <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
       </body>
     </html>
   );
