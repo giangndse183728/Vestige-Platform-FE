@@ -149,7 +149,7 @@ export default function NewspaperSlider() {
 
             <FadeUp delay={0.5}>
           <div className="mt-6 py-1 bg-black/10 backdrop-blur-sm">
-            <Marquee text="Trending / Viral / On Fire / Buzzing / In vouge / Hot / Stylish" />
+            <Marquee text="/ Trending / Viral / On Fire / Buzzing / In vouge / Hot / Stylish / Trending / Viral / On Fire / Buzzing / In vouge / Hot / Stylish /" />
           </div>
         </FadeUp>
             
@@ -281,7 +281,7 @@ export default function NewspaperSlider() {
 
       <FadeUp delay={0.5}>
           <div className="my-6 py-1 bg-black/10 backdrop-blur-sm">
-            <Marquee text="Brand-New / Up-To-Date / Lastest / New-Arrival / Just-In / " />
+            <Marquee text="/ Brand-New / Up-To-Date / Lastest / New-Arrival / Just-In / Brand-New / Up-To-Date / Lastest / New-Arrival / Just-In /" />
           </div>
         </FadeUp>
 

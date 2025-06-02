@@ -10,8 +10,9 @@ import ChatSpeedDial from "@/features/chatbot/components/chat-speed-dial";
 import { usePathname } from 'next/navigation';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Toaster } from '@/components/ui/sonner';
+import { useState } from "react";
 
-const queryClient = new QueryClient();
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -50,6 +51,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const [queryClient] = useState(() => new QueryClient());
   const pathname = usePathname();
   const noLayout = pathname === '/login';
 
@@ -60,13 +62,13 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preload" href="/background.jpg" as="image" />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} ${metalMania.variable} ${cinzel.variable} antialiased text-gray-900`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${metalMania.variable} ${cinzel.variable} antialiased text-gray-900 overlay-scroll`}>
       <QueryClientProvider client={queryClient}>
         {noLayout ? (
        
           <div className="flex flex-col min-h-screen relative">
             {children}
-            <Footer />
+         
           </div>
           
         ) : (
@@ -106,6 +108,7 @@ export default function RootLayout({
         </Script>
         <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
+         <Toaster />
       </body>
     </html>
   );

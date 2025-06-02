@@ -32,13 +32,13 @@ export default function SignupForm() {
   const form = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
       confirmPassword: "",
-      name: "",
-      yearOfBirth: new Date("2000-01-01"),
-      gender: "male",
-      phone: "",
+      firstName: "",
+      lastName: "",
+      email: "",
+      phoneNumber: "",
     },
   });
 
@@ -52,43 +52,65 @@ export default function SignupForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
         <Card variant="decorated">
-          <CardContent className="p-16">
+          <CardContent className="p-12">
             <div className="space-y-4">
               <div className="flex gap-8 items-start">
                 <div className="flex-1 space-y-5">
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-serif text-base whitespace-nowrap">First Name</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <User className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                              <Input 
+                                placeholder="First name" 
+                                className="border-black/20 focus-visible:ring-red-800/20 rounded-none h-11 w-full pl-10" 
+                                {...field} 
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage className="text-red-800" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="font-serif text-base whitespace-nowrap">Last Name</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <User className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                              <Input 
+                                placeholder="Last name" 
+                                className="border-black/20 focus-visible:ring-red-800/20 rounded-none h-11 w-full pl-10" 
+                                {...field} 
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage className="text-red-800" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                   <FormField
                     control={form.control}
-                    name="name"
+                    name="username"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-serif text-base">Full Name</FormLabel>
+                        <FormLabel className="font-serif text-base whitespace-nowrap">Username</FormLabel>
                         <FormControl>
                           <div className="relative">
                             <User className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
                             <Input 
-                              placeholder="Full name" 
-                              className="border-black/20 focus-visible:ring-red-800/20 rounded-none h-11 w-full pl-10" 
-                              {...field} 
-                            />
-                          </div>
-                        </FormControl>
-                        <FormMessage className="text-red-800" />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="font-serif text-base">Email Address</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Mail className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-                            <Input 
-                              placeholder="your.name@example.com" 
+                              placeholder="Enter username" 
                               className="border-black/20 focus-visible:ring-red-800/20 rounded-none h-11 w-full pl-10" 
                               {...field} 
                             />
@@ -106,7 +128,7 @@ export default function SignupForm() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="font-serif text-base">Password</FormLabel>
+                        <FormLabel className="font-serif text-base whitespace-nowrap">Password</FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Lock className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
@@ -151,72 +173,52 @@ export default function SignupForm() {
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-black/10"></div>
                 </div>
-                <div className="relative flex justify-center">
-                  <span className="bg-[#f8f6f3] px-6 text-sm text-gray-500 uppercase tracking-wider font-serif italic">Additional Details</span>
-                </div>
               </div>
 
-              {/* Additional Info Section */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4 place-items-center">
-                <FormField
-                  control={form.control}
-                  name="yearOfBirth"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="font-serif text-base">Birth Year</FormLabel>
-                      <FormControl>
-                        <DatePickerDemo {...field} />
-                      </FormControl>
-                      <FormMessage className="text-red-800" />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="font-serif text-base whitespace-nowrap">Phone Number</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Phone className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-                          <Input 
-                            placeholder="(123) 456-7890" 
-                            className="border-black/20 focus-visible:ring-red-800/20 rounded-none h-11 w-full pl-10" 
-                            {...field} 
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage className="text-red-800" />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="gender"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="font-serif text-base">Gender</FormLabel>
-                      <div className="relative">
-                        <Users className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 z-10" />
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger className="border-black/20 focus:ring-red-800/20 rounded-none w-full pl-10">
-                              <SelectValue placeholder="Select" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent className="rounded-none">
-                            <SelectItem value="male">Male</SelectItem>
-                            <SelectItem value="female">Female</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <FormMessage className="text-red-800" />
-                    </FormItem>
-                  )}
-                />
+              {/* Contact Info Section */}
+              <div className="px-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-serif text-base">Email Address</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Mail className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                            <Input 
+                              placeholder="your.name@example.com" 
+                              className="border-black/20 focus-visible:ring-red-800/20 rounded-none h-11 w-full pl-10" 
+                              {...field} 
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage className="text-red-800" />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="phoneNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-serif text-base whitespace-nowrap">Phone Number</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Phone className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                            <Input 
+                              placeholder="(123) 456-7890" 
+                              className="border-black/20 focus-visible:ring-red-800/20 rounded-none h-11 w-full pl-10" 
+                              {...field} 
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage className="text-red-800" />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
             </div>
           </CardContent>
@@ -224,15 +226,11 @@ export default function SignupForm() {
 
         <Button 
           type="submit" 
-          className="w-full bg-red-800 hover:bg-red-900 font-serif rounded-none h-12 text-lg"
+          className="w-full bg-red-800 hover:bg-red-900 text-white/90 font-serif rounded-none h-12 text-lg"
           disabled={signup.isPending}
         >
           {signup.isPending ? 'Creating Account...' : 'Create Account'}
         </Button>
-        
-        <div className="text-center font-serif text-xs text-gray-500 italic">
-          Join our exclusive community of fashion enthusiasts
-        </div>
       </form>
     </Form>
   );
