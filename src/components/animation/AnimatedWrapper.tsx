@@ -1,6 +1,6 @@
 "use client";
 import { motion, HTMLMotionProps } from 'framer-motion';
-import { useEffect, useState, ReactNode } from 'react';
+import { useEffect, useState, ReactNode, useRef } from 'react';
 
 interface AnimatedTextProps {
   children: ReactNode;
@@ -28,6 +28,8 @@ interface MarqueeProps {
   speed?: number;
   className?: string;
   textClassName?: string;
+  gap?: number;
+  duplicates?: number;
 }
 
 interface ClientAnimatedSectionProps extends HTMLMotionProps<"section"> {
@@ -160,26 +162,34 @@ export const Marquee = ({
   text = "",
   speed = 20,
   className = "relative overflow-hidden w-full py-4",
-  textClassName = "mx-6 font-metal text-sm uppercase tracking-wider text-[#660000]"
+  textClassName = "mx-6 font-metal text-sm uppercase tracking-wider text-[#660000]",
+  gap = 64,
+  duplicates = 8
 }: MarqueeProps) => {
   return (
     <div className={className}>
       <motion.div
-        className="flex  whitespace-nowrap"
-        animate={{ x: ['0%', '-50%'] }}
+        className="flex whitespace-nowrap"
+        animate={{ 
+          x: [0, -2000] 
+        }}
         transition={{
           ease: 'linear',
           duration: speed,
           repeat: Infinity,
+          repeatType: 'loop'
         }}
+        style={{ willChange: 'transform' }}
       >
-        {[...Array(2)].map((_, i) => (
-          <div key={i} className="flex space-x-16 px-4">
-            {[...Array(3)].map((_, j) => (
-              <h1
-                key={`${i}-${j}`}
-                className={textClassName}
-              >
+       
+        {[...Array(4)].map((setIndex) => (
+          <div 
+            key={setIndex}
+            className="flex items-center shrink-0"
+            style={{ gap: `${gap}px`, marginRight: `${gap}px` }}
+          >
+            {[...Array(duplicates)].map((_, i) => (
+              <h1 key={`${setIndex}-${i}`} className={textClassName}>
                 {text}
               </h1>
             ))}
@@ -239,7 +249,3 @@ export const ClientAnimatedSection = ({
     </motion.section>
   );
 };
-
-
-
-

@@ -1,13 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, X, Search, Heart, User, ShoppingBag } from "lucide-react";
+import { Menu, X, Search, Heart, User, ShoppingBag, LogOut, UserCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showMasthead, setShowMasthead] = useState(true);
+  const [isClient, setIsClient] = useState(false);
+  const { isAuthenticated, logout, isLoading } = useAuth();
+
+  // Prevent hydration mismatch and auth flash
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -33,18 +48,111 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', throttledHandleScroll);
   }, []);
 
+  // Don't render auth-dependent UI until client-side hydration is complete
+  const renderAuthUI = () => {
+    if (!isClient || isLoading) {
+      // Show a skeleton placeholder while loading
+      return (
+        <div className="flex items-center space-x-4">
+          <Skeleton className="w-8 h-8" />
+        </div>
+      );
+    }
+
+    if (isAuthenticated) {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="p-2 text-black/80 hover:text-[#660000]">
+              <User className="h-5 w-5" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem asChild>
+              <Link href="/profile" className="flex items-center cursor-pointer">
+                <UserCircle className="mr-2 h-4 w-4" />
+                <span>Profile</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => logout()}
+              className="flex items-center cursor-pointer text-red-600"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Logout</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    }
+
+    return (
+      <Link 
+        href="/login" 
+        className="px-3 py-1 border border-black text-black text-xs font-metal hover:bg-black hover:text-white transition-colors"
+      >
+        LOGIN
+      </Link>
+    );
+  };
+
+  const renderMobileAuthUI = () => {
+    if (!isClient || isLoading) {
+      return (
+        <div className="flex items-center">
+          <Skeleton className="w-20 h-6" />
+        </div>
+      );
+    }
+
+    if (isAuthenticated) {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center text-black hover:text-[#660000]">
+              <User className="h-5 w-5 mr-2" />
+              <span className="font-gothic">Account</span>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem asChild>
+              <Link href="/profile" className="flex items-center cursor-pointer">
+                <UserCircle className="mr-2 h-4 w-4" />
+                <span>Profile</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => logout()}
+              className="flex items-center cursor-pointer text-red-600"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Logout</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    }
+
+    return (
+      <Link 
+        href="/login" 
+        className="px-3 py-1.5 text-black/80 hover:text-[#660000] font-gothic tracking-widest text-xs border border-black/20 hover:border-[#660000]/50 transition-colors"
+      >
+        LOGIN
+      </Link>
+    );
+  };
+
   return (
     <motion.nav 
-      className="w-full fixed z-50 bg-white/80 backdrop-blur-md border-b-2 border-black"
+      className="w-full fixed z-50 bg-white/80 backdrop-blur-md border-b-2 border-black "
       initial={false}
     >
       <div className="h-1 w-full bg-[#660000]/80"></div>
-      
-      {/* Glassmorphism decorative elements */}
+    
       <div className="absolute top-12 left-16 w-32 h-32 bg-[#660000]/10 rounded-full blur-2xl"></div>
       <div className="absolute top-8 right-16 w-24 h-24 bg-black/5 rounded-full blur-xl"></div>
       
-      {/* Masthead - Magazine Style Header with Glassmorphism */}
       <motion.div
         className="overflow-hidden"
         animate={{ 
@@ -123,19 +231,28 @@ const Navbar = () => {
 
           {/* User Controls */}
           <div className="hidden md:flex items-center space-x-4">
-            <button className="p-2 text-black/80 hover:text-[#660000] ">
-              <Search className="h-5 w-5" />
-            </button>
-            <button className="p-2 text-black/80 hover:text-[#660000] ">
-              <Heart className="h-5 w-5" />
-            </button>
-            <button className="p-2 text-black/80 hover:text-[#660000] ">
-              <User className="h-5 w-5" />
-            </button>
-            <button className="p-2 text-black/80 hover:text-[#660000] relative ">
-              <ShoppingBag className="h-5 w-5" />
-              <span className="absolute top-0 right-0 h-4 w-4 rounded-full bg-[#660000]/90  text-white text-[10px] flex items-center justify-center font-medium shadow-sm">3</span>
-            </button>
+            {isClient ? (
+              <>
+                <button className="p-2 text-black/80 hover:text-[#660000]">
+                  <Search className="h-5 w-5" />
+                </button>
+                <button className="p-2 text-black/80 hover:text-[#660000]">
+                  <Heart className="h-5 w-5" />
+                </button>
+                <button className="p-2 text-black/80 hover:text-[#660000] relative">
+                  <ShoppingBag className="h-5 w-5" />
+                  <span className="absolute top-0 right-0 h-4 w-4 rounded-full bg-[#660000]/90 text-white text-[10px] flex items-center justify-center font-medium shadow-sm">3</span>
+                </button>
+                {renderAuthUI()}
+              </>
+            ) : (
+              <>
+                <Skeleton className="w-8 h-8" />
+                <Skeleton className="w-8 h-8" />
+                <Skeleton className="w-8 h-8" />
+                <Skeleton className="w-8 h-8" />
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -203,10 +320,7 @@ const Navbar = () => {
                   <Heart className="h-5 w-5 mr-2" />
                   <span className="font-gothic">Wishlist</span>
                 </Link>
-                <Link href="/account" className="flex items-center text-black hover:text-[#660000]">
-                  <User className="h-5 w-5 mr-2" />
-                  <span className="font-gothic">Account</span>
-                </Link>
+                {renderMobileAuthUI()}
                 <Link href="/cart" className="flex items-center text-black hover:text-[#660000]">
                   <ShoppingBag className="h-5 w-5 mr-2" />
                   <span className="font-gothic">Cart (3)</span>
