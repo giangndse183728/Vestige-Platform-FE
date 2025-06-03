@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ROUTES } from "@/constants/routes";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -207,11 +208,11 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center justify-center space-x-8 mx-auto ">
             {[
-              { name: "SHOP", path: "/shop" },
-              { name: "DESIGNERS", path: "/designers" },
-              { name: "COLLECTIONS", path: "/collections" },
-              { name: "EDITORIAL", path: "/editorial" },
-              { name: "ABOUT", path: "/about" }
+              { name: "SHOP", path: ROUTES.SHOP },
+              { name: "DESIGNERS", path: ROUTES.DESIGNERS },
+              { name: "COLLECTIONS", path: ROUTES.COLLECTIONS },
+              { name: "EDITORIAL", path: ROUTES.EDITORIAL },
+              { name: "SUBSCRIPTION", path: ROUTES.ABOUT }
             ].map((item, index) => (
               <Link
                 key={item.name}
@@ -296,11 +297,11 @@ const Navbar = () => {
               {/* Mobile menu items */}
               <div className="space-y-0">
                 {[
-                  { name: "SHOP", path: "/shop" },
-                  { name: "DESIGNERS", path: "/designers" },
-                  { name: "COLLECTIONS", path: "/collections" },
-                  { name: "EDITORIAL", path: "/editorial" },
-                  { name: "ABOUT", path: "/about" }
+                  { name: "SHOP", path: ROUTES.SHOP },
+                  { name: "DESIGNERS", path: ROUTES.DESIGNERS },
+                  { name: "COLLECTIONS", path: ROUTES.COLLECTIONS },
+                  { name: "EDITORIAL", path: ROUTES.EDITORIAL },
+                  { name: "ABOUT", path: ROUTES.ABOUT }
                 ].map((item) => (
                   <Link
                     key={item.name}

@@ -181,15 +181,14 @@ export const Marquee = ({
         }}
         style={{ willChange: 'transform' }}
       >
-       
-        {[...Array(4)].map((setIndex) => (
+        {[...Array(4)].map((_, setIndex) => (
           <div 
-            key={setIndex}
+            key={`marquee-set-${setIndex}`}
             className="flex items-center shrink-0"
             style={{ gap: `${gap}px`, marginRight: `${gap}px` }}
           >
             {[...Array(duplicates)].map((_, i) => (
-              <h1 key={`${setIndex}-${i}`} className={textClassName}>
+              <h1 key={`marquee-item-${setIndex}-${i}`} className={textClassName}>
                 {text}
               </h1>
             ))}
