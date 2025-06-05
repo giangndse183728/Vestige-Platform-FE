@@ -9,7 +9,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Progress } from '@/components/ui/progress';
 import { Star, Shield, Calendar, User, TrendingUp, Award, Edit3, Save, X, Camera } from 'lucide-react';
 import { useProfile } from '../hooks/useProfile';
 import { profileFormSchema, ProfileFormData } from '../schema';
@@ -54,7 +53,6 @@ export const Profile = () => {
 
   const handleSave = async () => {
     try {
-      // Validate the form data
       const validatedData = profileFormSchema.parse(editData);
       await updateProfile(validatedData);
       setIsEditing(false);
@@ -92,7 +90,6 @@ export const Profile = () => {
 
   return (
     <div className="p-6 bg-[#f8f7f3]/60 min-h-screen">
-      {/* Newspaper Header */}
       <div className="border-t-4 border-b-4 border-black py-4 mb-6">
         <div className="text-center">
           <h1 className="font-metal text-4xl font-bold text-black tracking-wider">
@@ -114,7 +111,6 @@ export const Profile = () => {
       <div className="max-w-6xl mx-auto">
         <div className="border-2 border-black p-6 mb-6">
           <div className="flex flex-col lg:flex-row gap-8">
-            {/* Avatar Section */}  
             <div className="flex-shrink-0">
               <div className="relative">
                 <div className="w-100 h-80 bg-gray-200 border-4 border-black flex items-center justify-center">
@@ -149,7 +145,6 @@ export const Profile = () => {
               </div>
             </div>
 
-            {/* Profile Information */}
             <div className="flex-1">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="font-metal text-2xl font-bold text-black border-b-2 border-black pb-1">
@@ -175,7 +170,6 @@ export const Profile = () => {
               </div>
 
               {!isEditing ? (
-                // Display Mode
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div className="border-b border-black pb-2">
@@ -217,7 +211,6 @@ export const Profile = () => {
                   </div>
                 </div>
               ) : (
-                // Edit Mode
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div>
@@ -308,7 +301,6 @@ export const Profile = () => {
             ACTIVITY & STATISTICS
           </h4>
           
-          {/* Rating and Trust Scores */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <div className="border border-black p-4">
               <div className="flex items-center justify-between mb-2">
@@ -379,7 +371,6 @@ export const Profile = () => {
             </div>
           </div>
 
-          {/* Sales Performance */}
           <div className="border border-black p-4">
             <h5 className="font-metal text-lg font-bold text-black mb-4">SALES PERFORMANCE</h5>
             <div className="flex items-center justify-between mb-2">
@@ -405,7 +396,6 @@ export const Profile = () => {
         </div>
       </div>
 
-      {/* Footer */}
       <div className="mt-8 border-t-2 border-black pt-4 text-center">
         <p className="font-gothic text-xs text-gray-500">
           THE PROFILE HERALD • Published by Community Editorial Board • All Rights Reserved

@@ -17,7 +17,6 @@ export const useProfile = () => {
     queryKey: authKeys.user(),
     queryFn: getProfile,
     staleTime: 1000 * 60 * 5,
-    refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
 
