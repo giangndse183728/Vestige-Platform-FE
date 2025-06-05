@@ -45,4 +45,38 @@ export const profileUserSchema = profileFormSchema.extend({
 
 export type ProfileFormData = z.infer<typeof profileFormSchema>;
 export type ProfileStats = z.infer<typeof profileStatsSchema>;
-export type ProfileUser = z.infer<typeof profileUserSchema>; 
+export type ProfileUser = z.infer<typeof profileUserSchema>;
+
+export const addressSchema = z.object({
+  addressId: z.number(),
+  addressLine1: z.string(),
+  addressLine2: z.string().nullable(),
+  city: z.string(),
+  state: z.string(),
+  postalCode: z.string(),
+  country: z.string(),
+  isDefault: z.boolean(),
+  createdAt: z.string()
+});
+
+export const addressFormSchema = z.object({
+  addressLine1: z.string().min(1, 'Address line 1 is required'),
+  addressLine2: z.string().nullable(),
+  city: z.string().min(1, 'City is required'),
+  state: z.string().min(1, 'State is required'),
+  postalCode: z.string().min(1, 'Postal code is required'),
+  country: z.string().min(1, 'Country is required'),
+  isDefault: z.boolean().default(false)
+});
+
+export const addressesResponseSchema = z.object({
+  status: z.string(),
+  message: z.string(),
+  data: z.array(addressSchema),
+  metadata: z.record(z.any()),
+  errors: z.array(z.string())
+});
+
+export type Address = z.infer<typeof addressSchema>;
+export type AddressFormData = z.infer<typeof addressFormSchema>;
+export type AddressesResponse = z.infer<typeof addressesResponseSchema>; 

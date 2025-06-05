@@ -14,6 +14,10 @@ import { useProfile } from '../hooks/useProfile';
 import { profileFormSchema, ProfileFormData } from '../schema';
 import { ProfileSkeleton } from './ProfileSkeleton';
 import { toast } from 'sonner';
+import { useAddresses } from '../hooks/useAddresses';
+import { AddressForm } from './AddressForm';
+import { AddressList } from './AddressList';
+import { AddressFormData, Address } from '../schema';
 
 export const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -26,8 +30,22 @@ export const Profile = () => {
     bio: null,
     profilePictureUrl: null
   });
+  const [isAddingAddress, setIsAddingAddress] = useState(false);
+  const [editingAddress, setEditingAddress] = useState<Address | null>(null);
 
   const { user, isLoading, error, updateProfile, isUpdating } = useProfile();
+  const {
+    addresses,
+    isLoading: isLoadingAddresses,
+    createAddress,
+    updateAddress,
+    deleteAddress,
+    setDefaultAddress,
+    isCreating,
+    isUpdating: isUpdatingAddresses,
+    isDeleting,
+    isSettingDefault
+  } = useAddresses();
 
   const formatDate = (dateString: string): string => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -76,6 +94,31 @@ export const Profile = () => {
     }));
   };
 
+  const handleAddAddress = () => {
+    setEditingAddress(null);
+    setIsAddingAddress(true);
+  };
+
+  const handleEditAddress = (address: Address) => {
+    setEditingAddress(address);
+    setIsAddingAddress(true);
+  };
+
+  const handleCancelAddress = () => {
+    setIsAddingAddress(false);
+    setEditingAddress(null);
+  };
+
+  const handleSubmitAddress = async (data: AddressFormData) => {
+    if (editingAddress) {
+      await updateAddress({ addressId: editingAddress.addressId, data });
+    } else {
+      await createAddress(data);
+    }
+    setIsAddingAddress(false);
+    setEditingAddress(null);
+  };
+
   if (isLoading) {
     return <ProfileSkeleton />;
   }
@@ -89,7 +132,7 @@ export const Profile = () => {
   }
 
   return (
-    <div className="p-6 bg-[#f8f7f3]/60 min-h-screen">
+    <div className="p-6 bg-[#f8f7f3]/80 min-h-screen">
       <div className="border-t-4 border-b-4 border-black py-4 mb-6">
         <div className="text-center">
           <h1 className="font-metal text-4xl font-bold text-black tracking-wider">
@@ -393,6 +436,46 @@ export const Profile = () => {
               This member maintains an active presence and continues to contribute positively to our community.
             </p>
           </div>
+        </div>
+
+        {/* Add this section after the Activity & Statistics section */}
+        <div className="border-2 border-black p-6 mt-6">
+          <div className="flex items-center justify-between mb-6">
+            <h4 className="font-metal text-2xl font-bold text-black border-b-2 border-black pb-1">
+              ADDRESSES
+            </h4>
+            {!isAddingAddress && (
+              <Button
+                onClick={handleAddAddress}
+                className="bg-black text-white hover:bg-gray-800"
+              >
+                Add New Address
+              </Button>
+            )}
+          </div>
+
+          {isAddingAddress ? (
+            <div className="border-2 border-black p-6">
+              <h5 className="font-metal text-xl mb-4">
+                {editingAddress ? 'Edit Address' : 'Add New Address'}
+              </h5>
+              <AddressForm
+                initialData={editingAddress || undefined}
+                onSubmit={handleSubmitAddress}
+                onCancel={handleCancelAddress}
+                isSubmitting={isCreating || isUpdatingAddresses}
+              />
+            </div>
+          ) : (
+            <AddressList
+              addresses={addresses}
+              onEdit={handleEditAddress}
+              onDelete={deleteAddress}
+              onSetDefault={setDefaultAddress}
+              isDeleting={isDeleting}
+              isSettingDefault={isSettingDefault}
+            />
+          )}
         </div>
       </div>
 
