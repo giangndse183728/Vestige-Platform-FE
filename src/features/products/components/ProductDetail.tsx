@@ -2,6 +2,8 @@ import Image from 'next/image';
 import { Star, Heart, Eye, Truck, Shield, Clock, UserCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useCartStore } from '@/features/cart/hooks';
+import { toast } from 'sonner';
 
 interface Seller {
   userId: number;
@@ -64,6 +66,31 @@ interface ProductDetailProps {
 }
 
 export function ProductDetail({ product }: ProductDetailProps) {
+  const addToCart = useCartStore((state) => state.addItem);
+
+  const handleAddToCart = () => {
+    addToCart({
+      productId: product.productId,
+      title: product.title,
+      price: product.price,
+      imageUrl: product.images[0]?.imageUrl || '/rick.png',
+      size: product.size || null,
+      color: product.color || null,
+      seller: {
+        username: product.seller.username,
+        firstName: product.seller.firstName,
+        lastName: product.seller.lastName,
+      },
+      brand: {
+        name: product.brand.name,
+      },
+      category: {
+        name: product.category.name,
+      },
+    });
+    toast.success('Added to cart');
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -217,7 +244,10 @@ export function ProductDetail({ product }: ProductDetailProps) {
               <button className="w-full bg-[var(--dark-red)] text-white py-3 font-medium hover:bg-[var(--dark-red)]/90 transition-colors border-2 border-black -mr-[2px] -mb-[2px]">
                 Buy Now
               </button>
-              <Button variant="corner-red" >
+              <Button 
+                variant="corner-red" 
+                onClick={handleAddToCart}
+              >
                 Add to Cart
               </Button>
               

@@ -59,23 +59,38 @@ api.interceptors.response.use(
 
       try {
         const refreshToken = localStorage.getItem("refreshToken");
+        
+        if (!refreshToken) {
+          throw new Error("No refresh token available");
+        }
 
         const res = await axios.post(
-          `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3001/api"}/auth/refresh`,
+          `${process.env.NEXT_PUBLIC_APP_API_URL || "http://localhost:3001/api"}/auth/refresh`,
           { refreshToken },
-          { withCredentials: true }
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            withCredentials: true
+          }
         );
 
-        const newToken = res.data.accessToken;
+        if (res.data?.accessToken) {
+          localStorage.setItem("accessToken", res.data.accessToken);
+          if (res.data.refreshToken) {
+            localStorage.setItem("refreshToken", res.data.refreshToken);
+          }
+          
+          processQueue(null, res.data.accessToken);
+          originalRequest.headers.Authorization = `Bearer ${res.data.accessToken}`;
 
-        localStorage.setItem("authToken", newToken);
-        processQueue(null, newToken);
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
-
-        return api(originalRequest);
+          return api(originalRequest);
+        } else {
+          throw new Error("Invalid refresh token response");
+        }
       } catch (err) {
         processQueue(err, null);
-        localStorage.removeItem("authToken");
+        localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         window.location.href = "/login";
         return Promise.reject(err);
@@ -89,7 +104,6 @@ api.interceptors.response.use(
 );
 
 export default api;
-
 
 export type ApiResponse<T> = {
   status: string;

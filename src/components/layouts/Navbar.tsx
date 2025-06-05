@@ -6,6 +6,7 @@ import { Menu, X, Search, Heart, User, ShoppingBag, LogOut, UserCircle } from "l
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useCartStore } from "@/features/cart/hooks";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,6 +22,7 @@ const Navbar = () => {
   const { isAuthenticated, logout, isLoading } = useAuth();
   const pathname = usePathname();
   const isHomePage = pathname === '/';
+  const totalItems = useCartStore((state) => state.totalItems());
 
   // Handle route changes
   useEffect(() => {
@@ -250,10 +252,12 @@ const Navbar = () => {
               <button className="p-2 text-black/80 hover:text-[#660000]">
                 <Heart className="h-5 w-5" />
               </button>
-              <button className="p-2 text-black/80 hover:text-[#660000] relative">
+              <Link href="/cart" className="p-2 text-black/80 hover:text-[#660000] relative">
                 <ShoppingBag className="h-5 w-5" />
-                <span className="absolute top-0 right-0 h-4 w-4 rounded-full bg-[#660000]/90 text-white text-[10px] flex items-center justify-center font-medium shadow-sm">3</span>
-              </button>
+                <span className="absolute top-0 right-0 h-4 w-4 rounded-full bg-[#660000]/90 text-white text-[10px] flex items-center justify-center font-medium shadow-sm">
+                  {totalItems || 0}
+                </span>
+              </Link>
               {renderAuthUI()}
             </>
           </div>
@@ -326,7 +330,7 @@ const Navbar = () => {
                 {renderMobileAuthUI()}
                 <Link href="/cart" className="flex items-center text-black hover:text-[#660000]">
                   <ShoppingBag className="h-5 w-5 mr-2" />
-                  <span className="font-gothic">Cart (3)</span>
+                  <span className="font-gothic">Cart {totalItems > 0 && `(${totalItems})`}</span>
                 </Link>
               </div>
             </div>
