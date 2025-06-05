@@ -1,3 +1,5 @@
+'use client';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { login, signup, logout } from '../services';
@@ -8,12 +10,7 @@ import {
   SignupResponse,
 } from '@/features/auth/schema';
 import { toast } from 'sonner';
-import { useCurrentUser } from './useCurrentUser';
-
-export const authKeys = {
-  all: ['auth'] as const,
-  user: () => [...authKeys.all, 'user'] as const,
-};
+import { useProfile } from '@/features/profile/hooks/useProfile';
 
 export const useLogin = () => {
   const router = useRouter();
@@ -22,7 +19,7 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: (credentials: LoginFormData) => login(credentials),
     onSuccess: (data: LoginResponse) => {
-      queryClient.invalidateQueries({ queryKey: authKeys.user() });
+      queryClient.invalidateQueries({ queryKey: ['user'] });
       toast.success('Login successful!');
       router.push('/');
     },
@@ -37,10 +34,12 @@ export const useSignup = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (userData: SignupFormData) => signup(userData),
+    mutationFn: (formData: SignupFormData) => {
+      const { confirmPassword, ...payload } = formData;
+      return signup(payload);
+    },
     onSuccess: (data: SignupResponse) => {
-
-      queryClient.invalidateQueries({ queryKey: authKeys.user() });
+      queryClient.invalidateQueries({ queryKey: ['user'] });
       toast.success('Account created successfully!');
       router.push('/');
     },
@@ -72,7 +71,7 @@ export const useLogout = () => {
 };
 
 export const useAuth = () => {
-  const { data: user, isLoading, error } = useCurrentUser();
+  const { user, isLoading, error } = useProfile();
 
   const loginMutation = useLogin();
   const signupMutation = useSignup();

@@ -1,5 +1,6 @@
 import api from '@/libs/axios'
-import { LoginFormData, SignupFormData, LoginResponse, SignupResponse, AuthUser } from './schema'
+import { ApiResponse } from '@/libs/axios'
+import { LoginFormData, SignupFormData, SignupPayload, LoginResponse, SignupResponse, AuthUser } from './schema'
 
 export async function login(credentials: LoginFormData): Promise<LoginResponse> {
   try {
@@ -17,9 +18,9 @@ export async function login(credentials: LoginFormData): Promise<LoginResponse> 
 }
 
 
-export async function signup(userData: SignupFormData): Promise<SignupResponse> {
+export async function signup(userData: SignupPayload): Promise<SignupResponse> {
   try {
-    const response = await api.post<SignupResponse>('/auth/signup', userData)
+    const response = await api.post<SignupResponse>('/auth/register', userData)
 
     if (response.data) {
       localStorage.setItem('accessToken', response.data.accessToken)
@@ -45,6 +46,6 @@ export async function logout(): Promise<void> {
 }
 
 export const getCurrentUser = async (): Promise<AuthUser> => {
-    const response = await api.get<AuthUser>('/users/profile');
-    return response.data;
-  };
+  const response = await api.get<ApiResponse<AuthUser>>('/users/profile');
+  return response.data.data;
+};

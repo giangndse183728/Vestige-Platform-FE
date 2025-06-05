@@ -12,6 +12,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from '@/components/ui/sonner';
 import { useState } from "react";
+import { ROUTES_NO_LAYOUT } from "@/constants/routes";
 
 
 const geistSans = Geist({
@@ -53,7 +54,7 @@ export default function RootLayout({
 }) {
   const [queryClient] = useState(() => new QueryClient());
   const pathname = usePathname();
-  const noLayout = pathname === '/login';
+  const noLayout = ROUTES_NO_LAYOUT.includes(pathname);
 
   return (
     <html lang="en">
@@ -66,10 +67,12 @@ export default function RootLayout({
       <QueryClientProvider client={queryClient}>
         {noLayout ? (
        
-          <div className="flex flex-col min-h-screen relative">
-            {children}
-         
-          </div>
+       <main className="flex-1 relative z-10">
+       <div className="absolute inset-0 bg-[url('/background.jpg')] bg-cover bg-center bg-fixed opacity-95 pointer-events-none"></div>
+       <div className="relative z-10 ">
+         {children}
+       </div>
+     </main>
           
         ) : (
           <div className="flex flex-col min-h-screen relative">

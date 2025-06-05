@@ -10,3 +10,5 @@ export const ROUTES = {
     ABOUT: "/about"
   };
   
+export const ROUTES_NO_LAYOUT = ["/login", "/profile"];
+  

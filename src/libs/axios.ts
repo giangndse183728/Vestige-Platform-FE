@@ -89,3 +89,11 @@ api.interceptors.response.use(
 );
 
 export default api;
+
+
+export type ApiResponse<T> = {
+  status: string;
+  message: string;
+  data: T;
+};
+
