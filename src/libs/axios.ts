@@ -1,4 +1,3 @@
-// lib/axios.ts
 import axios from "axios";
 
 const api = axios.create({
@@ -40,7 +39,7 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 403 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       if (isRefreshing) {
@@ -71,7 +70,7 @@ api.interceptors.response.use(
             headers: {
               "Content-Type": "application/json",
             },
-            withCredentials: true
+          
           }
         );
 
@@ -92,7 +91,7 @@ api.interceptors.response.use(
         processQueue(err, null);
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
-        window.location.href = "/login";
+    
         return Promise.reject(err);
       } finally {
         isRefreshing = false;

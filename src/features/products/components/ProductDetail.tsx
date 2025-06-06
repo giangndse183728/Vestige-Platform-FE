@@ -47,7 +47,6 @@ interface Product {
   size: string | null;
   color: string | null;
   authenticityConfidenceScore: number;
-  shippingFee: number;
   status: string;
   viewsCount: number;
   likesCount: number;
@@ -179,7 +178,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 </span>
               )}
             </div>
-            <p className="text-sm text-gray-600">Shipping: ${product.shippingFee.toFixed(2)}</p>
+          
           </div>
           </CardContent>
           </Card>
