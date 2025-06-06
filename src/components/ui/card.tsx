@@ -1,9 +1,9 @@
 import * as React from "react"
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/libs/cn";
 
 interface CardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
-  variant?: "default" | "decorated";
+  variant?: "default" | "decorated" | "decorated-image";
   contentPadding?: string;
 }
 
@@ -11,6 +11,8 @@ const Card = React.forwardRef<
   HTMLDivElement,
   CardProps
 >(({ className, variant = "default", contentPadding, children, ...props }, ref) => {
+ 
+
   if (variant === "decorated") {
     return (
       <div
@@ -21,28 +23,28 @@ const Card = React.forwardRef<
         )}
         {...props}
       >
-        <div className="absolute inset-0 bg-white/80 border border-black/10"></div>
-        <div className="absolute inset-0 border-2 border-dashed border-black/10 m-4"></div>
+        <div className="absolute inset-0 bg-white/80 border border-black/10 z-0"></div>
+        <div className="absolute inset-0 border-2 border-dashed border-black/10 m-4 z-0"></div>
         
         {/* Decorative corners */}
-        <div className="absolute top-0 left-0 w-10 h-10">
+        <div className="absolute top-0 left-0 w-10 h-10 z-30">
           <div className="absolute top-0 left-0 w-full h-full border-t-2 border-l-2 border-black/40"></div>
           <div className="absolute top-3 left-3 w-3 h-3 bg-red-800/80 rotate-45"></div>
         </div>
-        <div className="absolute top-0 right-0 w-10 h-10">
+        <div className="absolute top-0 right-0 w-10 h-10 z-30">
           <div className="absolute top-0 right-0 w-full h-full border-t-2 border-r-2 border-black/40"></div>
           <div className="absolute top-3 right-3 w-3 h-3 bg-red-800/80 rotate-45"></div>
         </div>
-        <div className="absolute bottom-0 left-0 w-10 h-10">
+        <div className="absolute bottom-0 left-0 w-10 h-10 z-30">
           <div className="absolute bottom-0 left-0 w-full h-full border-b-2 border-l-2 border-black/40"></div>
           <div className="absolute bottom-3 left-3 w-3 h-3 bg-red-800/80 rotate-45"></div>
         </div>
-        <div className="absolute bottom-0 right-0 w-10 h-10">
+        <div className="absolute bottom-0 right-0 w-10 h-10 z-30">
           <div className="absolute bottom-0 right-0 w-full h-full border-b-2 border-r-2 border-black/40"></div>
           <div className="absolute bottom-3 right-3 w-3 h-3 bg-red-800/80 rotate-45"></div>
         </div>
         
-        <div className="relative z-10">
+        <div className="relative z-20 h-full w-full">
           {children}
         </div>
       </div>
@@ -131,12 +133,28 @@ const CardDescription = React.forwardRef<
 ))
 CardDescription.displayName = "CardDescription"
 
+interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {
+  forImage?: boolean;
+}
+
 const CardContent = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
-))
+  CardContentProps
+>(({ className, forImage = false, ...props }, ref) => {
+  if (forImage) {
+    return (
+      <div 
+        ref={ref} 
+        className={cn("absolute inset-4 z-40", className)} 
+        {...props} 
+      />
+    );
+  }
+  
+  return (
+    <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+  );
+})
 CardContent.displayName = "CardContent"
 
 const CardFooter = React.forwardRef<
@@ -151,4 +169,4 @@ const CardFooter = React.forwardRef<
 ))
 CardFooter.displayName = "CardFooter"
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } 
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
