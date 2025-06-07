@@ -21,8 +21,9 @@ const buttonVariants = cva(
         double:
           "relative border-2 border-black rounded-none px-[10px] py-[20px] pt-[25px] bg-transparent text-black transition-all cursor-pointer after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:right-[4px] after:bottom-[4px] after:border-2 after:border-gray-500 after:-z-[1] after:transition-all hover:after:border-[rgb(150,1,1)]",
         date:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        "corner-red":
+          "relative border-2 border-black rounded-none bg-white text-black transition-all cursor-pointer h-[50px] min-h-[50px] px-6 before:content-[''] before:absolute before:top-[4px] before:left-[4px] before:w-[10px] before:h-[10px] before:border-t-2 before:border-l-2 before:border-red-800 before:transition-all hover:before:top-[8px] hover:before:left-[8px] after:content-[''] after:absolute after:top-[4px] after:right-[4px] after:w-[10px] after:h-[10px] after:border-t-2 after:border-r-2 after:border-red-800 after:transition-all hover:after:top-[8px] hover:after:right-[8px] [&>span]:before:content-[''] [&>span]:before:absolute [&>span]:before:bottom-[4px] [&>span]:before:left-[4px] [&>span]:before:w-[10px] [&>span]:before:h-[10px] [&>span]:before:border-b-2 [&>span]:before:border-l-2 [&>span]:before:border-red-800 [&>span]:before:transition-all hover:[&>span]:before:bottom-[8px] hover:[&>span]:before:left-[8px] [&>span]:after:content-[''] [&>span]:after:absolute [&>span]:after:bottom-[4px] [&>span]:after:right-[4px] [&>span]:after:w-[10px] [&>span]:after:h-[10px] [&>span]:after:border-b-2 [&>span]:after:border-r-2 [&>span]:after:border-red-800 [&>span]:after:transition-all hover:[&>span]:after:bottom-[8px] hover:[&>span]:after:right-[8px]"
       },
       size: {
         default: "h-10 px-4 py-2",

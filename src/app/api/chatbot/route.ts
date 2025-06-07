@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios, { AxiosError } from 'axios';
 
-// Define error interface
 interface ErrorWithMessage {
   message: string;
 }
 
-// Type guard for ErrorWithMessage
 function isErrorWithMessage(error: unknown): error is ErrorWithMessage {
   return (
     typeof error === 'object' &&
@@ -56,14 +54,14 @@ export async function POST(request: NextRequest) {
         }
       );
       
-      // Return the response
+
       return NextResponse.json({ 
         response: response.data.choices[0].message 
       });
     } catch (error: unknown) {
       console.error('OpenRouter API error:', error);
       
-      // Handle authentication errors specifically
+
       if (axios.isAxiosError(error)) {
         const axiosError = error as AxiosError;
         if (axiosError.response?.status === 401) {
