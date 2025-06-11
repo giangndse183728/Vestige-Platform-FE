@@ -28,7 +28,7 @@ export default function LoginPage() {
             backgroundImage: 'url(https://www.miamidesigndistrict.com/images/listings/large/363_rick-owens_1630503172238324.jpg)',
           }}
         >
-          <div className={`absolute inset-0 bg-black transition-opacity duration-500 ${activeTab === 'signup' ? 'opacity-40' : 'opacity-70'}`} />
+          <div className={`absolute inset-0 bg-black transition-opacity duration-500 ${activeTab === 'signup' ? 'opacity-40' : 'opacity-90'}`} />
         </div>
 
         <div className={`w-full ${activeTab === 'signup' ? 'max-w-3xl' : 'max-w-md'} z-10 transition-all duration-500 ease-in-out`}>
@@ -43,7 +43,7 @@ export default function LoginPage() {
             
                 <h1 className="font-metal text-3xl relative mt-2">
                   <span className="text-black">VES</span>
-                  <span className="text-[#660000]">TIGE</span>
+                  <span className="text-red-900">TIGE</span>
                 </h1>
                 <div className="flex items-center justify-center gap-4 mt-3">
                   <div className="h-px bg-red-800 flex-1 max-w-[60px]"></div>
@@ -62,7 +62,7 @@ export default function LoginPage() {
             
                 <h1 className="font-metal text-3xl relative mt-2">
                   <span className="text-black">VES</span>
-                  <span className="text-[#660000]">TIGE</span>
+                  <span className="text-red-900">TIGE</span>
                 </h1>
               </div>
             )}

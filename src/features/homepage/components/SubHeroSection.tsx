@@ -167,23 +167,16 @@ const SubHeroSection = () => {
                 <p className="font-gothic text-sm uppercase tracking-widest mb-4">Limited Edition Pieces</p>
                 <div className="h-[1px] w-16 bg-black/30 mx-auto mb-4"></div>
                 <p className="font-serif italic text-black/70 mb-6">
-                  Enter code <span className="font-bold not-italic">LEGACY25</span> at checkout
+                  Enter code <span className="font-bold not-italic">WELVES25</span> at checkout
                 </p>
-
-                <MotionDiv
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.98 }}
-                >
                   <Button
                     variant="double"
                     className="font-gothic text-sm uppercase tracking-widest"
                     asChild
                     size={'lg'}
-                    
                   >
                     <a href="/shop/limited-edition">Shop Now</a>
                   </Button>
-                </MotionDiv>
               </div>
             </FadeUp>
 

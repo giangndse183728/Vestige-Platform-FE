@@ -57,7 +57,7 @@ const Navbar = () => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="p-2 text-black/80 hover:text-[#660000]">
+            <button className="p-2 text-black/80 hover:text-red-900">
               <User className="h-5 w-5" />
             </button>
           </DropdownMenuTrigger>
@@ -103,7 +103,7 @@ const Navbar = () => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center text-black hover:text-[#660000]">
+            <button className="flex items-center text-black hover:text-red-900">
               <User className="h-5 w-5 mr-2" />
               <span className="font-gothic">Account</span>
             </button>
@@ -130,7 +130,7 @@ const Navbar = () => {
     return (
       <Link 
         href="/login" 
-        className="px-3 py-1.5 text-black/80 hover:text-[#660000] font-gothic tracking-widest text-xs border border-black/20 hover:border-[#660000]/50 transition-colors"
+        className="px-3 py-1.5 text-black/80 hover:text-red-900 font-gothic tracking-widest text-xs border border-black/20 hover:border-red-900/50 transition-colors"
       >
         LOGIN
       </Link>
@@ -142,9 +142,9 @@ const Navbar = () => {
       className="w-full fixed z-50 bg-white/80 backdrop-blur-md border-b-2 border-black"
       initial={false}
     >
-      <div className="h-1 w-full bg-[#660000]/80"></div>
+      <div className="h-1 w-full bg-red-900/80"></div>
     
-      <div className="absolute top-12 left-16 w-32 h-32 bg-[#660000]/10 rounded-full blur-2xl"></div>
+      <div className="absolute top-12 left-16 w-32 h-32 bg-red-900/10 rounded-full blur-2xl"></div>
       <div className="absolute top-8 right-16 w-24 h-24 bg-black/5 rounded-full blur-xl"></div>
       
       <motion.div
@@ -172,8 +172,8 @@ const Navbar = () => {
             <Link href="/" className="absolute left-1/2 transform -translate-x-1/2 group">
               <h1 className="font-metal text-4xl sm:text-5xl tracking-wider uppercase text-center inline-block relative">
                 <span className="text-black">VES</span>
-                <span className="text-[#660000]">TIGE</span>
-                <span className="absolute -top-2 -right-2 text-[#660000] text-xs">®</span>
+                <span className="text-red-900">TIGE</span>
+                <span className="absolute -top-2 -right-2 text-red-900 text-xs">®</span>
               </h1>
             </Link>
 
@@ -211,8 +211,8 @@ const Navbar = () => {
               <Link href="/" className="group">
                 <h1 className="font-metal text-xl tracking-wider uppercase inline-block relative">
                   <span className="text-black">VES</span>
-                  <span className="text-[#660000]">TIGE</span>
-                  <span className="absolute -top-1 -right-1 text-[#660000] text-[8px]">®</span>
+                  <span className="text-red-900">TIGE</span>
+                  <span className="absolute -top-1 -right-1 text-red-900 text-[8px]">®</span>
                 </h1>
               </Link>
             </motion.div>
@@ -230,11 +230,11 @@ const Navbar = () => {
               <Link
                 key={item.name}
                 href={item.path}
-                className="group relative px-2 py-1 text-black hover:text-[#660000] transition-colors font-gothic tracking-widest text-xs"
+                className="group relative px-2 py-1 text-black hover:text-red-900 transition-colors font-gothic tracking-widest text-xs"
               >
                 <span className="relative">
                   {item.name}
-                  <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#660000] group-hover:w-full transition-all duration-300"></span>
+                  <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-red-900 group-hover:w-full transition-all duration-300"></span>
                 </span>
                 {index < 4 && (
                   <span className="absolute -right-4 top-1/2 transform -translate-y-1/2 text-black/40">/</span>
@@ -246,15 +246,15 @@ const Navbar = () => {
           {/* User Controls */}
           <div className="hidden md:flex items-center space-x-4">
             <>
-              <button className="p-2 text-black/80 hover:text-[#660000]">
+              <button className="p-2 text-black/80 hover:text-red-900">
                 <Search className="h-5 w-5" />
               </button>
-              <button className="p-2 text-black/80 hover:text-[#660000]">
+              <button className="p-2 text-black/80 hover:text-red-900">
                 <Heart className="h-5 w-5" />
               </button>
-              <Link href="/cart" className="p-2 text-black/80 hover:text-[#660000] relative">
+              <Link href="/cart" className="p-2 text-black/80 hover:text-red-900 relative">
                 <ShoppingBag className="h-5 w-5" />
-                <span className="absolute top-0 right-0 h-4 w-4 rounded-full bg-[#660000]/90 text-white text-[10px] flex items-center justify-center font-medium shadow-sm">
+                <span className="absolute top-0 right-0 h-4 w-4 rounded-full bg-red-900/90 text-white text-[10px] flex items-center justify-center font-medium shadow-sm">
                   {totalItems || 0}
                 </span>
               </Link>
@@ -265,7 +265,7 @@ const Navbar = () => {
           {/* Mobile menu button */}
           <button 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden flex items-center justify-center p-2 text-black/80 hover:text-[#660000]"
+            className="md:hidden flex items-center justify-center p-2 text-black/80 hover:text-red-900"
             aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           >
             {isMenuOpen ? (
@@ -312,10 +312,10 @@ const Navbar = () => {
                   <Link
                     key={item.name}
                     href={item.path}
-                    className="flex items-center py-3 text-black hover:text-[#660000] border-b border-black/10 font-gothic"
+                    className="flex items-center py-3 text-black hover:text-red-900 border-b border-black/10 font-gothic"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <span className="mr-3 text-[#660000]">—</span>
+                    <span className="mr-3 text-red-900">—</span>
                     <span>{item.name}</span>
                   </Link>
                 ))}
@@ -323,12 +323,12 @@ const Navbar = () => {
               
               {/* User controls */}
               <div className="flex items-center space-x-4 mt-6 pt-4 border-t border-black/10">
-                <Link href="/wishlist" className="flex items-center text-black hover:text-[#660000]">
+                <Link href="/wishlist" className="flex items-center text-black hover:text-red-900">
                   <Heart className="h-5 w-5 mr-2" />
                   <span className="font-gothic">Wishlist</span>
                 </Link>
                 {renderMobileAuthUI()}
-                <Link href="/cart" className="flex items-center text-black hover:text-[#660000]">
+                <Link href="/cart" className="flex items-center text-black hover:text-red-900">
                   <ShoppingBag className="h-5 w-5 mr-2" />
                   <span className="font-gothic">Cart {totalItems > 0 && `(${totalItems})`}</span>
                 </Link>

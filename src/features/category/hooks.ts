@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getCategories } from './service';
-import { CategoriesResponse } from './schema';
+import { CategoryList } from './schema';
 
 export const categoryKeys = {
   all: ['categories'] as const,
@@ -8,7 +8,7 @@ export const categoryKeys = {
 };
 
 export const useCategories = () => {
-  return useQuery<CategoriesResponse>({
+  return useQuery<CategoryList>({
     queryKey: categoryKeys.lists(),
     queryFn: getCategories,
     initialData: [],

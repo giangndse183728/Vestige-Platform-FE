@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Category } from '../schema';
 
 interface CategorySelectProps {
   value: string;
@@ -23,12 +24,13 @@ export function CategorySelect({
   label = 'Category',
   required = false,
 }: CategorySelectProps) {
-  const { data: categories, isLoading } = useCategories();
+  const { data, isLoading } = useCategories();
+  const categories = data || [];
 
-  // Filter out duplicate categories (those that appear as children)
-  const uniqueCategories = categories?.filter((category) => {
+
+  const uniqueCategories = categories.filter((category: Category) => {
     if (category.parent === null) return true;
-    return !categories.some((c) => c.children?.some((child) => child.categoryId === category.categoryId));
+    return !categories.some((c: Category) => c.children?.some((child: Category) => child.categoryId === category.categoryId));
   });
 
   return (
@@ -46,14 +48,14 @@ export function CategorySelect({
           <SelectValue placeholder="Select category" />
         </SelectTrigger>
         <SelectContent className="rounded-none bg-white">
-          {uniqueCategories?.map((category) => (
+          {uniqueCategories?.map((category: Category) => (
             <div key={category.categoryId}>
               <SelectItem 
                 value={category.categoryId.toString()}
               >
                 {category.name}
               </SelectItem>
-              {category.children?.map((child) => (
+              {category.children?.map((child: Category) => (
                 <SelectItem 
                   key={child.categoryId}
                   value={child.categoryId.toString()}

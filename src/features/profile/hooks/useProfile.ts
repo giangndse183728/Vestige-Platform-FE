@@ -18,6 +18,7 @@ export const useProfile = () => {
     queryFn: getProfile,
     staleTime: 1000 * 60 * 5,
     refetchOnReconnect: false,
+    retry: false,
   });
 
   const updateProfileMutation = useMutation({
