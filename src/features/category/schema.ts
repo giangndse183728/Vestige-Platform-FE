@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { ApiResponse } from "@/libs/axios";
 
 const categorySchemaBase = {
   categoryId: z.number(),
@@ -32,4 +33,5 @@ export type Category = {
   childrenCount: number;
 };
 
-export type CategoriesResponse = Category[];
+export type CategoryList = Category[];
+export type CategoriesResponse = CategoryList;

@@ -222,14 +222,13 @@ const HeroSectionClient = ({ featuredItems, heroSEOContent }: HeroSectionClientP
                     <motion.div
                       className="absolute inset-[5%] border-2 border-[#111] overflow-hidden shadow-lg"
                       whileHover={{ boxShadow: "0 10px 25px rgba(0,0,0,0.2)" }}
-                      transition={{ duration: 0.3 }}
+                      transition={{ duration: 0.4 }}
                     >
                       
                       <div className="absolute inset-0 border-[8px] border-[#111] z-20 pointer-events-none"></div>
                       <div className="absolute inset-[8px] border border-white z-20 pointer-events-none"></div>
                       
                       {/* Main image */}
-                      <FadeUp once={true}>
                         <Image
                        width={800}
                        height={300}
@@ -238,7 +237,7 @@ const HeroSectionClient = ({ featuredItems, heroSEOContent }: HeroSectionClientP
                           className="absolute inset-0 w-full h-full object-cover"
                           priority
                         />
-                      </FadeUp>
+                      
                       
                       <div className="absolute inset-0 bg-[#111]/10 mix-blend-multiply z-10"></div>
             

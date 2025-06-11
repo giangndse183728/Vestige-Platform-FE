@@ -35,11 +35,15 @@ export function AddressList({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {addresses.map((address) => (
-        <Card key={address.addressId} className="p-4 border-2 border-black">
+        <Card variant='double' key={address.addressId} className="p-8 ">
           <div className="flex justify-between items-start mb-2">
             <div>
               {address.isDefault && (
-                <Badge className="bg-green-600 mb-2">Default</Badge>
+                <div className="mb-4 inline-flex items-center gap-2 border-b-2 border-black pb-1">
+                  <span className="font-metal text-xs tracking-[0.2em] text-red-900">PRIMARY</span>
+                  <span className="text-xs font-gothic">•</span>
+                  <span className="font-gothic text-xs italic">EST. {new Date().getFullYear()}</span>
+                </div>
               )}
               <h3 className="font-metal text-lg">
                 {address.addressLine1}

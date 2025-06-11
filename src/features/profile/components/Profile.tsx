@@ -18,6 +18,7 @@ import { useAddresses } from '../hooks/useAddresses';
 import { AddressForm } from './AddressForm';
 import { AddressList } from './AddressList';
 import { AddressFormData, Address } from '../schema';
+import { MotionDiv } from '@/components/animation/AnimatedWrapper';
 
 export const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -152,19 +153,32 @@ export const Profile = () => {
 
      
       <div className="max-w-6xl mx-auto">
-        <div className="border-2 border-black p-6 mb-6">
+        <Card variant='stamp'>
+      <CardContent>
           <div className="flex flex-col lg:flex-row gap-8">
             <div className="flex-shrink-0">
               <div className="relative">
-                <div className="w-100 h-80 bg-gray-200 border-4 border-black flex items-center justify-center">
-                  {editData.profilePictureUrl ? (
-                    <img 
-                      src={editData.profilePictureUrl} 
-                      alt="Profile" 
-                      className="w-full h-full object-cover"
-                    />
+                <div className="w-100 h-80 bg-gray-200 border-3 border-darkred flex items-center justify-center">
+                  {isEditing ? (
+                    editData.profilePictureUrl ? (
+                      <img 
+                        src={editData.profilePictureUrl} 
+                        alt="Profile" 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <User className="w-24 h-24 text-gray-500" />
+                    )
                   ) : (
-                    <User className="w-24 h-24 text-gray-500" />
+                    user.profilePictureUrl ? (
+                      <img 
+                        src={user.profilePictureUrl} 
+                        alt="Profile" 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <User className="w-24 h-24 text-gray-500" />
+                    )
                   )}
                 </div>
                 {isEditing && (
@@ -190,8 +204,9 @@ export const Profile = () => {
 
             <div className="flex-1">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="font-metal text-2xl font-bold text-black border-b-2 border-black pb-1">
-                  PROFILE INFORMATION
+                <h3 className="font-metal text-2xl  text-black border-b-2 border-black pb-1">
+                  <span className="text-red-900">PROFILE  </span>
+                  INFORMATION
                 </h3>
                 {!isEditing ? (
                   <Button onClick={handleEdit} variant="outline" className="border-black text-black hover:bg-gray-100">
@@ -336,9 +351,56 @@ export const Profile = () => {
               )}
             </div>
           </div>
+          </CardContent>
+        </Card>
+
+        <div className="border-2 border-black p-6 mt-6 my-8 bg-black/10">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <h4 className="font-metal text-2xl font-bold text-black tracking-wider">
+                ADDRESSES
+              </h4>
+              <div className="h-6 w-[1px] bg-black"></div>
+              <span className="font-gothic text-sm text-gray-600 tracking-wider">SECTION</span>
+            </div>
+            {!isAddingAddress && (
+             
+                  <Button
+                onClick={handleAddAddress}
+                variant={'double'}
+           
+              >
+                Add New Address
+              </Button>
+             
+            )}
+          </div>
+
+          {isAddingAddress ? (
+            <div className="border-2 border-black p-6">
+              <h5 className="font-metal text-xl mb-4">
+                {editingAddress ? 'Edit Address' : 'Add New Address'}
+              </h5>
+              <AddressForm
+                initialData={editingAddress || undefined}
+                onSubmit={handleSubmitAddress}
+                onCancel={handleCancelAddress}
+                isSubmitting={isCreating || isUpdatingAddresses}
+              />
+            </div>
+          ) : (
+            <AddressList
+              addresses={addresses}
+              onEdit={handleEditAddress}
+              onDelete={deleteAddress}
+              onSetDefault={setDefaultAddress}
+              isDeleting={isDeleting}
+              isSettingDefault={isSettingDefault}
+            />
+          )}
         </div>
 
-        {/* Activity Section with Charts */}
+     
         <div className="border-2 border-black p-6">
           <h4 className="font-metal text-2xl font-bold text-black mb-6 border-b-2 border-black pb-2">
             ACTIVITY & STATISTICS
@@ -438,45 +500,8 @@ export const Profile = () => {
           </div>
         </div>
 
-        {/* Add this section after the Activity & Statistics section */}
-        <div className="border-2 border-black p-6 mt-6">
-          <div className="flex items-center justify-between mb-6">
-            <h4 className="font-metal text-2xl font-bold text-black border-b-2 border-black pb-1">
-              ADDRESSES
-            </h4>
-            {!isAddingAddress && (
-              <Button
-                onClick={handleAddAddress}
-                className="bg-black text-white hover:bg-gray-800"
-              >
-                Add New Address
-              </Button>
-            )}
-          </div>
 
-          {isAddingAddress ? (
-            <div className="border-2 border-black p-6">
-              <h5 className="font-metal text-xl mb-4">
-                {editingAddress ? 'Edit Address' : 'Add New Address'}
-              </h5>
-              <AddressForm
-                initialData={editingAddress || undefined}
-                onSubmit={handleSubmitAddress}
-                onCancel={handleCancelAddress}
-                isSubmitting={isCreating || isUpdatingAddresses}
-              />
-            </div>
-          ) : (
-            <AddressList
-              addresses={addresses}
-              onEdit={handleEditAddress}
-              onDelete={deleteAddress}
-              onSetDefault={setDefaultAddress}
-              isDeleting={isDeleting}
-              isSettingDefault={isSettingDefault}
-            />
-          )}
-        </div>
+     
       </div>
 
       <div className="mt-8 border-t-2 border-black pt-4 text-center">

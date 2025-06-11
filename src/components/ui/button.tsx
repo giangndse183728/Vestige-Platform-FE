@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
+import { MotionDiv } from "../animation/AnimatedWrapper"
 
 import { cn } from "@/libs/cn"
 
@@ -49,7 +50,7 @@ export interface ButtonProps
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, icon, children, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
-    return (
+    const buttonContent = (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
@@ -61,6 +62,19 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </span>
       </Comp>
     )
+
+    if (variant === "double") {
+      return (
+        <MotionDiv
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          {buttonContent}
+        </MotionDiv>
+      )
+    }
+
+    return buttonContent
   }
 )
 Button.displayName = "Button"

@@ -3,7 +3,7 @@ import HeroSectionClient from './HeroSectionClient';
 
 const featuredItems = [
   {
-    image: "/banner.png",
+    image: "/gm.jpg",
     title: "DIGITAL COUTURE",
     subtitle: "Redefining Tomorrow"
   },
