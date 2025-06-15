@@ -9,7 +9,7 @@ export const categoryKeys = {
 };
 
 export const useCategories = () => {
-  return useQuery<CategoriesResponse>({
+  return useQuery<CategoryList>({
     queryKey: categoryKeys.lists(),
     queryFn: getCategories,
   });

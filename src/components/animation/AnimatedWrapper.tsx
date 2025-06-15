@@ -125,7 +125,7 @@ export const FadeUp = ({
 export const AnimatedText = ({ 
   children,
   className = "",
-  textColor = "#660000",
+  textColor = "red-900",
   shadowColor = "102,0,0",
   shadowIntensity = 0.5,
   animationDuration = 3,
@@ -162,7 +162,7 @@ export const Marquee = ({
   text = "",
   speed = 20,
   className = "relative overflow-hidden w-full py-4",
-  textClassName = "mx-6 font-metal text-sm uppercase tracking-wider text-[#660000]",
+  textClassName = "mx-6 font-metal text-sm uppercase tracking-wider text-red-900",
   gap = 64,
   duplicates = 8
 }: MarqueeProps) => {

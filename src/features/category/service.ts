@@ -2,9 +2,9 @@ import api from '@/libs/axios';
 import { ApiResponse } from '@/libs/axios';
 import { CategoriesResponse, Category } from './schema';
 
-export const getCategories = async (): Promise<CategoriesResponse> => {
-  const response = await api.get<CategoriesResponse>('/categories');
-  return response.data || [];
+export const getCategories = async (): Promise<CategoryList> => {
+  const response = await api.get<ApiResponse<CategoryList>>('/categories');
+  return response.data.data;
 };
 
 export const createCategory = async (data: {
