@@ -105,6 +105,17 @@ export function ProductDetail({ product }: ProductDetailProps) {
     return condition.toLowerCase().replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
   };
 
+  const getConditionHearts = (condition: string) => {
+    const conditions = {
+      'NEW': 5,
+      'LIKE_NEW': 4,
+      'EXCELLENT': 3,
+      'GOOD': 2,
+      'FAIR': 1
+    };
+    return conditions[condition as keyof typeof conditions] || 0;
+  };
+
   return (
     <div className="container mx-auto py-8 mt-1 overflow-hidden">
       <div className="grid grid-cols-1 lg:grid-cols-2 ">
@@ -193,23 +204,69 @@ export function ProductDetail({ product }: ProductDetailProps) {
           </Card>
 
           <div className="space-y-4">
-            <div className="p-4 bg-white/90 backdrop-blur-sm border-2 border-black -mr-[2px] -mb-[2px]">
-              <h3 className="font-medium text-xl mb-2 font-metal">Product Details</h3>
-              <div className="space-y-2 text-sm">
-                <p><span className="text-gray-600">Condition:</span> {formatCondition(product.condition)}</p>
-                {product.size && <p><span className="text-gray-600">Size:</span> {product.size}</p>}
-                {product.color && <p><span className="text-gray-600">Color:</span> {product.color}</p>}
-                <p><span className="text-gray-600">Brand:</span> {product.brand.name}</p>
-                <p><span className="text-gray-600">Category:</span> {product.category.name}</p>
+            <div className="p-5 bg-white/90 backdrop-blur-sm border-2 border-black -mr-[2px] -mb-[2px]">
+              <h3 className="font-metal text-lg mb-3">Product Details</h3>
+              <div className="grid grid-cols-2 divide-x divide-gray-500">
+                <div className="pr-3">
+                  <div className="grid grid-cols-1 divide-y divide-gray-500">
+                    <div className="py-2">
+                      <div className="text-xs text-gray-500 mb-1">Condition</div>
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((heart) => (
+                          <Heart
+                            key={heart}
+                            className={`w-4 h-4 ${
+                              heart <= getConditionHearts(product.condition)
+                                ? 'fill-red-900 text-[var(--dark-red)] '
+                                : 'text-gray-500'
+                            }`}
+                          />
+                        ))}
+                        <span className="text-sm font-medium ml-2">{formatCondition(product.condition)}</span>
+                      </div>
+                    </div>
+                    {product.color && (
+                      <div className="py-2">
+                        <div className="text-xs text-gray-500 mb-1">Color</div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3  border border-black-500 border-3 rotate-45" style={{ backgroundColor: product.color.toLowerCase() }} />
+                          <div className="text-sm font-medium">{product.color}</div>
+                        </div>
+                      </div>
+                    )}
+                    {product.size && (
+                      <div className="py-2">
+                        <div className="text-xs text-gray-500 mb-1">Size</div>
+                        <div className="flex items-center">
+                          <div className="px-3 py-1 bg-gray-50 border border-gray-200 rounded-sm">
+                            <span className="text-sm font-medium tracking-wider">{product.size}US</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="pl-3">
+                  <div className="grid grid-cols-1 divide-y divide-gray-500">
+                    <div className="py-2">
+                      <div className="text-xs text-gray-500 mb-1">Brand</div>
+                      <div className="text-sm font-medium">{product.brand.name}</div>
+                    </div>
+                    <div className="py-2">
+                      <div className="text-xs text-gray-500 mb-1">Category</div>
+                      <div className="text-sm font-medium">{product.category.name}</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="p-4 bg-white/90 backdrop-blur-sm border-2 border-black -mr-[2px] -mb-[2px]">
+            <div className="p-5 bg-white/90 backdrop-blur-sm border-2 border-black -mr-[2px] -mb-[2px]">
               <h3 className="font-medium text-xl mb-2 font-metal">Description</h3>
               <p className="text-sm text-gray-600 ">{product.description}</p>
             </div>
 
-            <div className="p-4 bg-white/90 backdrop-blur-sm border-2 border-black -mr-[2px] -mb-[2px]">
+            <div className="p-5 bg-white/90 backdrop-blur-sm border-2 border-black -mr-[2px] -mb-[2px]">
               <h3 className="font-medium text-xl mb-2 font-metal">Seller Information</h3>
               <Link 
                 href={`/users/${product.seller.userId}`}
