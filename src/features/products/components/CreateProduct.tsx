@@ -15,11 +15,14 @@ import { toast } from 'sonner';
 import { CategorySelect } from '@/features/category/components/CategorySelect';
 import { X, Plus, ImageIcon, Upload } from 'lucide-react';
 import * as z from 'zod';
+import { storage } from '@/libs/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export function CreateProduct() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [uploadingImages, setUploadingImages] = useState<boolean>(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -31,7 +34,7 @@ export function CreateProduct() {
     categoryId: '',
     brandId: '',
     status: 'ACTIVE',
-    imageUrls: [''] // Start with one empty image URL
+    imageUrls: [''] 
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -41,7 +44,6 @@ export function CreateProduct() {
       [name]: value
     }));
     
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -53,7 +55,6 @@ export function CreateProduct() {
       [name]: value
     }));
     
-    // Clear error when user selects
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -94,6 +95,36 @@ export function CreateProduct() {
       return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
     } catch {
       return false;
+    }
+  };
+
+  const handleImageUpload = async (file: File, index: number) => {
+    try {
+      setUploadingImages(true);
+      const storageRef = ref(storage, `products/${Date.now()}_${file.name}`);
+      const snapshot = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+      
+      const newImageUrls = [...formData.imageUrls];
+      newImageUrls[index] = downloadURL;
+      setFormData(prev => ({
+        ...prev,
+        imageUrls: newImageUrls
+      }));
+      
+      toast.success('Image uploaded successfully');
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast.error('Failed to upload image');
+    } finally {
+      setUploadingImages(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleImageUpload(file, index);
     }
   };
 
@@ -142,7 +173,6 @@ export function CreateProduct() {
 
   return (
     <div className="container mx-auto py-4 mt-1 overflow-hidden px-6">
-      {/* Newspaper Header */}
       <div className="mb-8 text-center border-b-4 border-black pb-6">
         <h1 className="font-serif text-5xl font-bold text-black mb-2 tracking-wide">
           THE MARKETPLACE HERALD
@@ -166,76 +196,43 @@ export function CreateProduct() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Column - Product Images */}
           <div className="space-y-6">
-            <Card variant="decorated" >
-             
-              
-          
-              <CardContent className="p-10">
+            <Card variant="stamp">
+              <CardContent className="p-1">
                 <div className="space-y-4">
-                  {/* Main Image Preview */}
                   <div className="relative aspect-[4/3] bg-gray-100 border-2 border-black overflow-hidden">
-                    {formData.imageUrls[0] && isValidImageUrl(formData.imageUrls[0]) ? (
+                    {formData.imageUrls[0] ? (
                       <Image
                         src={formData.imageUrls[0]}
                         alt="Product preview"
                         fill
                         className="object-cover"
                         onError={() => {
-                          // Handle image load error
+                          toast.error('Failed to load image');
                         }}
                       />
                     ) : (
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
                         <Upload className="w-12 h-12 mb-2" />
                         <span className="text-lg font-serif">Primary Image Preview</span>
-                        <span className="text-sm">Add image URL below</span>
+                        <span className="text-sm">Upload an image below</span>
                       </div>
                     )}
                   </div>
 
-                  {/* Thumbnail Previews */}
-                  <div className="grid grid-cols-4 gap-2">
-                    {formData.imageUrls.slice(1, 5).map((url, index) => (
-                      <div key={index + 1} className="relative aspect-[4/3] bg-gray-100 border-2 border-black overflow-hidden">
-                        {url && isValidImageUrl(url) ? (
-                          <Image
-                            src={url}
-                            alt={`Preview ${index + 2}`}
-                            fill
-                            className="object-cover"
-                          />
-                        ) : (
-                          <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                            <ImageIcon className="w-6 h-6" />
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                    
-                    {/* Fill remaining slots */}
-                    {Array.from({ length: Math.max(0, 4 - (formData.imageUrls.length - 1)) }).map((_, index) => (
-                      <div key={`empty-${index}`} className="aspect-[4/3] bg-gray-50 border-2 border-dashed border-gray-300 flex items-center justify-center">
-                        <ImageIcon className="w-6 h-6 text-gray-300" />
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Image URL Inputs */}
+                  {/* Image Upload Inputs */}
                   <div className="space-y-3">
-                    <Label className="font-serif text-lg">Image URLs</Label>
+                    <Label className="font-serif text-lg">Product Images</Label>
                     {formData.imageUrls.map((url, index) => (
                       <div key={index} className="flex gap-2">
                         <div className="flex-1">
                           <Input
-                            type="url"
-                            value={url}
-                            onChange={(e) => handleImageUrlChange(index, e.target.value)}
-                            placeholder={index === 0 ? "Primary image URL" : `Image ${index + 1} URL`}
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleFileChange(e, index)}
                             className="border-2 border-black font-mono text-sm"
+                            disabled={uploadingImages}
                           />
-                          {index === 0 && errors.imageUrls && (
-                            <p className="text-red-600 text-xs mt-1">{errors.imageUrls}</p>
-                          )}
+                        
                         </div>
                         {index > 0 && (
                           <Button
@@ -244,6 +241,7 @@ export function CreateProduct() {
                             size="icon"
                             onClick={() => removeImageUrl(index)}
                             className="border-2 border-black hover:bg-red-50"
+                            disabled={uploadingImages}
                           >
                             <X className="w-4 h-4" />
                           </Button>
@@ -257,6 +255,7 @@ export function CreateProduct() {
                         variant="outline"
                         onClick={addImageUrl}
                         className="w-full border-2 border-black hover:bg-gray-50"
+                        disabled={uploadingImages}
                       >
                         <Plus className="w-4 h-4 mr-2" />
                         Add Another Image
@@ -269,7 +268,7 @@ export function CreateProduct() {
 
                {/* Submit Button */}
                <Card variant="decorated" className="border-2 border-black">
-              <CardContent className="p-6">
+              <CardContent className="p-8">
                 <div className="flex flex-col gap-3">
                   <Button
                     type="submit"
@@ -292,14 +291,13 @@ export function CreateProduct() {
             </Card>
           </div>
 
-          {/* Right Column - Product Information */}
+          {/*Product Information */}
           <div className="space-y-6">
-            {/* Basic Information */}
-            <Card variant="decorated" className="border-2 border-black">
-              <CardHeader className="border-b-2 border-black bg-black text-white">
-                <CardTitle className="font-serif text-xl">BASIC INFORMATION</CardTitle>
+            <Card variant="double" className="border-2 border-black">
+              <CardHeader className="border-b-2 border-black bg-red-900 text-black">
+                <CardTitle className="font-metal text-xl text-white font-normal">BASIC INFORMATION</CardTitle>
               </CardHeader>
-              <CardContent className="p-6 space-y-4">
+              <CardContent className="p-10 space-y-4">
                 <div>
                   <Label htmlFor="title" className="font-serif text-lg">Product Title</Label>
                   <Input
@@ -367,11 +365,11 @@ export function CreateProduct() {
             </Card>
 
             {/* Product Details */}
-            <Card variant="decorated" className="border-2 border-black">
+            <Card variant="double" className="border-2 border-black">
               <CardHeader className="border-b-2 border-black bg-black text-white">
-                <CardTitle className="font-serif text-xl">PRODUCT DETAILS</CardTitle>
+                <CardTitle className="font-metal  text-xl font-normal">PRODUCT DETAILS</CardTitle>
               </CardHeader>
-              <CardContent className="p-6 space-y-4">
+              <CardContent className="p-10 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="condition" className="font-serif">Condition</Label>
@@ -440,7 +438,7 @@ export function CreateProduct() {
                 </div>
 
                 <div>
-                  <Label htmlFor="categoryId" className="font-serif">Category</Label>
+                  <Label htmlFor="categoryId" className="font-serif"></Label>
                   <CategorySelect
                     value={formData.categoryId}
                     onValueChange={(value) => handleSelectChange('categoryId', value)}

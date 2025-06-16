@@ -221,11 +221,11 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center justify-center space-x-8 mx-auto">
             {[
-              { name: "SHOP", path: ROUTES.SHOP },
+              { name: "MARKETPLACE", path: ROUTES.MARKETPLACE},
               { name: "DESIGNERS", path: ROUTES.DESIGNERS },
-              { name: "COLLECTIONS", path: ROUTES.COLLECTIONS },
+              { name: "CATEGORY", path: ROUTES.COLLECTIONS },
               { name: "EDITORIAL", path: ROUTES.EDITORIAL },
-              { name: "SUBSCRIPTION", path: ROUTES.ABOUT }
+              { name: "SUBSCRIPTION", path: ROUTES.SUBSCRIPTION }
             ].map((item, index) => (
               <Link
                 key={item.name}
@@ -303,11 +303,11 @@ const Navbar = () => {
               {/* Mobile menu items */}
               <div className="space-y-0">
                 {[
-                  { name: "SHOP", path: ROUTES.SHOP },
+                  { name: "MARKETPLACE", path: ROUTES.MARKETPLACE },
                   { name: "DESIGNERS", path: ROUTES.DESIGNERS },
                   { name: "COLLECTIONS", path: ROUTES.COLLECTIONS },
                   { name: "EDITORIAL", path: ROUTES.EDITORIAL },
-                  { name: "ABOUT", path: ROUTES.ABOUT }
+                  { name: "SUBSCRIPTION", path: ROUTES.SUBSCRIPTION }
                 ].map((item) => (
                   <Link
                     key={item.name}
