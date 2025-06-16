@@ -3,8 +3,8 @@ import { ApiResponse } from '@/libs/axios';
 import { BrandsResponse, Brand, CreateBrandRequest } from './schema';
 
 export const getBrands = async (): Promise<BrandsResponse> => {
-  const response = await api.get<BrandsResponse>('/brands');
-  return response.data || [];
+  const response = await api.get<ApiResponse<BrandsResponse>>('/brands');
+  return response.data.data;
 };
 
 export const createBrand = async (data: CreateBrandRequest): Promise<Brand> => {

@@ -1,6 +1,6 @@
 import api from '@/libs/axios';
 import { ApiResponse } from '@/libs/axios';
-import { CategoriesResponse, Category } from './schema';
+import { CategoriesResponse, Category, CategoryList } from './schema';
 
 export const getCategories = async (): Promise<CategoryList> => {
   const response = await api.get<ApiResponse<CategoryList>>('/categories');
