@@ -54,7 +54,7 @@ export default function RootLayout({
 }) {
   const [queryClient] = useState(() => new QueryClient());
   const pathname = usePathname();
-  const noLayout = ROUTES_NO_LAYOUT.includes(pathname);
+  const noLayout = ROUTES_NO_LAYOUT.includes(pathname) || pathname.startsWith("/admin");
 
   return (
     <html lang="en">
@@ -89,7 +89,7 @@ export default function RootLayout({
             
             <main className="flex-1 relative z-10">
               <div className="absolute inset-0 bg-[url('/background.jpg')] bg-cover bg-center bg-fixed opacity-95 pointer-events-none"></div>
-              <div className="relative z-10 py-8">
+              <div className="relative z-10 pt-16">
                 {children}
               </div>
             </main>
