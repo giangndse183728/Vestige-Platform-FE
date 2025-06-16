@@ -34,8 +34,11 @@ function DropdownMenuTrigger({
 function DropdownMenuContent({
   className,
   sideOffset = 4,
+  variant = "default",
   ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Content> & {
+  variant?: "default" | "double"
+}) {
   return (
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
@@ -43,6 +46,7 @@ function DropdownMenuContent({
         sideOffset={sideOffset}
         className={cn(
           "backdrop-blur-lg bg-gradient-to-br from-white/40 via-white/30 to-red-50/15 dark:from-white/25 dark:via-white/20 dark:to-red-950/10 border-1 border-black text-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto p-1 shadow-2xl shadow-black/40",
+          variant === "double" && "border-2 border-black before:content-[''] before:absolute before:inset-0 before:border before:border-dashed before:border-black before:m-1",
           className
         )}
         {...props}
@@ -224,13 +228,17 @@ function DropdownMenuSubTrigger({
 
 function DropdownMenuSubContent({
   className,
+  variant = "default",
   ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.SubContent>) {
+}: React.ComponentProps<typeof DropdownMenuPrimitive.SubContent> & {
+  variant?: "default" | "double"
+}) {
   return (
     <DropdownMenuPrimitive.SubContent
       data-slot="dropdown-menu-sub-content"
       className={cn(
         "backdrop-blur-lg bg-gradient-to-br from-white/40 via-white/30 to-red-50/15 dark:from-white/25 dark:via-white/20 dark:to-red-950/10 border-2 border-black text-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden p-1 shadow-2xl shadow-black/40",
+        variant === "double" && "border-2 border-black before:content-[''] before:absolute before:inset-0 before:border before:border-dashed before:border-black before:m-1",
         className
       )}
       {...props}

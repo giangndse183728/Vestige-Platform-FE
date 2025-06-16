@@ -7,7 +7,7 @@ export const ROUTES = {
     DESIGNERS: "/designers",
     COLLECTIONS: "/collections",
     EDITORIAL: "/editorial",
-    ABOUT: "/about"
+    SUBSCRIPTION: "/subscription"
   };
   
 export const ROUTES_NO_LAYOUT = ["/login", "/profile", "/seller-center"];

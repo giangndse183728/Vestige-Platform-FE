@@ -225,7 +225,7 @@ const Navbar = () => {
               { name: "DESIGNERS", path: ROUTES.DESIGNERS },
               { name: "COLLECTIONS", path: ROUTES.COLLECTIONS },
               { name: "EDITORIAL", path: ROUTES.EDITORIAL },
-              { name: "SUBSCRIPTION", path: ROUTES.ABOUT }
+              { name: "SUBSCRIPTION", path: ROUTES.SUBSCRIPTION }
             ].map((item, index) => (
               <Link
                 key={item.name}
@@ -307,7 +307,7 @@ const Navbar = () => {
                   { name: "DESIGNERS", path: ROUTES.DESIGNERS },
                   { name: "COLLECTIONS", path: ROUTES.COLLECTIONS },
                   { name: "EDITORIAL", path: ROUTES.EDITORIAL },
-                  { name: "ABOUT", path: ROUTES.ABOUT }
+                  { name: "SUBSCRIPTION", path: ROUTES.SUBSCRIPTION }
                 ].map((item) => (
                   <Link
                     key={item.name}

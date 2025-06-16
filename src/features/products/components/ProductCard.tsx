@@ -17,7 +17,7 @@ export function ProductCard({ product }: ProductCardProps) {
         
         <div className="relative h-65 overflow-hidden bg-gray-100">
           <Image 
-            src="/rick.png"
+            src={product.primaryImageUrl}
             alt={product.title}
             width={600}
             height={600}

@@ -2,6 +2,7 @@ import { cn } from "@/libs/cn";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Instagram, ShoppingBag, Users, Crown, Star, Zap } from "lucide-react";
+import { SubscriptionPlans } from "@/components/subscription/SubscriptionPlans";
 
 function About() {
   return (
@@ -64,7 +65,6 @@ function About() {
         </div>
 
         {/* Sidebar */}
-      
         <div className="space-y-8">
           {/* Quick Stats Box */}
           <Card variant="decorated">
@@ -127,126 +127,9 @@ function About() {
         </div>
       </div>
 
-      {/* Subscription Section - Newspaper Style */}
-      <div className="border-t-4 border-red-800 pt-8">
-        <div className="text-center mb-8">
-          <h2 className="text-4xl font-metal text-black-900 mb-2">SUBSCRIPTION RATES</h2>
-          <p className="font-gothic text-gray-600">Choose Your Access Level to The Vestige Experience</p>
-          <div className="w-24 h-1 bg-red-800 mx-auto mt-4"></div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Basic Plan */}
-          <div className="border-2 border-gray-400 bg-white">
-            <div className="bg-gray-100 p-4 text-center border-b-2 border-gray-400">
-              <Star className="w-8 h-8 text-gray-600 mx-auto mb-2" />
-              <h3 className="text-2xl font-metal text-gray-800">BASIC EDITION</h3>
-              <p className="font-gothic text-sm text-gray-600">For Casual Readers</p>
-              <div className="text-3xl font-metal mt-3">FREE</div>
-            </div>
-            <div className="p-6">
-              <div className="font-gothic text-sm space-y-3 mb-6">
-                <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
-                  <div className="w-2 h-2 bg-gray-400"></div>
-                  <span>Browse All Fashion Items</span>
-                </div>
-                <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
-                  <div className="w-2 h-2 bg-gray-400"></div>
-                  <span>Basic Search Filters</span>
-                </div>
-                <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
-                  <div className="w-2 h-2 bg-gray-400"></div>
-                  <span>List Up to 5 Items</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-gray-400"></div>
-                  <span>Standard Support</span>
-                </div>
-              </div>
-              <Button variant="outline" className="w-full font-gothic border-gray-400 text-gray-600 hover:bg-gray-100">
-                SUBSCRIBE FREE
-              </Button>
-            </div>
-          </div>
-
-          {/* Pro Plan */}
-          <div className="border-4 border-red-800 bg-white relative">
-            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-red-800 text-white px-6 py-1 font-gothic text-sm font-bold">
-              MOST POPULAR
-            </div>
-            <div className="bg-red-800 text-white p-4 text-center">
-              <Zap className="w-8 h-8 mx-auto mb-2" />
-              <h3 className="text-2xl font-metal">PRO EDITION</h3>
-              <p className="font-gothic text-sm opacity-90">For Fashion Enthusiasts</p>
-              <div className="text-3xl font-metal mt-3">$9.99<span className="text-base font-gothic">/month</span></div>
-            </div>
-            <div className="p-6">
-              <div className="font-gothic text-sm space-y-3 mb-6">
-                <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
-                  <div className="w-2 h-2 bg-red-800"></div>
-                  <span>Everything in Basic Edition</span>
-                </div>
-                <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
-                  <div className="w-2 h-2 bg-red-800"></div>
-                  <span>Advanced Search & Filters</span>
-                </div>
-                <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
-                  <div className="w-2 h-2 bg-red-800"></div>
-                  <span>List Up to 50 Items</span>
-                </div>
-                <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
-                  <div className="w-2 h-2 bg-red-800"></div>
-                  <span>Priority Customer Support</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-red-800"></div>
-                  <span>Early Access to Drops</span>
-                </div>
-              </div>
-              <Button className="w-full bg-red-800 hover:bg-red-900 font-gothic">
-                SUBSCRIBE PRO
-              </Button>
-            </div>
-          </div>
-
-          {/* Elite Plan */}
-          <div className="border-2 border-red-900 bg-white">
-            <div className="bg-red-900 text-white p-4 text-center">
-              <Crown className="w-8 h-8 mx-auto mb-2" />
-              <h3 className="text-2xl font-metal">ELITE EDITION</h3>
-              <p className="font-gothic text-sm opacity-90">For Industry Professionals</p>
-              <div className="text-3xl font-metal mt-3">$29.99<span className="text-base font-gothic">/month</span></div>
-            </div>
-            <div className="p-6">
-              <div className="font-gothic text-sm space-y-3 mb-6">
-                <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
-                  <div className="w-2 h-2 bg-red-900"></div>
-                  <span>Everything in Pro Edition</span>
-                </div>
-                <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
-                  <div className="w-2 h-2 bg-red-900"></div>
-                  <span>Unlimited Listings</span>
-                </div>
-                <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
-                  <div className="w-2 h-2 bg-red-900"></div>
-                  <span>VIP Customer Support</span>
-                </div>
-                <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
-                  <div className="w-2 h-2 bg-red-900"></div>
-                  <span>Exclusive Brand Partnerships</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-red-900"></div>
-                  <span>Analytics Dashboard</span>
-                </div>
-              </div>
-              <Button variant="outline" className="w-full font-gothic border-red-900 text-red-900 hover:bg-red-900 hover:text-white">
-                SUBSCRIBE ELITE
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Subscription Section */}
+      <div className="border-3 border-red-900 bg-white relative"></div>
+      <SubscriptionPlans />
 
       {/* Newspaper Footer */}
       <div className="mt-12 border-t-2 border-red-800 pt-4 text-center">

@@ -3,6 +3,7 @@ import { ApiResponse } from '@/libs/axios';
 import { ProfileFormData, ProfileUser } from './schema';
 import { Address, AddressFormData, AddressesResponse } from './schema';
 
+// Existing profile services
 export const updateProfile = async (data: ProfileFormData): Promise<ProfileUser> => {
   const response = await api.patch<ApiResponse<ProfileUser>>('/users/profile', data);
   return response.data.data;
@@ -13,6 +14,13 @@ export const getProfile = async (): Promise<ProfileUser> => {
   return response.data.data;
 };
 
+
+export const getPublicProfile = async (userId: number): Promise<ProfileUser> => {
+  const response = await api.get<ApiResponse<ProfileUser>>(`/users/${userId}`);
+  return response.data.data;
+};
+
+// Address services
 export const getAddresses = async (): Promise<AddressesResponse> => {
   const response = await api.get<AddressesResponse>('/users/addresses');
   return response.data;

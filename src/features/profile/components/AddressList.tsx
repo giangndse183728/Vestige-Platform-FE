@@ -45,14 +45,14 @@ export function AddressList({
                   <span className="font-gothic text-xs italic">EST. {new Date().getFullYear()}</span>
                 </div>
               )}
-              <h3 className="font-metal text-lg">
+              <h3 className=" text-lg">
                 {address.addressLine1}
                 {address.addressLine2 && <span>, {address.addressLine2}</span>}
               </h3>
-              <p className="font-gothic text-gray-600">
+              <p className="text-gray-600">
                 {address.city}, {address.state} {address.postalCode}
               </p>
-              <p className="font-gothic text-gray-600">{address.country}</p>
+              <p className=" text-gray-600">{address.country}</p>
             </div>
             <div className="flex space-x-2">
               <Button

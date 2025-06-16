@@ -166,11 +166,11 @@ export function CreateProduct() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Column - Product Images */}
           <div className="space-y-6">
-            <Card variant="decorated" >
+            <Card variant="stamp" >
              
               
           
-              <CardContent className="p-10">
+              <CardContent className="p-1">
                 <div className="space-y-4">
                   {/* Main Image Preview */}
                   <div className="relative aspect-[4/3] bg-gray-100 border-2 border-black overflow-hidden">
@@ -269,7 +269,7 @@ export function CreateProduct() {
 
                {/* Submit Button */}
                <Card variant="decorated" className="border-2 border-black">
-              <CardContent className="p-6">
+              <CardContent className="p-8">
                 <div className="flex flex-col gap-3">
                   <Button
                     type="submit"
@@ -292,14 +292,13 @@ export function CreateProduct() {
             </Card>
           </div>
 
-          {/* Right Column - Product Information */}
+          {/*Product Information */}
           <div className="space-y-6">
-            {/* Basic Information */}
-            <Card variant="decorated" className="border-2 border-black">
-              <CardHeader className="border-b-2 border-black bg-black text-white">
-                <CardTitle className="font-serif text-xl">BASIC INFORMATION</CardTitle>
+            <Card variant="double" className="border-2 border-black">
+              <CardHeader className="border-b-2 border-black bg-red-900 text-black">
+                <CardTitle className="font-metal text-xl text-white font-normal">BASIC INFORMATION</CardTitle>
               </CardHeader>
-              <CardContent className="p-6 space-y-4">
+              <CardContent className="p-10 space-y-4">
                 <div>
                   <Label htmlFor="title" className="font-serif text-lg">Product Title</Label>
                   <Input
@@ -367,11 +366,11 @@ export function CreateProduct() {
             </Card>
 
             {/* Product Details */}
-            <Card variant="decorated" className="border-2 border-black">
+            <Card variant="double" className="border-2 border-black">
               <CardHeader className="border-b-2 border-black bg-black text-white">
-                <CardTitle className="font-serif text-xl">PRODUCT DETAILS</CardTitle>
+                <CardTitle className="font-metal  text-xl font-normal">PRODUCT DETAILS</CardTitle>
               </CardHeader>
-              <CardContent className="p-6 space-y-4">
+              <CardContent className="p-10 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="condition" className="font-serif">Condition</Label>
@@ -440,7 +439,7 @@ export function CreateProduct() {
                 </div>
 
                 <div>
-                  <Label htmlFor="categoryId" className="font-serif">Category</Label>
+                  <Label htmlFor="categoryId" className="font-serif"></Label>
                   <CategorySelect
                     value={formData.categoryId}
                     onValueChange={(value) => handleSelectChange('categoryId', value)}
