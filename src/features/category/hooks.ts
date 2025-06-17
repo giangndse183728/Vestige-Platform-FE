@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getCategories, createCategory, updateCategory, deleteCategory } from './service';
-import { CategoriesResponse, Category } from './schema';
+import { getCategories, createCategory, updateCategory, deleteCategory, getCategory } from './service';
+import { CategoriesResponse, Category, CategoryList } from './schema';
 
 export const categoryKeys = {
   all: ['categories'] as const,
@@ -12,6 +12,14 @@ export const useCategories = () => {
   return useQuery<CategoryList>({
     queryKey: categoryKeys.lists(),
     queryFn: getCategories,
+  });
+};
+
+export const useCategory = (categoryId?: number) => {
+  return useQuery<Category>({
+    queryKey: categoryKeys.detail(categoryId as number),
+    queryFn: () => getCategory(categoryId as number),
+    enabled: !!categoryId,
   });
 };
 

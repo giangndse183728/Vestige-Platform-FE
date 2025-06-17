@@ -87,7 +87,7 @@ export default function AdminDashboard() {
             {/* Main Content */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Recent Orders */}
-              <Card className="lg:col-span-2">
+              <Card className="lg:col-span-3">
                 <div className="p-6 border-b">
                   <div className="flex items-center justify-between">
                     <h2 className="text-lg font-semibold text-gray-900">Recent Orders</h2>
@@ -130,35 +130,6 @@ export default function AdminDashboard() {
                       ))}
                     </tbody>
                   </table>
-                </div>
-              </Card>
-
-              {/* Quick Actions */}
-              <Card>
-                <div className="p-6 border-b">
-                  <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
-                </div>
-                <div className="p-6 space-y-4">
-                  {[
-                    { icon: Users, label: "Manage Users", color: "bg-blue-50 text-blue-600" },
-                    { icon: ShoppingBag, label: "Manage Products", color: "bg-green-50 text-green-600" },
-                    { icon: FileText, label: "View Reports", color: "bg-purple-50 text-purple-600" },
-                    { icon: Settings, label: "Settings", color: "bg-yellow-50 text-yellow-600" },
-                  ].map((action) => (
-                    <Button
-                      key={action.label}
-                      variant="ghost"
-                      className="w-full flex items-center justify-between p-3 hover:bg-gray-50"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-lg ${action.color}`}>
-                          <action.icon className="h-5 w-5" />
-                        </div>
-                        <span className="text-sm font-medium text-gray-700">{action.label}</span>
-                      </div>
-                      <ChevronRight className="h-5 w-5 text-gray-400" />
-                    </Button>
-                  ))}
                 </div>
               </Card>
             </div>

@@ -5,6 +5,7 @@ export const ROUTES = {
     PROFILE: "/profile",
     MARKETPLACE: "/marketplace",
     DESIGNERS: "/designers",
+    CATEGORIES: "/categories",
     COLLECTIONS: "/collections",
     EDITORIAL: "/editorial",
     SUBSCRIPTION: "/subscription"

@@ -223,7 +223,7 @@ const Navbar = () => {
             {[
               { name: "MARKETPLACE", path: ROUTES.MARKETPLACE},
               { name: "DESIGNERS", path: ROUTES.DESIGNERS },
-              { name: "CATEGORY", path: ROUTES.COLLECTIONS },
+              { name: "CATEGORY", path: ROUTES.CATEGORIES },
               { name: "EDITORIAL", path: ROUTES.EDITORIAL },
               { name: "SUBSCRIPTION", path: ROUTES.SUBSCRIPTION }
             ].map((item, index) => (
@@ -305,7 +305,7 @@ const Navbar = () => {
                 {[
                   { name: "MARKETPLACE", path: ROUTES.MARKETPLACE },
                   { name: "DESIGNERS", path: ROUTES.DESIGNERS },
-                  { name: "COLLECTIONS", path: ROUTES.COLLECTIONS },
+                  { name: "CATEGORY", path: ROUTES.CATEGORIES },
                   { name: "EDITORIAL", path: ROUTES.EDITORIAL },
                   { name: "SUBSCRIPTION", path: ROUTES.SUBSCRIPTION }
                 ].map((item) => (
