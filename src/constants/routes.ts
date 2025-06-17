@@ -3,11 +3,11 @@ export const ROUTES = {
     LOGIN: "/login",
     DASHBOARD: "/dashboard",
     PROFILE: "/profile",
-    SHOP: "/shop",
+    MARKETPLACE: "/marketplace",
     DESIGNERS: "/designers",
     COLLECTIONS: "/collections",
     EDITORIAL: "/editorial",
-    ABOUT: "/about"
+    SUBSCRIPTION: "/subscription"
   };
   
 export const ROUTES_NO_LAYOUT = ["/login", "/profile", "/seller-center", "/admin"];

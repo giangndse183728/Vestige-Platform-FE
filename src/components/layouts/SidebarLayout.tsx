@@ -35,7 +35,7 @@ const SidebarSkeleton = () => {
   return (
     <div className="flex min-h-screen bg-[#f8f7f3]">
       {/* Sidebar Skeleton */}
-      <div className="w-80 bg-white border-r-4 border-black fixed h-full overflow-y-auto">
+      <div className="w-80 bg-white border-r-3 border-black fixed h-full overflow-y-auto">
         {/* Header Skeleton */}
         <div className="border-b-2 border-black p-6">
           <div className="text-center">
@@ -170,7 +170,7 @@ const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, currentPage = "
   return (
     <div className="flex min-h-screen bg-[#f8f7f3]">
       {/* Sidebar */}
-      <div className="w-80 bg-white border-r-4 border-black fixed h-full overflow-y-auto">
+      <div className="w-80 bg-white border-r-3 border-black fixed h-full overflow-y-auto">
         {/* Header */}
         <div className="border-b-2 border-black p-6">
           <div className="text-center">

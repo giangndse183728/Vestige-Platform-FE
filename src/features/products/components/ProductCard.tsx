@@ -15,9 +15,9 @@ export function ProductCard({ product }: ProductCardProps) {
           {product.condition}
         </div>
         
-        <div className="relative h-65 overflow-hidden bg-gray-100">
+        <div className="relative h-80 overflow-hidden bg-gray-100">
           <Image 
-            src="/rick.png"
+            src={product.primaryImageUrl}
             alt={product.title}
             width={600}
             height={600}

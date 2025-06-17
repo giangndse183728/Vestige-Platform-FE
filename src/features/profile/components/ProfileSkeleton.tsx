@@ -4,20 +4,6 @@ import { Separator } from '@/components/ui/separator';
 export const ProfileSkeleton = () => {
   return (
     <div className="p-6 bg-[#f8f7f3] min-h-screen">
-      {/* Newspaper Header Skeleton */}
-      <div className="border-t-4 border-b-4 border-black py-4 mb-6">
-        <div className="text-center">
-          <Skeleton className="h-12 w-64 mx-auto" />
-          <Skeleton className="h-4 w-48 mx-auto mt-2" />
-          <div className="flex justify-center items-center gap-4 mt-2">
-            <Skeleton className="h-3 w-24" />
-            <Skeleton className="h-3 w-3" />
-            <Skeleton className="h-3 w-32" />
-            <Skeleton className="h-3 w-3" />
-            <Skeleton className="h-3 w-24" />
-          </div>
-        </div>
-      </div>
 
       {/* Profile Section Skeleton */}
       <div className="max-w-6xl mx-auto">

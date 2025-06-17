@@ -101,10 +101,16 @@ const Card = React.forwardRef<
         <div className="absolute inset-0 bg-white/80 border border-red-900 z-0"></div>
         <div className="absolute inset-0 border-2 border-dashed border-black/10 m-4 z-0"></div>
         
-      
-        
         <div className="relative z-20 h-full w-full">
-          {children}
+          {React.Children.map(children, child => {
+            if (React.isValidElement<CardHeaderProps>(child) && child.type === CardHeader) {
+              return React.cloneElement(child, {
+                ...child.props,
+                className: cn("border-b-2 border-black bg-red-900 text-black", child.props.className)
+              });
+            }
+            return child;
+          })}
         </div>
       </div>
     );
@@ -160,7 +166,14 @@ const CardHeader = React.forwardRef<
       ref={ref}
       className={cn("flex flex-col space-y-1.5 p-6", className)}
       {...props}
-    />
+    >
+      {React.Children.map(children, child => {
+        if (React.isValidElement(child) && child.type === CardTitle) {
+          return <div className="font-serif text-xl">{child}</div>;
+        }
+        return child;
+      })}
+    </div>
   );
 })
 CardHeader.displayName = "CardHeader"
