@@ -12,6 +12,8 @@ import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { createBrandSchema } from '@/features/brand/schema';
+import * as z from "zod";
 
 export default function BrandManager() {
   const { data: brands, isLoading } = useBrands();
@@ -25,27 +27,34 @@ export default function BrandManager() {
   const [formData, setFormData] = useState({
     name: '',
     logoUrl: '',
-    description: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       if (editingBrand) {
+        let validatedData = createBrandSchema.parse(formData);
+
         await updateBrand.mutateAsync({
           brandId: editingBrand.brandId,
-          data: formData,
+          data: validatedData,
         });
         toast.success('Brand updated successfully');
         setEditingBrand(null);
       } else {
-        await createBrand.mutateAsync(formData);
+        let validatedData = createBrandSchema.parse(formData);
+
+        await createBrand.mutateAsync(validatedData);
         toast.success('Brand created successfully');
         setIsCreating(false);
       }
-      setFormData({ name: '', logoUrl: '', description: '' });
-    } catch (error) {
-      toast.error('An error occurred');
+      setFormData({ name: '', logoUrl: '' });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        toast.error(error.errors[0].message);
+      } else {
+        toast.error(error.response?.data?.message || 'An error occurred while creating/updating the brand.');
+      }
     }
   };
 
@@ -54,7 +63,6 @@ export default function BrandManager() {
     setFormData({
       name: brand.name,
       logoUrl: brand.logoUrl,
-      description: brand.description || '',
     });
   };
 
@@ -63,8 +71,12 @@ export default function BrandManager() {
       try {
         await deleteBrand.mutateAsync(brandId);
         toast.success('Brand deleted successfully');
-      } catch (error) {
-        toast.error('An error occurred');
+      } catch (error: any) {
+        if (error.response?.status === 409) {
+          toast.error('Cannot delete brand: It has associated products. Please remove or reassign the products first.');
+        } else {
+          toast.error('Cannot delete brand: It has associated products. Please remove or reassign the products first.');
+        }
       }
     }
   };
@@ -125,9 +137,9 @@ export default function BrandManager() {
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value.trim() })}
                 className="mt-1"
-                required
+                required={true}
               />
             </div>
             <div>
@@ -136,18 +148,9 @@ export default function BrandManager() {
                 id="logoUrl"
                 type="url"
                 value={formData.logoUrl}
-                onChange={(e) => setFormData({ ...formData, logoUrl: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, logoUrl: e.target.value.trim() })}
                 className="mt-1"
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="description" className="text-sm font-medium text-gray-700">Description</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="mt-1"
+                required={true}
               />
             </div>
             <div className="flex gap-2">
@@ -160,7 +163,7 @@ export default function BrandManager() {
                 onClick={() => {
                   setEditingBrand(null);
                   setIsCreating(false);
-                  setFormData({ name: '', logoUrl: '', description: '' });
+                  setFormData({ name: '', logoUrl: '' });
                 }}
                 className=""
               >
@@ -178,7 +181,6 @@ export default function BrandManager() {
             <thead>
               <tr className="bg-gray-50">
                 <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Brand</th>
-                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
                 <th className="text-right py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
@@ -194,9 +196,6 @@ export default function BrandManager() {
                       />
                       <span className="text-sm font-medium text-gray-900">{brand.name}</span>
                     </div>
-                  </td>
-                  <td className="py-4 px-6">
-                    <p className="text-sm text-gray-500 line-clamp-2">{brand.description}</p>
                   </td>
                   <td className="py-4 px-6">
                     <div className="flex items-center justify-end gap-2">
