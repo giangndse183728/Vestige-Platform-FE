@@ -7,8 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search } from 'lucide-react';
 import { toast } from 'sonner';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { createBrandSchema } from '@/features/brand/schema';
+import * as z from "zod";
 
 export default function BrandManager() {
   const { data: brands, isLoading } = useBrands();
@@ -18,30 +23,38 @@ export default function BrandManager() {
 
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     logoUrl: '',
-    description: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       if (editingBrand) {
+        let validatedData = createBrandSchema.parse(formData);
+
         await updateBrand.mutateAsync({
           brandId: editingBrand.brandId,
-          data: formData,
+          data: validatedData,
         });
         toast.success('Brand updated successfully');
         setEditingBrand(null);
       } else {
-        await createBrand.mutateAsync(formData);
+        let validatedData = createBrandSchema.parse(formData);
+
+        await createBrand.mutateAsync(validatedData);
         toast.success('Brand created successfully');
         setIsCreating(false);
       }
-      setFormData({ name: '', logoUrl: '', description: '' });
-    } catch (error) {
-      toast.error('An error occurred');
+      setFormData({ name: '', logoUrl: '' });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        toast.error(error.errors[0].message);
+      } else {
+        toast.error(error.response?.data?.message || 'An error occurred while creating/updating the brand.');
+      }
     }
   };
 
@@ -50,7 +63,6 @@ export default function BrandManager() {
     setFormData({
       name: brand.name,
       logoUrl: brand.logoUrl,
-      description: brand.description || '',
     });
   };
 
@@ -59,115 +71,158 @@ export default function BrandManager() {
       try {
         await deleteBrand.mutateAsync(brandId);
         toast.success('Brand deleted successfully');
-      } catch (error) {
-        toast.error('An error occurred');
+      } catch (error: any) {
+        if (error.response?.status === 409) {
+          toast.error('Cannot delete brand: It has associated products. Please remove or reassign the products first.');
+        } else {
+          toast.error('Cannot delete brand: It has associated products. Please remove or reassign the products first.');
+        }
       }
     }
   };
 
+  const filteredBrands = brands?.filter(brand =>
+    brand.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    brand.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-gothic">Brands</h2>
-        <Button
-          onClick={() => setIsCreating(true)}
-          className="flex items-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          Add Brand
-        </Button>
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900">Brands</h2>
+          <p className="text-sm text-gray-500">Manage your product brands</p>
+        </div>
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <div className="relative flex-1 sm:flex-none">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              type="search"
+              placeholder="Search brands..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 w-64"
+            />
+          </div>
+          <Button
+            onClick={() => setIsCreating(true)}
+            className="flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Add Brand
+          </Button>
+        </div>
       </div>
 
+      {/* Form */}
       {(isCreating || editingBrand) && (
-        <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg">
-          <div>
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              required
-            />
+        <Card>
+          <div className="p-6 border-b">
+            <h3 className="text-lg font-semibold text-gray-900">
+              {editingBrand ? 'Edit Brand' : 'Create New Brand'}
+            </h3>
           </div>
-          <div>
-            <Label htmlFor="logoUrl">Logo URL</Label>
-            <Input
-              id="logoUrl"
-              type="url"
-              value={formData.logoUrl}
-              onChange={(e) => setFormData({ ...formData, logoUrl: e.target.value })}
-              required
-            />
-          </div>
-          <div>
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            />
-          </div>
-          <div className="flex gap-2">
-            <Button type="submit">
-              {editingBrand ? 'Update' : 'Create'}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                setEditingBrand(null);
-                setIsCreating(false);
-                setFormData({ name: '', logoUrl: '', description: '' });
-              }}
-            >
-              Cancel
-            </Button>
-          </div>
-        </form>
-      )}
-
-      <div className="grid gap-4">
-        {brands?.map((brand) => (
-          <div
-            key={brand.brandId}
-            className="flex items-center justify-between p-4 border rounded-lg"
-          >
-            <div className="flex items-center gap-4">
-              <img
-                src={brand.logoUrl}
-                alt={brand.name}
-                className="w-12 h-12 object-contain"
+          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <div>
+              <Label htmlFor="name" className="text-sm font-medium text-gray-700">Name</Label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value.trim() })}
+                className="mt-1"
+                required={true}
               />
-              <div>
-                <h3 className="font-gothic text-lg">{brand.name}</h3>
-                {brand.description && (
-                  <p className="text-sm text-gray-600">{brand.description}</p>
-                )}
-              </div>
+            </div>
+            <div>
+              <Label htmlFor="logoUrl" className="text-sm font-medium text-gray-700">Logo URL</Label>
+              <Input
+                id="logoUrl"
+                type="url"
+                value={formData.logoUrl}
+                onChange={(e) => setFormData({ ...formData, logoUrl: e.target.value.trim() })}
+                className="mt-1"
+                required={true}
+              />
             </div>
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => handleEdit(brand)}
-              >
-                <Pencil className="h-4 w-4" />
+              <Button type="submit">
+                {editingBrand ? 'Update' : 'Create'}
               </Button>
               <Button
+                type="button"
                 variant="outline"
-                size="icon"
-                onClick={() => handleDelete(brand.brandId)}
+                onClick={() => {
+                  setEditingBrand(null);
+                  setIsCreating(false);
+                  setFormData({ name: '', logoUrl: '' });
+                }}
+                className=""
               >
-                <Trash2 className="h-4 w-4" />
+                Cancel
               </Button>
             </div>
-          </div>
-        ))}
-      </div>
+          </form>
+        </Card>
+      )}
+
+      {/* Brands List */}
+      <Card className="overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Brand</th>
+                <th className="text-right py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {filteredBrands?.map((brand) => (
+                <tr key={brand.brandId} className="hover:bg-gray-50">
+                  <td className="py-4 px-6">
+                    <div className="flex items-center gap-4">
+                      <img
+                        src={brand.logoUrl}
+                        alt={brand.name}
+                        className="w-12 h-12 object-contain bg-gray-50 rounded-lg p-2 border border-gray-200"
+                      />
+                      <span className="text-sm font-medium text-gray-900">{brand.name}</span>
+                    </div>
+                  </td>
+                  <td className="py-4 px-6">
+                    <div className="flex items-center justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEdit(brand)}
+                        className="h-8 w-8"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDelete(brand.brandId)}
+                        className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
     </div>
   );
 } 

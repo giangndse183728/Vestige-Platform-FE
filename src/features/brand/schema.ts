@@ -4,7 +4,6 @@ export const brandSchema = z.object({
   brandId: z.number(),
   name: z.string(),
   logoUrl: z.string().url(),
-  description: z.string().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -12,7 +11,6 @@ export const brandSchema = z.object({
 export const createBrandSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   logoUrl: z.string().url('Invalid logo URL'),
-  description: z.string().optional(),
 });
 
 export const brandsResponseSchema = z.array(brandSchema);
