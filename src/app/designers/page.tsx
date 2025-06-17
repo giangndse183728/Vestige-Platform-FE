@@ -55,28 +55,36 @@ export default function DesignersPage() {
                 </Card>
               ))
             ) : (
-              // Brand cards
-              filteredBrands?.map((brand) => (
-                <Card 
-                  key={brand.brandId} 
-                  className="overflow-hidden group hover:shadow-lg transition-all duration-300"
-                >
-                  <div className="relative aspect-[4/3] w-full bg-muted/10">
-                    <Image
-                      src={brand.logoUrl && isValidUrl(brand.logoUrl) ? brand.logoUrl : '/file.svg'}
-                      alt={brand.name}
-                      fill
-                      className="object-contain p-6 group-hover:scale-105 transition-transform duration-300"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    />
-                  </div>
-                  <div className="p-4 border-t">
-                    <h2 className="text-xl font-semibold text-center group-hover:text-primary transition-colors">
-                      {brand.name}
-                    </h2>
-                  </div>
-                </Card>
-              ))
+              // Brand cards or No results message
+              filteredBrands && filteredBrands.length > 0 ? (
+                filteredBrands.map((brand) => (
+                  <Card 
+                    key={brand.brandId} 
+                    className="overflow-hidden group hover:shadow-lg transition-all duration-300"
+                  >
+                    <div className="relative aspect-[4/3] w-full bg-muted/10">
+                      <Image
+                        src={brand.logoUrl && isValidUrl(brand.logoUrl) ? brand.logoUrl : '/file.svg'}
+                        alt={brand.name}
+                        fill
+                        className="object-contain p-6 group-hover:scale-105 transition-transform duration-300"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                    </div>
+                    <div className="p-4 border-t">
+                      <h2 className="text-xl font-semibold text-center group-hover:text-primary transition-colors">
+                        {brand.name}
+                      </h2>
+                    </div>
+                  </Card>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-10">
+                  <p className="text-muted-foreground text-lg">
+                    No brands found matching your search.
+                  </p>
+                </div>
+              )
             )}
           </div>
         </div>
