@@ -15,7 +15,7 @@ export function ProductCard({ product }: ProductCardProps) {
           {product.condition}
         </div>
         
-        <div className="relative h-80 overflow-hidden bg-gray-100">
+        <div className="relative aspect-[1/1] overflow-hidden bg-gray-100">
           <Image 
             src={product.primaryImageUrl}
             alt={product.title}

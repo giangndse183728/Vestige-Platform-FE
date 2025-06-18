@@ -41,6 +41,6 @@ export const deleteAddress = async (addressId: number): Promise<void> => {
 };
 
 export const setDefaultAddress = async (addressId: number): Promise<Address> => {
-  const response = await api.put<Address>(`/users/addresses/${addressId}/set-default`);
+  const response = await api.patch<Address>(`/users/addresses/${addressId}/set-default`);
   return response.data;
 };

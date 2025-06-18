@@ -13,11 +13,6 @@ export const metadata = generateSEOMetadata({
   }
 });
 
-
 export default function ProductsPage() {
-  return (
-    <main className="mt-24">
-      <ProductList />
-    </main>
-  );
+  return <ProductList />;
 }

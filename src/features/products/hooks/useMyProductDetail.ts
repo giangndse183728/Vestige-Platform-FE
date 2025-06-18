@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { getMyProductDetail } from '../services';
 
-export const useProductDetail = (id: string) => {
+export const useMyProductDetail = (id: string) => {
   return useQuery({
-    queryKey: ['product-detail', id],
+    queryKey: ['my-product-detail', id],
     queryFn: () => getMyProductDetail(id),
     enabled: !!id,
   });

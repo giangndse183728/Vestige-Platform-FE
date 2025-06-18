@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Star, Heart, Eye, Truck, Shield, Clock, UserCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -69,6 +70,7 @@ interface ProductDetailProps {
 export function ProductDetail({ product }: ProductDetailProps) {
   const addToCart = useCartStore((state) => state.addItem);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const router = useRouter();
 
   const handleAddToCart = () => {
     addToCart({
@@ -109,8 +111,8 @@ export function ProductDetail({ product }: ProductDetailProps) {
     const conditions = {
       'NEW': 5,
       'LIKE_NEW': 4,
-      'EXCELLENT': 3,
-      'GOOD': 2,
+      'USED_EXCELLENT': 3,
+      'USED_GOOD': 2,
       'FAIR': 1
     };
     return conditions[condition as keyof typeof conditions] || 0;
@@ -121,7 +123,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
       <div className="grid grid-cols-1 lg:grid-cols-2 ">
         {/* Product Images */}
         <div className="space-y-4">
-          <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden border-2 border-black -mr-[2px] -mb-[2px]">
+          <div className="relative aspect-[1/1] bg-gray-100 overflow-hidden border-2 border-black -mr-[2px] -mb-[2px]">
             {product.images.length > 0 ? (
               <Image
                 src={product.images[selectedImageIndex].imageUrl}
@@ -256,6 +258,19 @@ export function ProductDetail({ product }: ProductDetailProps) {
                       <div className="text-xs text-gray-500 mb-1">Category</div>
                       <div className="text-sm font-medium">{product.category.name}</div>
                     </div>
+                    <div className="py-2">
+                      <div className="text-xs text-gray-500 mb-1">Status</div>
+                      <div className="flex items-center gap-2">
+                        <div className={`px-3 py-1 rounded-sm text-xs font-medium ${
+                          product.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
+                          product.status === 'INACTIVE' ? 'bg-gray-100 text-gray-800' :
+                          product.status === 'DRAFT' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {product.status || 'INACTIVE'}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -311,7 +326,10 @@ export function ProductDetail({ product }: ProductDetailProps) {
             </div>
 
             <div className="flex flex-col ">
-              <button className="w-full bg-[var(--dark-red)] text-white py-3 font-medium hover:bg-[var(--dark-red)]/90 transition-colors border-2 border-black -mr-[2px] -mb-[2px]">
+              <button 
+                className="w-full bg-[var(--dark-red)] text-white py-3 font-medium hover:bg-red-700 transition-colors border-2 border-black -mr-[2px] -mb-[2px]"
+                onClick={() => router.push(`/checkout?productId=${product.productId}`)}
+              >
                 Buy Now
               </button>
               <Button 
