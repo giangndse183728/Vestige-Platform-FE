@@ -8,14 +8,14 @@ import Link from 'next/link';
 export default function CategoriesPage() {
   const { data: categories, isLoading } = useCategories();
 
-  // Filter top-level categories (level 0) that have children to serve as main mega menu columns
+  // Filter top-level categories
   const topLevelCategories = categories?.filter(cat => cat.level === 0);
 
   if (isLoading) {
     return (
       <main className="min-h-screen bg-background p-8">
         <div className="container mx-auto">
-          <h1 className="text-3xl font-bold mb-8">Shop by Category</h1>
+          <h1 className="font-metal text-3xl tracking-wider uppercase mb-8">Shop by Category</h1>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {Array.from({ length: 8 }).map((_, index) => (
               <div key={index} className="space-y-4">
@@ -44,28 +44,34 @@ export default function CategoriesPage() {
   return (
     <main className="min-h-screen bg-background p-8">
       <div className="container mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Shop by Category</h1>
+        <h1 className="font-metal text-3xl tracking-wider uppercase mb-8">Shop by Category</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12">
           {topLevelCategories?.map((category) => (
-            <div key={category.categoryId} className="space-y-4">
+            <Card key={category.categoryId} variant="double" className="p-6 hover:shadow-lg transition-shadow">
               <h2 className="text-xl font-semibold text-gray-900 border-b pb-2 mb-2">
-                <Link href={`/categories`} className="hover:text-primary transition-colors">
-                  {category.name}
+                <Link href={`/categories/${category.categoryId}`} className="hover:text-primary transition-colors">
+                  <span className="hover:underline underline-offset-4 transition-all">{category.name}</span>
                 </Link>
               </h2>
               {category.children && category.children.length > 0 && (
                 <ul className="space-y-2">
                   {category.children?.map((child) => (
                     <li key={child.categoryId}>
-                      <Link href={`/categories`} className="text-gray-700 hover:text-primary transition-colors text-base">
+                      <Link 
+                        href={`/categories/${child.categoryId}`}
+                        className="text-gray-700 hover:text-primary transition-colors text-base block hover:underline underline-offset-4 transition-all"
+                      >
                         {child.name}
                       </Link>
                       {child.children && child.children.length > 0 && (
                         <ul className="ml-4 space-y-1 mt-1">
                           {child.children.map((grandchild) => (
                             <li key={grandchild.categoryId}>
-                              <Link href={`/categories`} className="text-gray-500 hover:text-primary transition-colors text-sm">
+                              <Link 
+                                href={`/categories/${grandchild.categoryId}`}
+                                className="text-gray-500 hover:text-primary transition-colors text-sm block hover:underline underline-offset-4 transition-all"
+                              >
                                 {grandchild.name}
                               </Link>
                             </li>
@@ -76,7 +82,7 @@ export default function CategoriesPage() {
                   ))}
                 </ul>
               )}
-            </div>
+            </Card>
           ))}
         </div>
 

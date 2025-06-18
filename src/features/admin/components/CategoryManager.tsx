@@ -12,6 +12,12 @@ import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
 import * as z from "zod";
 import React from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 export default function CategoryManager() {
   const { data: categories, isLoading } = useCategories();
@@ -27,6 +33,7 @@ export default function CategoryManager() {
     description: '',
     parentCategoryId: null as number | null,
   });
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,6 +78,19 @@ export default function CategoryManager() {
       description: category.description || '',
       parentCategoryId: category.parent ? category.parent.categoryId : null,
     });
+    setIsModalOpen(true);
+  };
+
+  const handleCreate = () => {
+    setEditingCategory(null);
+    setFormData({ name: '', description: '', parentCategoryId: null });
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingCategory(null);
+    setFormData({ name: '', description: '', parentCategoryId: null });
   };
 
   const handleDelete = async (categoryId: number) => {
@@ -188,7 +208,7 @@ export default function CategoryManager() {
             />
           </div>
           <Button
-            onClick={() => setIsCreating(true)}
+            onClick={handleCreate}
             className="flex items-center gap-2"
           >
             <Plus className="h-4 w-4" />
@@ -198,14 +218,14 @@ export default function CategoryManager() {
       </div>
 
       {/* Form */}
-      {(isCreating || editingCategory) && (
-        <Card>
-          <div className="p-6 border-b">
-            <h3 className="text-lg font-semibold text-gray-900">
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>
               {editingCategory ? 'Edit Category' : 'Create New Category'}
-            </h3>
-          </div>
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="name" className="text-sm font-medium text-gray-700">Name</Label>
               <Input
@@ -246,26 +266,22 @@ export default function CategoryManager() {
                 ))}
               </select>
             </div>
-            <div className="flex gap-2">
-              <Button type="submit">
+            <div className="flex gap-2 pt-4">
+              <Button type="submit" className="flex-1 border border-black hover:bg-black hover:text-white transition-colors">
                 {editingCategory ? 'Update' : 'Create'}
               </Button>
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => {
-                  setEditingCategory(null);
-                  setIsCreating(false);
-                  setFormData({ name: '', description: '', parentCategoryId: null });
-                }}
-                className=""
+                onClick={handleCloseModal}
+                className="flex-1 border border-black hover:bg-black hover:text-white transition-colors"
               >
                 Cancel
               </Button>
             </div>
           </form>
-        </Card>
-      )}
+        </DialogContent>
+      </Dialog>
 
       {/* Categories List */}
       <Card className="overflow-hidden">

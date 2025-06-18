@@ -58,3 +58,23 @@ export const updateProduct = async (id: number, data: UpdateProductRequest) => {
   const response = await api.patch<ApiResponse<ProductDetail>>(`/products/${id}`, data);
   return response.data.data;
 };
+
+export const getAllProductStatuses = async (): Promise<any> => {
+  const response = await api.get('/products/admin/all-statuses');
+  return response.data.data;
+};
+
+export const deleteProductByAdmin = async (id: number) => {
+  const response = await api.delete(`/products/admin/${id}`);
+  return response.data;
+};
+
+export const updateProductByAdmin = async (id: number, data: any) => {
+  const response = await api.patch(`/products/admin/${id}`, data);
+  return response.data;
+};
+
+export const updateProductImagesByAdmin = async (id: number, images: any) => {
+  const response = await api.patch(`/products/admin/${id}/images`, images);
+  return response.data;
+};
