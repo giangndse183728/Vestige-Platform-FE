@@ -9,7 +9,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Star, Shield, Calendar, User, TrendingUp, Award, Edit3, Save, X, Camera } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Star, Shield, Calendar as CalendarIcon, User, TrendingUp, Award, Edit3, Save, X, Camera, CreditCard } from 'lucide-react';
 import { useProfile } from '../hooks/useProfile';
 import { profileFormSchema, ProfileFormData } from '../schema';
 import { ProfileSkeleton } from './ProfileSkeleton';
@@ -20,6 +22,9 @@ import { AddressList } from './AddressList';
 import { AddressFormData, Address } from '../schema';
 import { MotionDiv } from '@/components/animation/AnimatedWrapper';
 import { ActivityStats } from './ActivityStats';
+import { format } from 'date-fns';
+import { cn } from '@/libs/cn';
+import { StripeAccountSection } from '@/features/payment/components/StripeAccountSection';
 
 export const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -310,12 +315,33 @@ export const Profile = () => {
                   <div className="space-y-4">
                     <div>
                       <Label className="font-gothic text-sm text-black">Date of Birth</Label>
-                      <Input 
-                        type="date"
-                        value={editData.dateOfBirth || ''}
-                        onChange={(e) => handleInputChange('dateOfBirth', e.target.value || null)}
-                        className="border-black focus:border-black focus:ring-0"
-                      />
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant={"outline"}
+                            size={"sm"}
+                            className={cn(
+                              "w-[240px] justify-start text-left font-normal",
+                              !editData.dateOfBirth && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {editData.dateOfBirth ? (
+                              format(new Date(editData.dateOfBirth), "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={editData.dateOfBirth ? new Date(editData.dateOfBirth) : undefined}
+                            onSelect={(date) => handleInputChange('dateOfBirth', date ? date.toISOString().split('T')[0] : null)}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
                     </div>
                     <div>
                       <Label className="font-gothic text-sm text-black">Gender</Label>
@@ -400,6 +426,8 @@ export const Profile = () => {
             />
           )}
         </div>
+
+        <StripeAccountSection />
 
         <ActivityStats user={user} />
 

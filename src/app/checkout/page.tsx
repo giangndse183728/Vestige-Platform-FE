@@ -1,0 +1,345 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { useCreateOrder } from '@/features/order/hooks/useCreateOrder';
+import { useAddresses } from '@/features/profile/hooks/useAddresses';
+import { CreateOrderData } from '@/features/order/schema';
+import { useProductDetail } from '@/features/products/hooks/useProductDetail';
+import { toast } from 'sonner';
+import { MapPin, CreditCard, Truck, ArrowLeft, UserCircle, Shield, Star } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { CompactStripeStatus } from '@/features/payment/components/CompactStripeStatus';
+
+export default function CheckoutPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const productId = searchParams.get('productId');
+  
+  const [orderData, setOrderData] = useState<CreateOrderData>({
+    items: [],
+    shippingAddressId: 0,
+    paymentMethod: 'STRIPE_CARD',
+    notes: ''
+  });
+
+  const { mutate: createOrder, isPending } = useCreateOrder();
+  const { addresses, isLoading: isLoadingAddresses } = useAddresses();
+  const { data: product, isLoading: isLoadingProduct } = useProductDetail(productId || '');
+
+  useEffect(() => {
+    if (addresses && addresses.length > 0 && orderData.shippingAddressId === 0) {
+      const defaultAddress = addresses.find(addr => addr.isDefault);
+      if (defaultAddress) {
+        setOrderData(prev => ({
+          ...prev,
+          shippingAddressId: defaultAddress.addressId
+        }));
+      }
+    }
+  }, [addresses, orderData.shippingAddressId]);
+
+  useEffect(() => {
+    if (productId) {
+      setOrderData(prev => ({
+        ...prev,
+        items: [{ productId: parseInt(productId), notes: '' }]
+      }));
+    }
+  }, [productId]);
+
+  const handleItemNotesChange = (notes: string) => {
+    setOrderData(prev => ({
+      ...prev,
+      items: prev.items.map(item => ({ ...item, notes }))
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!orderData.shippingAddressId) {
+      toast.error('Please select a shipping address');
+      return;
+    }
+
+
+    createOrder(orderData, {
+      onSuccess: () => {
+        toast.success('Order created successfully!');
+      }
+    });
+  };
+
+  const handleInputChange = (field: keyof CreateOrderData, value: any) => {
+    setOrderData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  if (isLoadingProduct || !product) {
+    return (
+      <div className="min-h-screen bg-[#f8f7f3]/80 flex items-center justify-center">
+        <div className="text-center">
+          <p className="font-gothic text-lg">Loading product details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#f8f7f3]/80">
+      <div className="max-w-8xl mx-auto p-6 mt-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - Order Form */}
+          <div className="lg:col-span-2 space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Product Summary */}
+              <Card variant="double">
+                <CardContent className="p-10">
+                  <h3 className="font-metal text-lg mb-6">Product Details</h3>
+                  
+                  {/* Product Image and Basic Info */}
+                  <div className="flex gap-6 mb-6">
+                    <div className="relative w-70 h-70 bg-gray-100 border-2 border-black flex-shrink-0">
+                      <Image
+                        src={product.images[0]?.imageUrl || '/rick.png'}
+                        alt={product.title}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-medium text-xl mb-2">{product.title}</h4>
+                      <p className="text-lg font-metal text-red-900 mb-4">${product.price.toFixed(2)}</p>
+                      
+                      {/* Product Details Table */}
+                      <div className="border border-gray-200 rounded-lg overflow-hidden mb-4">
+                        <table className="w-full text-sm">
+                          <tbody>
+                            <tr className="border-b border-gray-100">
+                              <td className="px-3 py-2 bg-gray-50 font-medium text-gray-700 w-1/3">Brand</td>
+                              <td className="px-3 py-2">{product.brand.name}</td>
+                            </tr>
+                            <tr className="border-b border-gray-100">
+                              <td className="px-3 py-2 bg-gray-50 font-medium text-gray-700">Category</td>
+                              <td className="px-3 py-2">{product.category.name}</td>
+                            </tr>
+                            {product.size && (
+                              <tr className="border-b border-gray-100">
+                                <td className="px-3 py-2 bg-gray-50 font-medium text-gray-700">Size</td>
+                                <td className="px-3 py-2">{product.size}</td>
+                              </tr>
+                            )}
+                            {product.color && (
+                              <tr>
+                                <td className="px-3 py-2 bg-gray-50 font-medium text-gray-700">Color</td>
+                                <td className="px-3 py-2">
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-4 h-4 border border-gray-300 rounded" style={{ backgroundColor: product.color.toLowerCase() }} />
+                                    <span>{product.color}</span>
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                      
+                      {/* Item Notes */}
+                 
+                    </div>
+                  </div>
+
+                  {/* Seller Information */}
+                  <div className="border-t border-gray-200 pt-6">
+                    <h4 className="font-metal text-md mb-4">Seller Information</h4>
+                    <div className="flex items-center gap-4">
+                      <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-black">
+                        {product.seller.profilePictureUrl ? (
+                          <Image
+                            src={product.seller.profilePictureUrl}
+                            alt={`${product.seller.firstName} ${product.seller.lastName}`}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                            <UserCircle className="w-8 h-8 text-gray-400" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className="font-medium text-lg">{product.seller.firstName} {product.seller.lastName}</span>
+                          {product.seller.isLegitProfile && (
+                            <span className="flex items-center gap-1 text-green-600 text-sm bg-green-50 px-2 py-1 rounded">
+                              <Shield className="w-4 h-4" />
+                              Verified Seller
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-4 text-sm text-gray-600">
+                          <div className="flex items-center gap-1">
+                            <Star className="w-4 h-4 text-yellow-400" />
+                            <span>{product.seller.sellerRating} ({product.seller.sellerReviewsCount} reviews)</span>
+                          </div>
+                          <span>•</span>
+                          <span>{product.seller.successfulTransactions} successful transactions</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Shipping Address */}
+              <Card variant="stamp">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <MapPin className="w-5 h-5 text-red-900" />
+                    <h3 className="font-metal text-lg">Shipping Address</h3>
+                  </div>
+                  
+                  {isLoadingAddresses ? (
+                    <div className="text-center py-4">Loading addresses...</div>
+                  ) : addresses && addresses.length > 0 ? (
+                    <div className="space-y-3">
+                      {addresses.map((address) => (
+                        <div
+                          key={address.addressId}
+                          className={`p-4 border-2 cursor-pointer transition-all ${
+                            orderData.shippingAddressId === address.addressId
+                              ? 'border-red-900 bg-red-50'
+                              : 'border-black hover:border-gray-600'
+                          }`}
+                          onClick={() => handleInputChange('shippingAddressId', address.addressId)}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <p className="font-medium">{address.addressLine1}</p>
+                              {address.addressLine2 && <p className="text-sm text-gray-600">{address.addressLine2}</p>}
+                              <p className="text-sm text-gray-600">
+                                {address.city}, {address.state} {address.postalCode}
+                              </p>
+                              <p className="text-sm text-gray-600">{address.country}</p>
+                            </div>
+                            {address.isDefault && (
+                              <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                                Default
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-4 text-gray-500">
+                      No addresses found. Please add an address in your profile.
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </form>
+          </div>
+
+          {/* Right Column - Order Summary */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-20">
+              <Card variant="decorated">
+                <CardContent className="p-10">
+                  <h3 className="font-metal text-lg mb-4">Order Summary</h3>
+                  <div className="space-y-4">
+                
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Product Price:</span>
+                        <span>${product.price.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>Shipping:</span>
+                        <span className="text-green-600">Free</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>Tax:</span>
+                        <span>$0.00</span>
+                      </div>
+                      <Separator />
+                      <div className="flex justify-between font-metal text-lg">
+                        <span>Total:</span>
+                        <span className="text-red-900">${product.price.toFixed(2)}</span>
+                      </div>
+                    </div>
+
+                    {/* Selected Address */}
+                    {orderData.shippingAddressId > 0 && addresses && (
+                      <div className="pt-4 border-t border-gray-200">
+                        <h4 className="font-medium text-sm mb-2">Shipping to:</h4>
+                        {addresses.find(addr => addr.addressId === orderData.shippingAddressId) && (
+                          <div className="text-xs text-gray-600">
+                            <p>{addresses.find(addr => addr.addressId === orderData.shippingAddressId)?.addressLine1}</p>
+                            <p>{addresses.find(addr => addr.addressId === orderData.shippingAddressId)?.city}, {addresses.find(addr => addr.addressId === orderData.shippingAddressId)?.state}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Payment Method */}
+                    <div className="pt-4 border-t border-gray-200">
+                      <h4 className="font-medium text-sm mb-2">Payment Method:</h4>
+                      <Select
+                        value={orderData.paymentMethod}
+                        onValueChange={(value) => handleInputChange('paymentMethod', value)}
+                      >
+                        <SelectTrigger className="border-black focus:border-black focus:ring-0 h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="COD">Cash on Delivery (COD)</SelectItem>
+                          <SelectItem value="STRIPE_CARD">Stripe Card</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {orderData.paymentMethod === 'STRIPE_CARD' && (
+                      <div className="pt-4 border-t border-gray-200">
+                        <CompactStripeStatus />
+                      </div>
+                    )}
+
+                    <div className="pt-4 space-y-3">
+                      <Button
+                        type="submit"
+                        disabled={isPending || !orderData.shippingAddressId}
+                        className="w-full text-white bg-red-900 hover:bg-red-800"
+                        onClick={handleSubmit}
+                      >
+                        {isPending ? 'Checkout...' : 'Checkout'}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => router.back()}
+                        className="w-full border-black text-black hover:bg-gray-100"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

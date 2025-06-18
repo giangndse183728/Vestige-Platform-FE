@@ -173,24 +173,6 @@ export function CreateProduct() {
 
   return (
     <div className="container mx-auto py-4 mt-1 overflow-hidden px-6">
-      <div className="mb-8 text-center border-b-4 border-black pb-6">
-        <h1 className="font-serif text-5xl font-bold text-black mb-2 tracking-wide">
-          THE MARKETPLACE HERALD
-        </h1>
-        <div className="flex items-center justify-center gap-4 text-sm">
-          <span className="border-l-2 border-r-2 border-black px-4 font-mono">
-            CREATE NEW LISTING
-          </span>
-          <span className="font-mono">
-            {new Date().toLocaleDateString('en-US', { 
-              weekday: 'long', 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}
-          </span>
-        </div>
-      </div>
 
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -199,7 +181,7 @@ export function CreateProduct() {
             <Card variant="stamp">
               <CardContent className="p-1">
                 <div className="space-y-4">
-                  <div className="relative aspect-[4/3] bg-gray-100 border-2 border-black overflow-hidden">
+                  <div className="relative aspect-[1/1] bg-gray-100 border-2 border-black overflow-hidden">
                     {formData.imageUrls[0] ? (
                       <Image
                         src={formData.imageUrls[0]}

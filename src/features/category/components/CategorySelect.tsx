@@ -16,6 +16,7 @@ interface CategorySelectProps {
   onValueChange: (value: string) => void;
   label?: string;
   required?: boolean;
+  showAllOption?: boolean;
 }
 
 export function CategorySelect({
@@ -23,6 +24,7 @@ export function CategorySelect({
   onValueChange,
   label = 'Category',
   required = false,
+  showAllOption = false,
 }: CategorySelectProps) {
   const { data, isLoading } = useCategories();
   const categories = data || [];
@@ -48,6 +50,11 @@ export function CategorySelect({
           <SelectValue placeholder="Select category" />
         </SelectTrigger>
         <SelectContent className="rounded-none bg-white">
+          {showAllOption && (
+            <SelectItem value="all">
+              All Categories
+            </SelectItem>
+          )}
           {uniqueCategories?.map((category: Category) => (
             <div key={category.categoryId}>
               <SelectItem 
