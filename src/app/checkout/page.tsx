@@ -9,14 +9,141 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useCreateOrder } from '@/features/order/hooks/useCreateOrder';
+import { useConfirmPayment } from '@/features/order/hooks/useConfirmPayment';
 import { useAddresses } from '@/features/profile/hooks/useAddresses';
-import { CreateOrderData } from '@/features/order/schema';
+import { CreateOrderData, Order } from '@/features/order/schema';
 import { useProductDetail } from '@/features/products/hooks/useProductDetail';
+import { useStripeRefreshOnboard } from '@/features/payment/hooks/useStripeRefreshOnboard';
 import { toast } from 'sonner';
-import { MapPin, CreditCard, Truck, ArrowLeft, UserCircle, Shield, Star } from 'lucide-react';
+import { MapPin, CreditCard, Truck, ArrowLeft, UserCircle, Shield, Star, ExternalLink } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { CompactStripeStatus } from '@/features/payment/components/CompactStripeStatus';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+
+// Initialize Stripe (you'll need to add your publishable key)
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_51RXISzFf0tmsJyuNYhfzqTsuXWJFp90cNQeLhe622Md8dBIfJsFUtFuJ5On4DusNRgidDMmjx7qvIICzkcQFIJo5004YuApasP');
+
+// Stripe Card Component
+const StripeCardForm = ({ order, onPaymentSuccess }: { order: Order; onPaymentSuccess: () => void }) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const { mutate: confirmPayment, isPending: isConfirmingPayment } = useConfirmPayment();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [cardError, setCardError] = useState<string>('');
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!stripe || !elements) {
+      toast.error('Stripe is not loaded. Please refresh the page.');
+      return;
+    }
+
+    setIsProcessing(true);
+    setCardError('');
+
+    const cardElement = elements.getElement(CardElement);
+    if (!cardElement) {
+      setIsProcessing(false);
+      toast.error('Card element not found. Please refresh the page.');
+      return;
+    }
+
+    // Confirm the payment with Stripe
+    const { error, paymentIntent } = await stripe.confirmCardPayment(order.metadata?.clientSecret || '', {
+      payment_method: {
+        card: cardElement,
+      },
+    });
+
+    if (error) {
+      setCardError(error.message || 'Payment failed');
+      toast.error(`Payment failed: ${error.message}`);
+      setIsProcessing(false);
+      return;
+    }
+
+    if (paymentIntent.status === 'succeeded') {
+      // Call our backend to confirm the payment
+      confirmPayment({
+        orderId: order.orderId,
+        stripePaymentIntentId: order.stripePaymentIntentId || '',
+        clientSecret: order.metadata?.clientSecret || ''
+      }, {
+        onSuccess: () => {
+          toast.success('Payment confirmed successfully!');
+          onPaymentSuccess();
+        },
+        onError: (error) => {
+          toast.error('Payment confirmation failed. Please contact support.');
+          console.error('Payment confirmation error:', error);
+          onPaymentSuccess(); // Still redirect since payment was successful
+        }
+      });
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label className="text-sm font-medium">Card Information</Label>
+        <div className="p-4 border-2 border-gray-300 rounded-lg focus-within:border-blue-500 transition-colors">
+          <CardElement
+            options={{
+              style: {
+                base: {
+                  fontSize: '16px',
+                  color: '#424770',
+                  fontFamily: 'system-ui, sans-serif',
+                  '::placeholder': {
+                    color: '#aab7c4',
+                  },
+                  ':-webkit-autofill': {
+                    color: '#424770',
+                  },
+                },
+                invalid: {
+                  color: '#9e2146',
+                },
+              },
+              hidePostalCode: true,
+            }}
+            onChange={(event) => {
+              if (event.error) {
+                setCardError(event.error.message);
+              } else {
+                setCardError('');
+              }
+            }}
+          />
+        </div>
+        {cardError && (
+          <p className="text-sm text-red-600">{cardError}</p>
+        )}
+      </div>
+      
+      <div className="bg-gray-50 p-4 rounded-lg">
+        <p className="text-sm text-gray-600 mb-2">Test Card Numbers:</p>
+        <div className="space-y-1 text-xs text-gray-500">
+          <p>• Visa: 4242 4242 4242 4242</p>
+          <p>• Mastercard: 5555 5555 5555 4444</p>
+          <p>• Any future date for expiry</p>
+          <p>• Any 3-digit CVC</p>
+        </div>
+      </div>
+
+      <Button
+        type="submit"
+        disabled={!stripe || isProcessing || isConfirmingPayment || !!cardError}
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400"
+      >
+        {isProcessing || isConfirmingPayment ? 'Processing Payment...' : 'Pay Now'}
+      </Button>
+    </form>
+  );
+};
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -30,9 +157,13 @@ export default function CheckoutPage() {
     notes: ''
   });
 
-  const { mutate: createOrder, isPending } = useCreateOrder();
+  const [createdOrder, setCreatedOrder] = useState<Order | null>(null);
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
+
+  const { mutate: createOrder, isPending: isCreatingOrder } = useCreateOrder();
   const { addresses, isLoading: isLoadingAddresses } = useAddresses();
   const { data: product, isLoading: isLoadingProduct } = useProductDetail(productId || '');
+  const { mutate: refreshStripeOnboard, isPending: isRefreshingOnboard } = useStripeRefreshOnboard();
 
   useEffect(() => {
     if (addresses && addresses.length > 0 && orderData.shippingAddressId === 0) {
@@ -70,12 +201,31 @@ export default function CheckoutPage() {
       return;
     }
 
-
+    // Create the order first
     createOrder(orderData, {
-      onSuccess: () => {
+      onSuccess: (order: Order) => {
         toast.success('Order created successfully!');
+        setCreatedOrder(order);
+        
+        if (orderData.paymentMethod === 'STRIPE_CARD') {
+          // Show Stripe payment form
+          setShowPaymentForm(true);
+        } else {
+          // For COD orders, redirect to success page
+          router.push(`/checkout/success?orderId=${order.orderId}`);
+        }
+      },
+      onError: (error) => {
+        toast.error('Failed to create order. Please try again.');
+        console.error('Order creation error:', error);
       }
     });
+  };
+
+  const handlePaymentSuccess = () => {
+    if (createdOrder) {
+      router.push(`/checkout/success?orderId=${createdOrder.orderId}`);
+    }
   };
 
   const handleInputChange = (field: keyof CreateOrderData, value: any) => {
@@ -94,6 +244,43 @@ export default function CheckoutPage() {
       </div>
     );
   }
+
+  // Show payment form if order was created and payment method is Stripe
+  if (showPaymentForm && createdOrder && orderData.paymentMethod === 'STRIPE_CARD') {
+    return (
+      <div className="min-h-screen bg-[#f8f7f3]/80">
+        <div className="max-w-2xl mx-auto p-6 mt-8">
+          <Card variant="double">
+            <CardContent className="p-8">
+              <div className="text-center mb-6">
+                <h2 className="font-metal text-2xl mb-2">Complete Payment</h2>
+                <p className="text-gray-600">Order #{createdOrder.orderId}</p>
+              </div>
+              
+              <Elements stripe={stripePromise}>
+                <StripeCardForm 
+                  order={createdOrder} 
+                  onPaymentSuccess={handlePaymentSuccess}
+                />
+              </Elements>
+              
+              <div className="mt-4 text-center">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowPaymentForm(false)}
+                  className="border-black text-black hover:bg-gray-100"
+                >
+                  Back to Checkout
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  const isProcessing = isCreatingOrder;
 
   return (
     <div className="min-h-screen bg-[#f8f7f3]/80">
@@ -248,6 +435,47 @@ export default function CheckoutPage() {
                   )}
                 </CardContent>
               </Card>
+
+              {/* Stripe Banking Section */}
+              <Card variant="double" className="border-2 border-black">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="w-5 h-5 text-blue-600" />
+                      <h3 className="font-metal text-lg">Stripe Banking Setup</h3>
+                    </div>
+                    <Button 
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        router.push('/profile');
+                      }}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      Go to Profile to Setup
+                    </Button>
+                  </div>
+                  
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <CreditCard className="w-5 h-5 text-blue-600 mt-0.5" />
+                      <div>
+                        <h4 className="font-medium text-blue-900 mb-1">Complete Your Banking Setup</h4>
+                        <p className="text-sm text-blue-700 mb-3">
+                          Set up your Stripe banking account to receive payments and manage your business finances securely.
+                        </p>
+                        <div className="text-xs text-blue-600">
+                          • Secure payment processing<br/>
+                          • Direct bank transfers<br/>
+                          • Business account management
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </form>
           </div>
 
@@ -318,11 +546,11 @@ export default function CheckoutPage() {
                     <div className="pt-4 space-y-3">
                       <Button
                         type="submit"
-                        disabled={isPending || !orderData.shippingAddressId}
+                        disabled={isProcessing || !orderData.shippingAddressId}
                         className="w-full text-white bg-red-900 hover:bg-red-800"
                         onClick={handleSubmit}
                       >
-                        {isPending ? 'Checkout...' : 'Checkout'}
+                        {isProcessing ? 'Processing...' : 'Checkout'}
                       </Button>
                       <Button
                         type="button"

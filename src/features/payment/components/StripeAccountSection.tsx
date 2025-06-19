@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { CreditCard, CheckCircle, XCircle, AlertCircle, ExternalLink, RefreshCw } from 'lucide-react';
 import { useStripeAccountStatus } from '../hooks/useStripeAccountStatus';
 import { useStripeOnboard } from '../hooks/useStripeOnboard';
+import { useStripeRefreshOnboard } from '../hooks/useStripeRefreshOnboard';
 import { toast } from 'sonner';
 
 export const StripeAccountSection = () => {
@@ -19,6 +20,7 @@ export const StripeAccountSection = () => {
   } = useStripeAccountStatus();
   
   const { mutate: startStripeOnboard, isPending: isStripeOnboarding } = useStripeOnboard();
+  const { mutate: refreshStripeOnboard, isPending: isRefreshingOnboard } = useStripeRefreshOnboard();
 
   const handleRefresh = () => {
     refetch();
@@ -115,16 +117,14 @@ export const StripeAccountSection = () => {
             <RefreshCw className="w-4 h-4 mr-2" />
             Refresh
           </Button>
-          {!accountStatus?.hasAccount && (
-            <Button 
-              onClick={() => startStripeOnboard()}
-              disabled={isStripeOnboarding}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              <CreditCard className="w-4 h-4 mr-2" />
-              {isStripeOnboarding ? 'Connecting...' : 'Connect Stripe'}
-            </Button>
-          )}
+          <Button 
+            onClick={() => refreshStripeOnboard()}
+            disabled={isRefreshingOnboard}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            <ExternalLink className="w-4 h-4 mr-2" />
+            {isRefreshingOnboard ? 'Setup...' : 'Setup Stripe Banking'}
+          </Button>
         </div>
       </div>
 

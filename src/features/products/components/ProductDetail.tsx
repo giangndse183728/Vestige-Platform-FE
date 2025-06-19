@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useCartStore } from '@/features/cart/hooks';
 import { toast } from 'sonner';
 import { useState } from 'react';
+import { formatVNDPrice } from '@/utils/format';
 
 interface Seller {
   userId: number;
@@ -192,11 +193,11 @@ export function ProductDetail({ product }: ProductDetailProps) {
           <div className="space-y-2 mt-2">
             <div className="flex items-baseline gap-3">
               <span className="text-4xl font-metal text-[var(--dark-red)]">
-                ${product.price.toFixed(2)}
+                {formatVNDPrice(product.price)}
               </span>
               {product.hasDiscount && (
                 <span className="text-lg text-gray-500 line-through">
-                  ${product.originalPrice.toFixed(2)}
+                  {formatVNDPrice(product.originalPrice)}
                 </span>
               )}
             </div>

@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Product } from '../schema';
 import { Eye, Heart } from 'lucide-react';
+import { formatVNDPrice } from '@/utils/format';
 
 interface ProductCardProps {
   product: Product;
@@ -36,7 +37,7 @@ export function ProductCard({ product }: ProductCardProps) {
           <h3 className="font-serif text-xl font-bold mb-3 leading-tight truncate" title={product.title}>{product.title}</h3>
           <p className="text-black/70 text-sm mb-5 font-serif">Brand: {product.brandName}</p>
           <div className="flex items-center justify-between border-t border-black/10 pt-3">
-            <span className="font-metal text-[var(--dark-red)]">Price: ${product.price}</span>
+            <span className="font-metal text-[var(--dark-red)]">Price: {formatVNDPrice(product.price)}</span>
             <div className="flex items-center gap-4 text-sm font-serif text-black/70">
               <span className="flex items-center gap-1">
                 <Eye className="w-4 h-4" />

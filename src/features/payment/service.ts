@@ -16,6 +16,11 @@ export const getStripeOnboardUrl = async (): Promise<StripeOnboardResponse> => {
   return response.data.data;
 };
 
+export const getStripeRefreshOnboardUrl = async (): Promise<StripeOnboardResponse> => {
+  const response = await api.post<ApiResponse<StripeOnboardResponse>>('/stripe/refresh-onboarding');
+  return response.data.data;
+};
+
 export const getStripeAccountStatus = async (): Promise<StripeAccountStatus> => {
   const response = await api.get<ApiResponse<StripeAccountStatus>>('/stripe/account-status');
   return response.data.data;

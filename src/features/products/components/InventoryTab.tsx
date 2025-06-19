@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Package, Edit, Trash2, Eye, Heart, DollarSign } from 'lucide-react';
 import { Product, ProductDetail } from '../schema';
 import Link from 'next/link';
+import { formatVNDPrice } from '@/utils/format';
 
 export function InventoryTab() {
   const { data, isLoading, error } = useMyProducts();
@@ -89,7 +90,7 @@ export function InventoryTab() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card variant="double" className="border-2 border-black">
-          <CardContent className="pt-18 text-center">
+          <CardContent className="pt-10 text-center">
             <Package className="w-8 h-8 mx-auto mb-2 text-[var(--dark-red)]" />
             <div className="font-gothic text-2xl font-bold">{totalProducts}</div>
             <div className="text-sm font-mono text-gray-600">Total Products</div>
@@ -97,7 +98,7 @@ export function InventoryTab() {
         </Card>
         
         <Card variant="double" className="border-2 border-black">
-          <CardContent className="pt-18 text-center">
+          <CardContent className="pt-10 text-center">
             <Eye className="w-8 h-8 mx-auto mb-2 text-[var(--dark-red)]" />
             <div className="font-serif text-2xl font-bold">{totalViews}</div>
             <div className="text-sm font-mono text-gray-600">Total Views</div>
@@ -105,17 +106,17 @@ export function InventoryTab() {
         </Card>
         
         <Card variant="double" className="border-2 border-black">
-          <CardContent className="pt-18  text-center">
+          <CardContent className="pt-10 text-center">
             <Heart className="w-8 h-8 mx-auto mb-2 text-[var(--dark-red)]" />
             <div className="font-serif text-2xl font-bold">{totalLikes}</div>
             <div className="text-sm font-mono text-gray-600">Total Likes</div>
           </CardContent>
         </Card>
         
-        <Card variant="stamp"className='border-white'>
-          <CardContent className="p-4 text-center">
+        <Card variant="double"className='border-2 border-black'>
+          <CardContent className="pt-10 text-center">
             <DollarSign className="w-8 h-8 mx-auto mb-2 text-[var(--dark-red)]" />
-            <div className="font-gothic text-2xl font-bold">${totalValue.toFixed(2)}</div>
+            <div className="font-gothic text-2xl font-bold">{formatVNDPrice(totalValue)}</div>
             <div className="text-sm font-mono text-gray-600">Total Value</div>
           </CardContent>
         </Card>
@@ -186,7 +187,7 @@ export function InventoryTab() {
                     
                     {/* Stats */}
                     <div className="flex items-center justify-between border-t border-black/10 pt-3 mb-4">
-                      <span className="font-metal text-[var(--dark-red)]">${product.price}</span>
+                      <span className="font-metal text-[var(--dark-red)]">{formatVNDPrice(product.price)}</span>
                       <div className="flex items-center gap-4 text-sm font-serif text-black/70">
                         <span className="flex items-center gap-1">
                           <Eye className="w-4 h-4" />

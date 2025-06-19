@@ -13,10 +13,12 @@ import { createProduct } from '@/features/products/services';
 import { createProductSchema, CreateProductRequest } from '@/features/products/schema';
 import { toast } from 'sonner';
 import { CategorySelect } from '@/features/category/components/CategorySelect';
+import { BrandSelect } from '@/features/brand/components/BrandSelect';
 import { X, Plus, ImageIcon, Upload } from 'lucide-react';
 import * as z from 'zod';
 import { storage } from '@/libs/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { formatVNDPrice } from '@/utils/format';
 
 export function CreateProduct() {
   const router = useRouter();
@@ -36,6 +38,21 @@ export function CreateProduct() {
     status: 'ACTIVE',
     imageUrls: [''] 
   });
+
+
+  const unformatVND = (value: string) => value.replace(/\D/g, '');
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const numeric = unformatVND(value);
+    const formatted = numeric ? Number(numeric).toLocaleString('vi-VN') : '';
+    setFormData(prev => ({
+      ...prev,
+      [name]: formatted
+    }));
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -137,8 +154,8 @@ export function CreateProduct() {
       const productData: CreateProductRequest = {
         title: formData.title,
         description: formData.description,
-        price: parseFloat(formData.price),
-        originalPrice: parseFloat(formData.originalPrice),
+        price: Number(unformatVND(formData.price)),
+        originalPrice: Number(unformatVND(formData.originalPrice)),
         condition: formData.condition,
         size: formData.size,
         color: formData.color,
@@ -147,7 +164,6 @@ export function CreateProduct() {
         imageUrls: formData.imageUrls.filter(url => url.trim() !== '')
       };
 
-      // Validate with Zod schema
       createProductSchema.parse(productData);
 
       await createProduct(productData);
@@ -310,17 +326,17 @@ export function CreateProduct() {
                   <div>
                     <Label htmlFor="price" className="font-serif text-lg">Selling Price</Label>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
                       <Input
                         id="price"
                         name="price"
-                        type="number"
-                        step="0.01"
+                        type="text"
                         value={formData.price}
-                        onChange={handleInputChange}
-                        className="border-2 border-black pl-8 mt-1"
-                        placeholder="0.00"
+                        onChange={handlePriceChange}
+                        className="border-2 border-black pr-14 mt-1"
+                        placeholder="1.000.000"
+                        autoComplete="off"
                       />
+                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 select-none">VND</span>
                     </div>
                     {errors.price && <p className="text-red-600 text-xs mt-1">{errors.price}</p>}
                   </div>
@@ -328,17 +344,17 @@ export function CreateProduct() {
                   <div>
                     <Label htmlFor="originalPrice" className="font-serif text-lg">Original Price</Label>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
                       <Input
                         id="originalPrice"
                         name="originalPrice"
-                        type="number"
-                        step="0.01"
+                        type="text"
                         value={formData.originalPrice}
-                        onChange={handleInputChange}
-                        className="border-2 border-black pl-8 mt-1"
-                        placeholder="0.00"
+                        onChange={handlePriceChange}
+                        className="border-2 border-black pr-14 mt-1"
+                        placeholder="1.000.000"
+                        autoComplete="off"
                       />
+                      <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 select-none">VND</span>
                     </div>
                     {errors.originalPrice && <p className="text-red-600 text-xs mt-1">{errors.originalPrice}</p>}
                   </div>
@@ -420,26 +436,21 @@ export function CreateProduct() {
                 </div>
 
                 <div>
-                  <Label htmlFor="categoryId" className="font-serif"></Label>
+                  <Label htmlFor="categoryId" className="font-serif">Category</Label>
                   <CategorySelect
                     value={formData.categoryId}
                     onValueChange={(value) => handleSelectChange('categoryId', value)}
                     required
-                    
                   />
                   {errors.categoryId && <p className="text-red-600 text-xs mt-1">{errors.categoryId}</p>}
                 </div>
 
                 <div>
-                  <Label htmlFor="brandId" className="font-serif">Brand ID</Label>
-                  <Input
-                    id="brandId"
-                    name="brandId"
-                    type="number"
+                  <Label htmlFor="brandId" className="font-serif">Brand</Label>
+                  <BrandSelect
                     value={formData.brandId}
-                    onChange={handleInputChange}
-                    className="border-2 border-black mt-1"
-                    placeholder="Enter brand ID"
+                    onValueChange={(value) => handleSelectChange('brandId', value)}
+                    required
                   />
                   {errors.brandId && <p className="text-red-600 text-xs mt-1">{errors.brandId}</p>}
                 </div>

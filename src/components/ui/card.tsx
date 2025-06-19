@@ -1,6 +1,6 @@
 import * as React from "react"
 
-import { cn } from "@/libs/cn";
+import { cn } from "@/utils/cn";
 
 interface CardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   variant?: "default" | "decorated" | "decorated-image" | "stamp" | "double";

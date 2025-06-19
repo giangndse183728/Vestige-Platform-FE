@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CategorySelect } from '@/features/category/components/CategorySelect';
+import { BrandSelect } from '@/features/brand/components/BrandSelect';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 
@@ -19,53 +20,70 @@ interface UpdateProductModalProps {
   onClose: () => void;
 }
 
+// Helper to remove all non-digit characters
+const unformatVND = (value: string) => value.replace(/\D/g, '');
+
 export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductModalProps) {
   const updateProductMutation = useUpdateProduct();
-  const [formData, setFormData] = useState<UpdateProductRequest>({
+  const [formData, setFormData] = useState<{
+    title: string;
+    description: string;
+    price: string;
+    originalPrice: string;
+    condition: string;
+    size: string;
+    color: string;
+    categoryId: string;
+    brandId: string;
+    imageUrls: string[];
+    status: string;
+  }>({
     title: '',
     description: '',
-    price: 0,
-    originalPrice: 0,
+    price: '',
+    originalPrice: '',
     condition: '',
     size: '',
     color: '',
-    categoryId: 0,
-    brandId: 0,
+    categoryId: '',
+    brandId: '',
     imageUrls: [],
     status: '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Initialize form data when product changes
   useEffect(() => {
     if (product) {
+      const formatVNDInput = (value: number) => {
+        const numeric = value.toString().replace(/\D/g, '');
+        return numeric ? Number(numeric).toLocaleString('vi-VN') : '';
+      };
       setFormData({
         title: product.title || '',
         description: product.description || '',
-        price: product.price || 0,
-        originalPrice: product.originalPrice || 0,
+        price: product.price ? formatVNDInput(product.price) : '',
+        originalPrice: product.originalPrice ? formatVNDInput(product.originalPrice) : '',
         condition: product.condition || '',
         size: product.size || '',
         color: product.color || '',
-        categoryId: product.category.categoryId || 0,
-        brandId: product.brand.brandId || 0,
+        categoryId: product.category.categoryId ? String(product.category.categoryId) : '',
+        brandId: product.brand.brandId ? String(product.brand.brandId) : '',
         imageUrls: product.images.map(img => img.imageUrl) || [],
         status: product.status || '',
       });
       setErrors({});
     } else {
-      // Reset form when no product is selected
       setFormData({
         title: '',
         description: '',
-        price: 0,
-        originalPrice: 0,
+        price: '',
+        originalPrice: '',
         condition: '',
         size: '',
         color: '',
-        categoryId: 0,
-        brandId: 0,
+        categoryId: '',
+        brandId: '',
         imageUrls: [],
         status: '',
       });
@@ -73,16 +91,27 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
     }
   }, [product]);
 
+  // Custom handler for price/originalPrice (same as CreateProduct)
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    let numeric = unformatVND(value);
+    numeric = numeric.replace(/^0+/, '');
+    const formatted = numeric ? Number(numeric).toLocaleString('vi-VN') : '';
+    setFormData(prev => ({
+      ...prev,
+      [name]: formatted
+    }));
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'price' || name === 'originalPrice' || name === 'categoryId' || name === 'brandId' 
-        ? parseFloat(value) || 0 
-        : value
+      [name]: value
     }));
-    
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -91,7 +120,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
   const handleSelectChange = (name: string, value: string) => {
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'categoryId' || name === 'brandId' ? parseInt(value) || 0 : value
+      [name]: value
     }));
     
     // Clear error when user selects
@@ -119,78 +148,70 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
     setFormData(prev => ({ ...prev, imageUrls: newImageUrls }));
   };
 
+  // Validation: parse price/originalPrice as numbers
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-
     if (!formData.title?.trim()) {
       newErrors.title = 'Title is required';
     }
-
     if (!formData.description?.trim()) {
       newErrors.description = 'Description is required';
     }
-
-    if (formData.price === undefined || formData.price < 0) {
+    if (formData.price === undefined || Number(unformatVND(formData.price)) < 0) {
       newErrors.price = 'Price must be greater than or equal to 0';
     }
-
-    if (formData.originalPrice === undefined || formData.originalPrice < 0) {
+    if (formData.originalPrice === undefined || Number(unformatVND(formData.originalPrice)) < 0) {
       newErrors.originalPrice = 'Original price must be greater than or equal to 0';
     }
-
     if (!formData.condition?.trim()) {
       newErrors.condition = 'Condition is required';
     }
-
     if (!formData.size?.trim()) {
       newErrors.size = 'Size is required';
     }
-
     if (!formData.color?.trim()) {
       newErrors.color = 'Color is required';
     }
-
     if (!formData.categoryId) {
       newErrors.categoryId = 'Category is required';
     }
-
     if (!formData.brandId) {
       newErrors.brandId = 'Brand is required';
     }
-
-    // Filter out empty URLs and check if at least one valid URL exists
     const validImageUrls = formData.imageUrls?.filter(url => url?.trim()) || [];
     if (validImageUrls.length === 0) {
       newErrors.imageUrls = 'At least one image is required';
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  // On submit, convert formatted string to number and use UpdateProductRequest
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!product) return;
-
     if (!validateForm()) {
       return;
     }
-
     try {
-      // Filter out empty image URLs before submitting
-      const filteredImageUrls = formData.imageUrls?.filter(url => url?.trim()) || [];
-      
+      const filteredImageUrls = formData.imageUrls.filter((url: string) => url?.trim()) || [];
       const submitData = {
-        ...formData,
-        imageUrls: filteredImageUrls
+        title: formData.title,
+        description: formData.description,
+        price: Number(unformatVND(formData.price)),
+        originalPrice: Number(unformatVND(formData.originalPrice)),
+        condition: formData.condition,
+        size: formData.size,
+        color: formData.color,
+        categoryId: parseInt(formData.categoryId),
+        brandId: parseInt(formData.brandId),
+        imageUrls: filteredImageUrls,
+        status: formData.status,
       };
-
       await updateProductMutation.mutateAsync({
         id: product.productId,
         data: submitData
       });
-      
       toast.success('Product updated successfully!');
       onClose();
     } catch (error) {
@@ -204,13 +225,13 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
     setFormData({
       title: '',
       description: '',
-      price: 0,
-      originalPrice: 0,
+      price: '',
+      originalPrice: '',
       condition: '',
       size: '',
       color: '',
-      categoryId: 0,
-      brandId: 0,
+      categoryId: '',
+      brandId: '',
       imageUrls: [],
       status: '',
     });
@@ -220,7 +241,10 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose} >
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent 
+        className="sm:max-w-3xl max-h-[90vh] overflow-y-auto"
+        onPointerDownOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle className="text-2xl font-metal font-bold">UPDATE PRODUCT</DialogTitle>
         </DialogHeader>
@@ -262,17 +286,17 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                 <div>
                   <Label htmlFor="price" className="font-serif text-lg">Selling Price</Label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
                     <Input
                       id="price"
                       name="price"
-                      type="number"
-                      step="0.01"
+                      type="text"
                       value={formData.price}
-                      onChange={handleInputChange}
-                      className="border-2 border-black pl-8 mt-1"
-                      placeholder="0.00"
+                      onChange={handlePriceChange}
+                      className="border-2 border-black pr-14 mt-1"
+                      placeholder="1.000.000"
+                      autoComplete="off"
                     />
+                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 select-none">VND</span>
                   </div>
                   {errors.price && <p className="text-red-600 text-xs mt-1">{errors.price}</p>}
                 </div>
@@ -280,17 +304,17 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                 <div>
                   <Label htmlFor="originalPrice" className="font-serif text-lg">Original Price</Label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
                     <Input
                       id="originalPrice"
                       name="originalPrice"
-                      type="number"
-                      step="0.01"
+                      type="text"
                       value={formData.originalPrice}
-                      onChange={handleInputChange}
-                      className="border-2 border-black pl-8 mt-1"
-                      placeholder="0.00"
+                      onChange={handlePriceChange}
+                      className="border-2 border-black pr-14 mt-1"
+                      placeholder="1.000.000"
+                      autoComplete="off"
                     />
+                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 select-none">VND</span>
                   </div>
                   {errors.originalPrice && <p className="text-red-600 text-xs mt-1">{errors.originalPrice}</p>}
                 </div>
@@ -374,7 +398,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
               <div>
                 <Label htmlFor="categoryId" className="font-serif">Category</Label>
                 <CategorySelect
-                  value={formData.categoryId?.toString() || ''}
+                  value={formData.categoryId}
                   onValueChange={(value) => handleSelectChange('categoryId', value)}
                   required
                 />
@@ -382,15 +406,11 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
               </div>
 
               <div>
-                <Label htmlFor="brandId" className="font-serif">Brand ID</Label>
-                <Input
-                  id="brandId"
-                  name="brandId"
-                  type="number"
+                <Label htmlFor="brandId" className="font-serif">Brand</Label>
+                <BrandSelect
                   value={formData.brandId}
-                  onChange={handleInputChange}
-                  className="border-2 border-black mt-1"
-                  placeholder="Enter brand ID"
+                  onValueChange={(value) => handleSelectChange('brandId', value)}
+                  required
                 />
                 {errors.brandId && <p className="text-red-600 text-xs mt-1">{errors.brandId}</p>}
               </div>
@@ -402,14 +422,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
             <CardHeader className="border-b-2 border-black bg-black text-white">
               <CardTitle className="font-metal text-xl font-normal">PRODUCT IMAGES</CardTitle>
             </CardHeader>
-            <CardContent className="p-10 space-y-4">
-              <div className="bg-yellow-50 border border-yellow-200 p-3 rounded">
-                <p className="text-yellow-800 text-sm">
-                  <strong>Note:</strong> There's currently a backend issue causing image duplication. 
-                  The images you set here will be the correct ones, but you may see duplicates temporarily.
-                </p>
-              </div>
-              
+            <CardContent className="p-10 space-y-4">      
               {formData.imageUrls?.map((url, index) => (
                 <div key={index} className="flex gap-2">
                   <Input

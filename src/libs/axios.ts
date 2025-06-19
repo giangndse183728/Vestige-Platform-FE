@@ -19,10 +19,15 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-let isRefreshing = false;
-let failedQueue: any[] = [];
+interface FailedQueueItem {
+  resolve: (token: string) => void;
+  reject: (err: unknown) => void;
+}
 
-const processQueue = (error: any, token: string | null = null) => {
+let isRefreshing = false;
+let failedQueue: FailedQueueItem[] = [];
+
+const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue.forEach((prom) => {
     if (token) {
       prom.resolve(token);
@@ -49,7 +54,7 @@ api.interceptors.response.use(
               originalRequest.headers.Authorization = "Bearer " + token;
               resolve(api(originalRequest));
             },
-            reject: (err: any) => reject(err),
+            reject: (err: unknown) => reject(err),
           });
         });
       }

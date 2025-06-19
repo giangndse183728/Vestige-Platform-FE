@@ -17,7 +17,6 @@ import {
   MessageSquare,
   Flag,
   Share2,
-  MapPin,
   Clock
 } from 'lucide-react';
 import { usePublicProfile } from '../hooks/usePublicProfile';
@@ -32,14 +31,6 @@ export const PublicUserProfile: React.FC<PublicUserProfileProps> = ({ userId }) 
   const profileId = userId || parseInt(params?.id as string, 10);
   
   const { user, isLoading, error } = usePublicProfile(profileId);
-
-  const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
 
   const getTimeAgo = (dateString: string): string => {
     const now = new Date();
@@ -88,10 +79,10 @@ export const PublicUserProfile: React.FC<PublicUserProfileProps> = ({ userId }) 
   }
 
   if (!user) {
-    return <div className="p-6 text-center font-gothic">User data not available.</div>;
+    return <div className="p-6 text-center font-gothic">User data not available.</div>
   }
 
-  return (
+  return (  
     <div className="p-6 mt-8 bg-[#f8f7f3]/80 min-h-screen">
   
 
