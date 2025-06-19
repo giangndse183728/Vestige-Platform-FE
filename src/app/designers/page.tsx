@@ -22,7 +22,7 @@ export default function DesignersPage() {
         <div className="space-y-8">
           {/* Header */}
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">Designers</h1>
+            <h1 className="font-metal text-3xl tracking-wider uppercase">Designers</h1>
             <p className="text-muted-foreground">
               Discover our curated collection of fashion designers and brands
             </p>
@@ -36,55 +36,42 @@ export default function DesignersPage() {
               placeholder="Search designers..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-2 rounded-md border border-input focus:ring-2 focus:ring-primary focus:border-primary w-full"
+              className="pl-10 pr-4 py-2 border border-input focus:ring-2 focus:ring-primary focus:border-primary w-full rounded-none"
             />
           </div>
 
           {/* Brands Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0">
             {isLoading ? (
               // Loading skeletons
-              Array.from({ length: 6 }).map((_, index) => (
-                <Card key={index} className="overflow-hidden">
-                  <div className="relative aspect-[4/3] w-full">
+              Array.from({ length: 8 }).map((_, index) => (
+                <Card key={index} className="overflow-hidden bg-white flex flex-col items-center rounded-none">
+                  <div className="relative w-full h-40 flex items-center justify-center">
                     <Skeleton className="absolute inset-0" />
-                  </div>
-                  <div className="p-4 border-t">
-                    <Skeleton className="h-6 w-3/4 mx-auto" />
+                    <div className="border-2 border-black w-full h-full absolute pointer-events-none z-10" />
                   </div>
                 </Card>
               ))
             ) : (
-              // Brand cards or No results message
-              filteredBrands && filteredBrands.length > 0 ? (
-                filteredBrands.map((brand) => (
-                  <Card 
-                    key={brand.brandId} 
-                    className="overflow-hidden group hover:shadow-lg transition-all duration-300"
-                  >
-                    <div className="relative aspect-[4/3] w-full bg-muted/10">
-                      <Image
-                        src={brand.logoUrl && isValidUrl(brand.logoUrl) ? brand.logoUrl : '/file.svg'}
-                        alt={brand.name}
-                        fill
-                        className="object-contain p-6 group-hover:scale-105 transition-transform duration-300"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      />
-                    </div>
-                    <div className="p-4 border-t">
-                      <h2 className="text-xl font-semibold text-center group-hover:text-primary transition-colors">
-                        {brand.name}
-                      </h2>
-                    </div>
-                  </Card>
-                ))
-              ) : (
-                <div className="col-span-full text-center py-10">
-                  <p className="text-muted-foreground text-lg">
-                    No brands found matching your search.
-                  </p>
-                </div>
-              )
+              // Brand cards
+              filteredBrands?.map((brand) => (
+                <Card 
+                  key={brand.brandId} 
+                  className="overflow-hidden group hover:shadow-lg transition-all duration-300 bg-white rounded-none flex flex-col items-center border-2 border-black">
+                  <div className="relative w-full h-40 flex items-center justify-center">
+                    <Image
+                      src={brand.logoUrl && isValidUrl(brand.logoUrl) ? brand.logoUrl : '/file.svg'}
+                      alt={brand.name}
+                      fill
+                      className="object-contain w-full h-full"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                    />
+                  </div>
+                  <div className="w-full py-3 px-4">
+                    <h2 className="text-lg font-semibold text-center text-gray-900 truncate">{brand.name}</h2>
+                  </div>
+                </Card>
+              ))
             )}
           </div>
         </div>

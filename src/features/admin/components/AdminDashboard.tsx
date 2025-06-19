@@ -1,29 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   Users, 
   ShoppingBag, 
   FileText, 
-  Settings, 
   BarChart3,
-  Plus,
-  Search,
   Tag,
   Briefcase,
-  ChevronRight,
   Bell,
   User
 } from "lucide-react";
 import CategoryManager from "./CategoryManager";
 import BrandManager from "./BrandManager";
+import ProductManager from "./ProductManager";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 
 // Mock data for the dashboard
@@ -45,6 +40,7 @@ const tabs = [
   { id: "overview", label: "Overview", icon: BarChart3 },
   { id: "categories", label: "Categories", icon: Tag },
   { id: "brands", label: "Brands", icon: Briefcase },
+  { id: "all-products", label: "All Product", icon: FileText },
 ];
 
 export default function AdminDashboard() {
@@ -56,6 +52,8 @@ export default function AdminDashboard() {
         return <CategoryManager />;
       case "brands":
         return <BrandManager />;
+      case "all-products":
+        return <ProductManager />;
       default:
         return (
           <>
@@ -73,7 +71,7 @@ export default function AdminDashboard() {
                       <div className="p-2 bg-gray-50 rounded-lg">
                         <stat.icon className="h-5 w-5 text-gray-600" />
                       </div>
-                      <Badge variant={stat.change.startsWith('+') ? "success" : "destructive"}>
+                      <Badge variant={stat.change.startsWith('+') ? "default" : "destructive"}>
                         {stat.change}
                       </Badge>
                     </div>
@@ -117,10 +115,10 @@ export default function AdminDashboard() {
                           <td className="py-4 px-6">
                             <Badge
                               variant={
-                                order.status === "Completed" ? "success" :
+                                order.status === "Completed" ? "default" :
                                 order.status === "Processing" ? "default" :
                                 order.status === "Shipped" ? "secondary" :
-                                "warning"
+                                "destructive"
                               }
                             >
                               {order.status}
@@ -157,14 +155,6 @@ export default function AdminDashboard() {
               </Link>
             </div>
             <div className="flex items-center gap-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  type="search"
-                  placeholder="Search..."
-                  className="pl-10 w-64"
-                />
-              </div>
               <Button variant="ghost" size="icon">
                 <Bell className="h-5 w-5" />
               </Button>

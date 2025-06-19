@@ -11,6 +11,12 @@ import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
 import { createBrandSchema } from '@/features/brand/schema';
 import * as z from "zod";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 export default function BrandManager() {
   const { data: brands, isLoading } = useBrands();
@@ -25,6 +31,7 @@ export default function BrandManager() {
     name: '',
     logoUrl: '',
   });
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,6 +68,19 @@ export default function BrandManager() {
       name: brand.name,
       logoUrl: brand.logoUrl,
     });
+    setIsModalOpen(true);
+  };
+
+  const handleCreate = () => {
+    setEditingBrand(null);
+    setFormData({ name: '', logoUrl: '' });
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingBrand(null);
+    setFormData({ name: '', logoUrl: '' });
   };
 
   const handleDelete = async (brandId: number) => {
@@ -79,8 +99,7 @@ export default function BrandManager() {
   };
 
   const filteredBrands = brands?.filter(brand =>
-    brand.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    brand.description?.toLowerCase().includes(searchQuery.toLowerCase())
+    brand.name.toLowerCase().includes(searchQuery.toLowerCase()) 
   );
 
   if (isLoading) {
@@ -111,7 +130,7 @@ export default function BrandManager() {
             />
           </div>
           <Button
-            onClick={() => setIsCreating(true)}
+            onClick={handleCreate}
             className="flex items-center gap-2"
           >
             <Plus className="h-4 w-4" />
@@ -121,14 +140,14 @@ export default function BrandManager() {
       </div>
 
       {/* Form */}
-      {(isCreating || editingBrand) && (
-        <Card>
-          <div className="p-6 border-b">
-            <h3 className="text-lg font-semibold text-gray-900">
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>
               {editingBrand ? 'Edit Brand' : 'Create New Brand'}
-            </h3>
-          </div>
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="name" className="text-sm font-medium text-gray-700">Name</Label>
               <Input
@@ -150,26 +169,22 @@ export default function BrandManager() {
                 required={true}
               />
             </div>
-            <div className="flex gap-2">
-              <Button type="submit">
+            <div className="flex gap-2 pt-4">
+              <Button type="submit" className="flex-1 border border-black hover:bg-black hover:text-white transition-colors">
                 {editingBrand ? 'Update' : 'Create'}
               </Button>
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => {
-                  setEditingBrand(null);
-                  setIsCreating(false);
-                  setFormData({ name: '', logoUrl: '' });
-                }}
-                className=""
+                onClick={handleCloseModal}
+                className="flex-1 border border-black hover:bg-black hover:text-white transition-colors"
               >
                 Cancel
               </Button>
             </div>
           </form>
-        </Card>
-      )}
+        </DialogContent>
+      </Dialog>
 
       {/* Brands List */}
       <Card className="overflow-hidden">
