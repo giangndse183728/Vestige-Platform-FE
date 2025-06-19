@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Star, Shield, Calendar as CalendarIcon, User, TrendingUp, Award, Edit3, Save, X, Camera, CreditCard } from 'lucide-react';
+import { Calendar as CalendarIcon, User, Edit3, Save, X, Camera } from 'lucide-react';
 import { useProfile } from '../hooks/useProfile';
 import { profileFormSchema, ProfileFormData } from '../schema';
 import { ProfileSkeleton } from './ProfileSkeleton';
@@ -23,7 +22,7 @@ import { AddressFormData, Address } from '../schema';
 import { MotionDiv } from '@/components/animation/AnimatedWrapper';
 import { ActivityStats } from './ActivityStats';
 import { format } from 'date-fns';
-import { cn } from '@/libs/cn';
+import { cn } from '@/utils/cn';
 import { StripeAccountSection } from '@/features/payment/components/StripeAccountSection';
 
 export const Profile = () => {
@@ -43,7 +42,6 @@ export const Profile = () => {
   const { user, isLoading, error, updateProfile, isUpdating } = useProfile();
   const {
     addresses,
-    isLoading: isLoadingAddresses,
     createAddress,
     updateAddress,
     deleteAddress,

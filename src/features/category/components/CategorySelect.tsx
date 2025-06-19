@@ -29,7 +29,6 @@ export function CategorySelect({
   const { data, isLoading } = useCategories();
   const categories = data || [];
 
-
   const uniqueCategories = categories.filter((category: Category) => {
     if (category.parent === null) return true;
     return !categories.some((c: Category) => c.children?.some((child: Category) => child.categoryId === category.categoryId));
@@ -37,10 +36,7 @@ export function CategorySelect({
 
   return (
     <div className="space-y-2">
-      <Label className="font-gothic">
-        {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
-      </Label>
+      
       <Select
         value={value}
         onValueChange={onValueChange}

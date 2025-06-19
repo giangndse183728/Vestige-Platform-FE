@@ -39,7 +39,11 @@ export default function MarketplaceLayout({
 
   return (
     <FiltersContext.Provider value={{ filters, setFilters, totalProducts, setTotalProducts }}>
-      <FilterProductLayout onFiltersChange={setFilters} totalProducts={totalProducts}>
+      <FilterProductLayout 
+        onFiltersChange={setFilters} 
+        totalProducts={totalProducts}
+        initialFilters={filters}
+      >
         {children}
       </FilterProductLayout>
     </FiltersContext.Provider>

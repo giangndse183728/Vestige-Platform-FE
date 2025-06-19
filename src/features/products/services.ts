@@ -9,9 +9,22 @@ export const getProducts = async (filters?: ProductFilters): Promise<ProductsRes
   if (filters?.search) params.append('search', filters.search);
   if (filters?.minPrice) params.append('minPrice', filters.minPrice);
   if (filters?.maxPrice) params.append('maxPrice', filters.maxPrice);
-  if (filters?.category) params.append('category', filters.category);
-  if (filters?.brand) params.append('brand', filters.brand);
-  if (filters?.condition) params.append('condition', filters.condition);
+  if (filters?.category) params.append('categoryId', filters.category);
+  
+  if (filters?.brand) {
+    const brandIds = filters.brand.split(',').filter(Boolean);
+    brandIds.forEach(brandId => {
+      params.append('brandId', brandId.trim());
+    });
+  }
+  
+  if (filters?.condition) {
+    const conditions = filters.condition.split(',').filter(Boolean);
+    conditions.forEach(condition => {
+      params.append('condition', condition.trim());
+    });
+  }
+  
   if (filters?.sortDir) params.append('sortDir', filters.sortDir);
 
   const queryString = params.toString();
@@ -27,9 +40,24 @@ export const getMyProducts = async (filters?: ProductFilters): Promise<ProductsR
   if (filters?.search) params.append('search', filters.search);
   if (filters?.minPrice) params.append('minPrice', filters.minPrice);
   if (filters?.maxPrice) params.append('maxPrice', filters.maxPrice);
-  if (filters?.category) params.append('category', filters.category);
-  if (filters?.brand) params.append('brand', filters.brand);
-  if (filters?.condition) params.append('condition', filters.condition);
+  if (filters?.category) params.append('categoryId', filters.category);
+  
+  // Handle brand filter - support multiple brands
+  if (filters?.brand) {
+    const brandIds = filters.brand.split(',').filter(Boolean);
+    brandIds.forEach(brandId => {
+      params.append('brandId', brandId.trim());
+    });
+  }
+  
+  // Handle condition filter - support multiple conditions
+  if (filters?.condition) {
+    const conditions = filters.condition.split(',').filter(Boolean);
+    conditions.forEach(condition => {
+      params.append('condition', condition.trim());
+    });
+  }
+  
   if (filters?.sortDir) params.append('sortDir', filters.sortDir);
 
   const queryString = params.toString();

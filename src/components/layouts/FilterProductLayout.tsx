@@ -11,35 +11,28 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { CategorySelect } from '@/features/category/components/CategorySelect';
+import { useBrands } from '@/features/brand/hooks';
 import { ProductFilters } from '@/features/products/schema';
 
 interface FilterProductLayoutProps {
   children: React.ReactNode;
   onFiltersChange: (filters: ProductFilters) => void;
   totalProducts?: number;
+  initialFilters?: ProductFilters;
 }
 
 const conditions = [
   { value: 'NEW', label: 'New', hearts: 5, description: 'Brand new with tags' },
   { value: 'LIKE_NEW', label: 'Like New', hearts: 4, description: 'Excellent condition' },
-  { value: 'EXCELLENT', label: 'Excellent', hearts: 4, description: 'Minor signs of wear' },
-  { value: 'GOOD', label: 'Good', hearts: 3, description: 'Some wear, good condition' },
-  { value: 'FAIR', label: 'Fair', hearts: 2, description: 'Noticeable wear' }
+  { value: 'USED_EXCELLENT', label: 'Excellent', hearts: 4, description: 'Minor signs of wear' },
+  { value: 'USED_GOOD', label: 'Good', hearts: 3, description: 'Some wear, good condition' },
+  { value: 'USED_FAIR', label: 'Fair', hearts: 2, description: 'Noticeable wear' }
 ];
 
-const brands = [
-  { value: 'nike', label: 'Nike', popular: true },
-  { value: 'adidas', label: 'Adidas', popular: true },
-  { value: 'supreme', label: 'Supreme', popular: true },
-  { value: 'off-white', label: 'Off-White', popular: false },
-  { value: 'balenciaga', label: 'Balenciaga', popular: false },
-  { value: 'gucci', label: 'Gucci', popular: true },
-  { value: 'louis-vuitton', label: 'Louis Vuitton', popular: false },
-  { value: 'rick-owens', label: 'Rick Owens', popular: false }
-];
-
-export function FilterProductLayout({ children, onFiltersChange, totalProducts }: FilterProductLayoutProps) {
-  const [filters, setFilters] = useState<ProductFilters>({
+export function FilterProductLayout({ children, onFiltersChange, totalProducts, initialFilters }: FilterProductLayoutProps) {
+  const { data: brands, isLoading: isLoadingBrands } = useBrands();
+  
+  const [filters, setFilters] = useState<ProductFilters>(initialFilters || {
     search: '',
     minPrice: '',
     maxPrice: '',
@@ -49,9 +42,16 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts }
     sortDir: 'desc'
   });
 
-  const [priceRange, setPriceRange] = useState([0, 1000]);
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState([
+    initialFilters?.minPrice ? parseInt(initialFilters.minPrice) : 0,
+    initialFilters?.maxPrice ? parseInt(initialFilters.maxPrice) : 1000
+  ]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>(
+    initialFilters?.brand ? initialFilters.brand.split(',').filter(Boolean) : []
+  );
+  const [selectedConditions, setSelectedConditions] = useState<string[]>(
+    initialFilters?.condition ? initialFilters.condition.split(',').filter(Boolean) : []
+  );
   const [isFilterExpanded, setIsFilterExpanded] = useState(true);
   const [isPriceExpanded, setIsPriceExpanded] = useState(false);
   const [isCategoryExpanded, setIsCategoryExpanded] = useState(false);
@@ -132,6 +132,10 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts }
     filters.category,
     priceRange[0] > 0 || priceRange[1] < 1000
   ].filter(Boolean).length;
+
+  // Group brands by popularity (you can adjust this logic based on your needs)
+  const popularBrands = brands?.slice(0, 6) || [];
+  const otherBrands = brands?.slice(6) || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50">
@@ -252,55 +256,67 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts }
                       
                       {isBrandsExpanded && (
                         <>
-                          {/* Popular Brands */}
-                          <div>
-                            <h4 className="text-xs font-serif font-semibold mb-2 text-gray-600 uppercase tracking-wide">
-                              Popular
-                            </h4>
-                            <div className="space-y-2">
-                              {brands.filter(brand => brand.popular).map((brand) => (
-                                <div key={brand.value} className="flex items-center space-x-2">
-                                  <Checkbox
-                                    id={`brand-${brand.value}`}
-                                    checked={selectedBrands.includes(brand.value)}
-                                    onCheckedChange={() => handleBrandToggle(brand.value)}
-                                    className="border-2"
-                                  />
-                                  <Label 
-                                    htmlFor={`brand-${brand.value}`}
-                                    className="text-sm font-serif cursor-pointer hover:font-semibold transition-all"
-                                  >
-                                    {brand.label}
-                                  </Label>
+                          {isLoadingBrands ? (
+                            <div className="text-sm text-gray-500">Loading brands...</div>
+                          ) : brands && brands.length > 0 ? (
+                            <>
+                              {/* Popular Brands */}
+                              {popularBrands.length > 0 && (
+                                <div>
+                                  <h4 className="text-xs font-serif font-semibold mb-2 text-gray-600 uppercase tracking-wide">
+                                    Popular
+                                  </h4>
+                                  <div className="space-y-2">
+                                    {popularBrands.map((brand) => (
+                                      <div key={brand.brandId} className="flex items-center space-x-2">
+                                        <Checkbox
+                                          id={`brand-${brand.brandId}`}
+                                          checked={selectedBrands.includes(brand.brandId.toString())}
+                                          onCheckedChange={() => handleBrandToggle(brand.brandId.toString())}
+                                          className="border-2"
+                                        />
+                                        <Label 
+                                          htmlFor={`brand-${brand.brandId}`}
+                                          className="text-sm font-serif cursor-pointer hover:font-semibold transition-all"
+                                        >
+                                          {brand.name}
+                                        </Label>
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
-                              ))}
-                            </div>
-                          </div>
+                              )}
 
-                          {/* Other Brands */}
-                          <div>
-                            <h4 className="text-xs font-serif font-semibold mb-2 text-gray-600 uppercase tracking-wide">
-                              Luxury
-                            </h4>
-                            <div className="space-y-2">
-                              {brands.filter(brand => !brand.popular).map((brand) => (
-                                <div key={brand.value} className="flex items-center space-x-2">
-                                  <Checkbox
-                                    id={`brand-${brand.value}`}
-                                    checked={selectedBrands.includes(brand.value)}
-                                    onCheckedChange={() => handleBrandToggle(brand.value)}
-                                    className="border-2"
-                                  />
-                                  <Label 
-                                    htmlFor={`brand-${brand.value}`}
-                                    className="text-sm font-serif cursor-pointer hover:font-semibold transition-all"
-                                  >
-                                    {brand.label}
-                                  </Label>
+                              {/* Other Brands */}
+                              {otherBrands.length > 0 && (
+                                <div>
+                                  <h4 className="text-xs font-serif font-semibold mb-2 text-gray-600 uppercase tracking-wide">
+                                    All Brands
+                                  </h4>
+                                  <div className="space-y-2">
+                                    {otherBrands.map((brand) => (
+                                      <div key={brand.brandId} className="flex items-center space-x-2">
+                                        <Checkbox
+                                          id={`brand-${brand.brandId}`}
+                                          checked={selectedBrands.includes(brand.brandId.toString())}
+                                          onCheckedChange={() => handleBrandToggle(brand.brandId.toString())}
+                                          className="border-2"
+                                        />
+                                        <Label 
+                                          htmlFor={`brand-${brand.brandId}`}
+                                          className="text-sm font-serif cursor-pointer hover:font-semibold transition-all"
+                                        >
+                                          {brand.name}
+                                        </Label>
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
-                              ))}
-                            </div>
-                          </div>
+                              )}
+                            </>
+                          ) : (
+                            <div className="text-sm text-gray-500">No brands available</div>
+                          )}
                         </>
                       )}
                     </div>
@@ -429,11 +445,14 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts }
                         Search: "{filters.search}"
                       </Badge>
                     )}
-                    {selectedBrands.map(brand => (
-                      <Badge key={brand} variant="outline" className="border-2 border-green-600 text-green-600 font-serif">
-                        {brands.find(b => b.value === brand)?.label}
-                      </Badge>
-                    ))}
+                    {selectedBrands.map(brandId => {
+                      const brand = brands?.find(b => b.brandId.toString() === brandId);
+                      return (
+                        <Badge key={brandId} variant="outline" className="border-2 border-green-600 text-green-600 font-serif">
+                          {brand?.name || brandId}
+                        </Badge>
+                      );
+                    })}
                     {selectedConditions.map(condition => (
                       <Badge key={condition} variant="outline" className="border-2 border-orange-600 text-orange-600 font-serif">
                         {conditions.find(c => c.value === condition)?.label}
