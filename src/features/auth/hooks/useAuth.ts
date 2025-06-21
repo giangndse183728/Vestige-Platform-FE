@@ -11,6 +11,7 @@ import {
 } from '@/features/auth/schema';
 import { toast } from 'sonner';
 import { useProfile } from '@/features/profile/hooks/useProfile';
+import { jwtDecode } from 'jwt-decode';
 
 export const useLogin = () => {
   const router = useRouter();
@@ -21,7 +22,16 @@ export const useLogin = () => {
     onSuccess: (data: LoginResponse) => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
       toast.success('Login successful!');
-      router.push('/');
+      try {
+        const decoded: any = jwtDecode(data.accessToken);
+        if (decoded.role === 'ADMIN') {
+          router.push('/admin');
+        } else {
+          router.push('/');
+        }
+      } catch (e) {
+        router.push('/');
+      }
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Login failed');
@@ -38,7 +48,7 @@ export const useSignup = () => {
       const { confirmPassword, ...payload } = formData;
       return signup(payload);
     },
-    onSuccess: (data: SignupResponse) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
       toast.success('Account created successfully!');
       router.push('/');
@@ -62,7 +72,7 @@ export const useLogout = () => {
       toast.success('Logged out successfully');
       router.push('/login');
     },
-    onError: (error: Error) => {
+    onError: () => {
       toast.error('Logout failed');
       queryClient.clear();
       router.push('/login');

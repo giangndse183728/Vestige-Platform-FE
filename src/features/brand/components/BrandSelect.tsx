@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { useBrands } from '../hooks';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Search } from 'lucide-react';
 
 interface BrandSelectProps {
   value: string;
@@ -17,10 +18,19 @@ export function BrandSelect({
   value, 
   onValueChange, 
   placeholder = "Select brand",
-  required = false,
   disabled = false 
 }: BrandSelectProps) {
   const { data: brands, isLoading, error } = useBrands();
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Filter brands based on search term
+  const filteredBrands = useMemo(() => {
+    if (!brands || !searchTerm.trim()) return brands || [];
+    
+    return brands.filter(brand =>
+      brand.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [brands, searchTerm]);
 
   if (isLoading) {
     return (
@@ -49,11 +59,31 @@ export function BrandSelect({
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
-        {brands?.map((brand) => (
-          <SelectItem key={brand.brandId} value={brand.brandId.toString()}>
-            {brand.name}
-          </SelectItem>
-        ))}
+        {/* Search Input */}
+        <div className="flex items-center border-b px-3 pb-2">
+          <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+          <Input
+            placeholder="Search brands..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="h-8 w-full bg-transparent border-0 focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+          />
+        </div>
+        
+        {/* Brand Options */}
+        <div className="max-h-[200px] overflow-y-auto">
+          {filteredBrands.length === 0 ? (
+            <div className="py-6 text-center text-sm text-muted-foreground">
+              {searchTerm.trim() ? 'No brands found.' : 'No brands available.'}
+            </div>
+          ) : (
+            filteredBrands.map((brand) => (
+              <SelectItem key={brand.brandId} value={brand.brandId.toString()}>
+                {brand.name}
+              </SelectItem>
+            ))
+          )}
+        </div>
       </SelectContent>
     </Select>
   );

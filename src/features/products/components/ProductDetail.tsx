@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Star, Heart, Eye, Truck, Shield, Clock, UserCircle } from 'lucide-react';
+import { Star, Heart, Eye, Shield, UserCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useCartStore } from '@/features/cart/hooks';

@@ -1,7 +1,5 @@
-import { cn } from "@/utils/cn";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Instagram, ShoppingBag, Users, Crown, Star, Zap } from "lucide-react";
+import { Card} from "@/components/ui/card";
 import { SubscriptionPlans } from "@/components/subscription/SubscriptionPlans";
 
 function About() {

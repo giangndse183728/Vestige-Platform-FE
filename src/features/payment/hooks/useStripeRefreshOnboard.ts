@@ -1,10 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { getStripeRefreshOnboardUrl } from '../service';
 
-interface StripeRefreshOnboardResponse {
-  url: string;
-}
-
 export const useStripeRefreshOnboard = () => {
   return useMutation({
     mutationFn: getStripeRefreshOnboardUrl,

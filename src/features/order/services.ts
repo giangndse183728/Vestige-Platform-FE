@@ -21,6 +21,11 @@ export const getOrders = async (): Promise<OrdersResponse> => {
   return response.data.data;
 };
 
+export const getOrdersByRole = async (role: 'buyer' | 'seller'): Promise<OrdersResponse> => {
+  const response = await api.get<ApiResponse<OrdersResponse>>(`/orders?role=${role}`);
+  return response.data.data;
+};
+
 export const getOrderById = async (orderId: number): Promise<Order> => {
   const response = await api.get<ApiResponse<Order>>(`/orders/${orderId}`);
   return response.data.data;

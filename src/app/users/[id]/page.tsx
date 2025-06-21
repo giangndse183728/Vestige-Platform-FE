@@ -1,13 +1,12 @@
 import { PublicUserProfile } from '@/features/profile/components/VisitProfile';
 
-interface UserProfilePageProps {
-  params: {
-    id: string;
-  };
+interface PageProps {
+  params: Promise<{ id: string }>;
 }
 
-export default async function UserProfilePage({ params }: UserProfilePageProps) {
-  const userId = parseInt(params.id, 10);
+export default async function UserProfilePage({ params }: PageProps) {
+  const { id } = await params;
+  const userId = parseInt(id, 10);
 
   return (
     <main>

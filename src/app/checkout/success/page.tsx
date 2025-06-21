@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -8,12 +8,12 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { useOrderDetail } from '@/features/order/hooks/useOrderDetail';
 import { OrderItemDetail } from '@/features/order/schema';
-import { CheckCircle, Package, MapPin, ArrowLeft, Home, User, Shield, Star } from 'lucide-react';
+import { CheckCircle, Package, MapPin, Home, User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { format } from 'date-fns';
 
-export default function CheckoutSuccessPage() {
+function CheckoutSuccessPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
@@ -59,7 +59,7 @@ export default function CheckoutSuccessPage() {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
-    }).format(amount / 100); // Assuming amount is in cents
+    }).format(amount / 100); 
   };
 
   return (
@@ -227,5 +227,13 @@ export default function CheckoutSuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CheckoutSuccessPageContent />
+    </Suspense>
   );
 } 

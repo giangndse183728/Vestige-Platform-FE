@@ -1,7 +1,7 @@
 import React from 'react';
 import { Star, Shield, Calendar, TrendingUp, Award } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+import {  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 
 interface ActivityStatsProps {
   user: {

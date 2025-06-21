@@ -2,11 +2,11 @@
 
 import { useProducts } from "../hooks/useProducts";
 import { ProductCard } from './ProductCard';
-import { useFilters } from '@/app/marketplace/layout';
+import { useFilters } from "../hooks/useFilters";
 import { useEffect } from 'react';
 
 export function ProductList() {
-  const { filters, totalProducts, setTotalProducts } = useFilters();
+  const { filters, setTotalProducts } = useFilters();
   const { data, isLoading, error } = useProducts(filters);
 
   // Update total products count when data changes

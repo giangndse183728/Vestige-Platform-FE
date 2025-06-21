@@ -3,22 +3,25 @@
 import { useState } from 'react';
 import { useMyProducts } from '../hooks/useMyProducts';
 import { useMyProductDetail } from '../hooks/useMyProductDetail';
-import { ProductCard } from './ProductCard';
 import { UpdateProductModal } from './UpdateProductModal';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Package, Edit, Trash2, Eye, Heart, DollarSign } from 'lucide-react';
-import { Product, ProductDetail } from '../schema';
+import { Product } from '../schema';
 import Link from 'next/link';
 import { formatVNDPrice } from '@/utils/format';
+import Image from 'next/image';
 
-export function InventoryTab() {
+interface InventoryTabProps {
+  onSwitchToAddProduct?: () => void;
+}
+
+export function InventoryTab({ onSwitchToAddProduct }: InventoryTabProps) {
   const { data, isLoading, error } = useMyProducts();
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
 
-  // Fetch detailed product information when a product is selected for editing
   const { data: selectedProductDetail } = useMyProductDetail(
     selectedProductId?.toString() || ''
   );
@@ -140,7 +143,10 @@ export function InventoryTab() {
               <Package className="w-16 h-16 mx-auto text-gray-400 mb-4" />
               <h3 className="font-serif text-xl font-bold mb-2">No Products Yet</h3>
               <p className="text-gray-600 font-mono mb-6">Start building your inventory by adding your first product.</p>
-              <Button className="bg-black text-white hover:bg-gray-800 border-2 border-black font-serif">
+              <Button 
+                onClick={onSwitchToAddProduct}
+                className="border-2 border-black bg-red-900 hover:bg-red-800 text-white"
+              >
                 Add Your First Product
               </Button>
             </div>
@@ -161,10 +167,13 @@ export function InventoryTab() {
                   {/* Product Image - Clickable */}
                   <Link href={`/products/${product.productId}`}>
                     <div className="relative aspect-[1/1] overflow-hidden bg-gray-100 cursor-pointer">
-                      <img 
+                      <Image
                         src={product.primaryImageUrl}
                         alt={product.title}
+                        width={400}
+                        height={400}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        unoptimized
                       />
                     </div>
                   </Link>

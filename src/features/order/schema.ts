@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { sellerSchema, productDetailSchema } from '@/features/products/schema';
+import { sellerSchema } from '@/features/products/schema';
 import { addressSchema } from '@/features/profile/schema';
 
 export const orderItemSchema = z.object({
@@ -14,7 +14,7 @@ export const createOrderSchema = z.object({
   notes: z.string().optional(),
 });
 
-// Create a product schema for order responses based on the API structure
+// Create a product schema for order responses 
 export const orderProductSchema = z.object({
   productId: z.number(),
   title: z.string(),

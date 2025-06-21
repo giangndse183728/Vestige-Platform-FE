@@ -14,15 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Mail, Lock, Phone, User, Users } from 'lucide-react';
-import { DatePickerDemo } from "@/components/ui/date-picker";
+import { Mail, Lock, Phone, User } from 'lucide-react';
 import { signupSchema, SignupFormData } from '../schema';
 import { useSignup } from "../hooks/useAuth";
 

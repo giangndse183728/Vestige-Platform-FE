@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useProfile } from '@/features/profile/hooks/useProfile';
 import { Skeleton } from '@/components/ui/skeleton';
+import Image from 'next/image';
 
 interface NavigationItem {
   id: string;
@@ -124,7 +125,7 @@ const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, currentPage = "
       id: 'my-orders',
       label: 'My Orders',
       icon: Package,
-      href: '/orders',
+      href: '/my-orders',
       color: 'text-gray-600 hover:text-black'
     },
     {
@@ -188,10 +189,13 @@ const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, currentPage = "
           <div className="flex items-center space-x-4">
             <div className="w-16 h-16 bg-gray-200 border-2 border-black flex items-center justify-center">
               {userData.profilePictureUrl ? (
-                <img 
-                  src={userData.profilePictureUrl} 
-                  alt="Profile" 
+                <Image
+                  src={userData.profilePictureUrl}
+                  alt="Profile"
+                  width={64}
+                  height={64}
                   className="w-full h-full object-cover"
+                  unoptimized
                 />
               ) : (
                 <User className="w-8 h-8 text-gray-500" />

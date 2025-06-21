@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getCategories, createCategory, updateCategory, deleteCategory, getCategory } from './service';
-import { CategoriesResponse, Category, CategoryList } from './schema';
+import { Category, CategoryList } from './schema';
 
 export const categoryKeys = {
   all: ['categories'] as const,
