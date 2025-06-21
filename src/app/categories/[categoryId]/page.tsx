@@ -6,7 +6,7 @@ import { useProducts } from '@/features/products/hooks/useProducts';
 import { ProductCard } from '@/features/products/components/ProductCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Grid, List } from 'lucide-react';
+import { Grid, List } from 'lucide-react';
 import { useState } from 'react';
 
 export default function CategoryPage() {

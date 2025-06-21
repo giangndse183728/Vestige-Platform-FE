@@ -3,22 +3,7 @@
 import React, { useState, createContext, useContext } from 'react';
 import { FilterProductLayout } from '@/components/layouts/FilterProductLayout';
 import { ProductFilters } from '@/features/products/schema';
-
-// Create a context for filters
-const FiltersContext = createContext<{
-  filters: ProductFilters;
-  setFilters: (filters: ProductFilters) => void;
-  totalProducts?: number;
-  setTotalProducts: (total: number | undefined) => void;
-} | null>(null);
-
-export const useFilters = () => {
-  const context = useContext(FiltersContext);
-  if (!context) {
-    throw new Error('useFilters must be used within a FiltersProvider');
-  }
-  return context;
-};
+import { FiltersContext } from '@/features/products/hooks/useFilters';
 
 export default function MarketplaceLayout({
   children,

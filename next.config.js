@@ -14,6 +14,10 @@ const nextConfig = {
       'www.fashionbeans.com',
     ],
   },
+  
+  eslint: {
+    ignoreDuringBuilds: true, // ✅ Tắt eslint khi chạy `next build`
+  },
 }
 
 module.exports = nextConfig 

@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { getOrders } from '../services';
-import { ActualOrder } from '../schema';
 
 export const useOrders = () => {
   return useQuery({

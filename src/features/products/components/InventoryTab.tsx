@@ -3,15 +3,15 @@
 import { useState } from 'react';
 import { useMyProducts } from '../hooks/useMyProducts';
 import { useMyProductDetail } from '../hooks/useMyProductDetail';
-import { ProductCard } from './ProductCard';
 import { UpdateProductModal } from './UpdateProductModal';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Package, Edit, Trash2, Eye, Heart, DollarSign } from 'lucide-react';
-import { Product, ProductDetail } from '../schema';
+import { Product } from '../schema';
 import Link from 'next/link';
 import { formatVNDPrice } from '@/utils/format';
+import Image from 'next/image';
 
 export function InventoryTab() {
   const { data, isLoading, error } = useMyProducts();
@@ -161,10 +161,13 @@ export function InventoryTab() {
                   {/* Product Image - Clickable */}
                   <Link href={`/products/${product.productId}`}>
                     <div className="relative aspect-[1/1] overflow-hidden bg-gray-100 cursor-pointer">
-                      <img 
+                      <Image
                         src={product.primaryImageUrl}
                         alt={product.title}
+                        width={400}
+                        height={400}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        unoptimized
                       />
                     </div>
                   </Link>

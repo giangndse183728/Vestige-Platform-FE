@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createOrder } from '../services';
-import { CreateOrderData } from '../schema';
 import { toast } from 'sonner';
 
 export const useCreateOrder = () => {

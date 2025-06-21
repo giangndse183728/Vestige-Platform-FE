@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useUpdateProduct } from '../hooks/useUpdateProduct';
-import { ProductDetail, UpdateProductRequest } from '../schema';
+import { ProductDetail } from '../schema';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

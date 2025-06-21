@@ -17,7 +17,6 @@ export function BrandSelect({
   value, 
   onValueChange, 
   placeholder = "Select brand",
-  required = false,
   disabled = false 
 }: BrandSelectProps) {
   const { data: brands, isLoading, error } = useBrands();

@@ -19,11 +19,11 @@ import { useAddresses } from '../hooks/useAddresses';
 import { AddressForm } from './AddressForm';
 import { AddressList } from './AddressList';
 import { AddressFormData, Address } from '../schema';
-import { MotionDiv } from '@/components/animation/AnimatedWrapper';
 import { ActivityStats } from './ActivityStats';
 import { format } from 'date-fns';
 import { cn } from '@/utils/cn';
 import { StripeAccountSection } from '@/features/payment/components/StripeAccountSection';
+import Image from 'next/image';
 
 export const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -165,20 +165,26 @@ export const Profile = () => {
                 <div className="w-100 h-80 bg-gray-200 border-3 border-darkred flex items-center justify-center">
                   {isEditing ? (
                     editData.profilePictureUrl ? (
-                      <img 
+                      <Image 
                         src={editData.profilePictureUrl} 
                         alt="Profile" 
+                        width={400}
+                        height={320}
                         className="w-full h-full object-cover"
+                        unoptimized
                       />
                     ) : (
                       <User className="w-24 h-24 text-gray-500" />
                     )
                   ) : (
                     user.profilePictureUrl ? (
-                      <img 
+                      <Image 
                         src={user.profilePictureUrl} 
                         alt="Profile" 
+                        width={400}
+                        height={320}
                         className="w-full h-full object-cover"
+                        unoptimized
                       />
                     ) : (
                       <User className="w-24 h-24 text-gray-500" />

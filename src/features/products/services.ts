@@ -67,7 +67,7 @@ export const getMyProducts = async (filters?: ProductFilters): Promise<ProductsR
   return response.data.data;
 };
 
-export const getProduct = async (id: string): Promise<ProductsResponse> => {
+export const getProduct = async (): Promise<ProductsResponse> => {
   const response = await api.get<ApiResponse<ProductsResponse>>(`/products`);
   return response.data.data;
 };

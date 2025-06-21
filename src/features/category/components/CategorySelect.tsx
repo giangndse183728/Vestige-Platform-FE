@@ -8,7 +8,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
 import { Category } from '../schema';
 
 interface CategorySelectProps {
@@ -22,8 +21,6 @@ interface CategorySelectProps {
 export function CategorySelect({
   value,
   onValueChange,
-  label = 'Category',
-  required = false,
   showAllOption = false,
 }: CategorySelectProps) {
   const { data, isLoading } = useCategories();

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -9,147 +9,22 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useCreateOrder } from '@/features/order/hooks/useCreateOrder';
-import { useConfirmPayment } from '@/features/order/hooks/useConfirmPayment';
 import { useAddresses } from '@/features/profile/hooks/useAddresses';
 import { CreateOrderData, Order } from '@/features/order/schema';
 import { useProductDetail } from '@/features/products/hooks/useProductDetail';
-import { useStripeRefreshOnboard } from '@/features/payment/hooks/useStripeRefreshOnboard';
 import { toast } from 'sonner';
-import { MapPin, CreditCard, Truck, ArrowLeft, UserCircle, Shield, Star, ExternalLink } from 'lucide-react';
+import { MapPin, CreditCard, UserCircle, Shield, Star, ExternalLink } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { CompactStripeStatus } from '@/features/payment/components/CompactStripeStatus';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import { StripeCardForm, stripePromise } from '@/features/payment/components/StripeCardForm';
 
-// Initialize Stripe (you'll need to add your publishable key)
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || 'pk_test_51RXISzFf0tmsJyuNYhfzqTsuXWJFp90cNQeLhe622Md8dBIfJsFUtFuJ5On4DusNRgidDMmjx7qvIICzkcQFIJo5004YuApasP');
-
-// Stripe Card Component
-const StripeCardForm = ({ order, onPaymentSuccess }: { order: Order; onPaymentSuccess: () => void }) => {
-  const stripe = useStripe();
-  const elements = useElements();
-  const { mutate: confirmPayment, isPending: isConfirmingPayment } = useConfirmPayment();
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [cardError, setCardError] = useState<string>('');
-
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-
-    if (!stripe || !elements) {
-      toast.error('Stripe is not loaded. Please refresh the page.');
-      return;
-    }
-
-    setIsProcessing(true);
-    setCardError('');
-
-    const cardElement = elements.getElement(CardElement);
-    if (!cardElement) {
-      setIsProcessing(false);
-      toast.error('Card element not found. Please refresh the page.');
-      return;
-    }
-
-    // Confirm the payment with Stripe
-    const { error, paymentIntent } = await stripe.confirmCardPayment(order.metadata?.clientSecret || '', {
-      payment_method: {
-        card: cardElement,
-      },
-    });
-
-    if (error) {
-      setCardError(error.message || 'Payment failed');
-      toast.error(`Payment failed: ${error.message}`);
-      setIsProcessing(false);
-      return;
-    }
-
-    if (paymentIntent.status === 'succeeded') {
-      // Call our backend to confirm the payment
-      confirmPayment({
-        orderId: order.orderId,
-        stripePaymentIntentId: order.stripePaymentIntentId || '',
-        clientSecret: order.metadata?.clientSecret || ''
-      }, {
-        onSuccess: () => {
-          toast.success('Payment confirmed successfully!');
-          onPaymentSuccess();
-        },
-        onError: (error) => {
-          toast.error('Payment confirmation failed. Please contact support.');
-          console.error('Payment confirmation error:', error);
-          onPaymentSuccess(); // Still redirect since payment was successful
-        }
-      });
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label className="text-sm font-medium">Card Information</Label>
-        <div className="p-4 border-2 border-gray-300 rounded-lg focus-within:border-blue-500 transition-colors">
-          <CardElement
-            options={{
-              style: {
-                base: {
-                  fontSize: '16px',
-                  color: '#424770',
-                  fontFamily: 'system-ui, sans-serif',
-                  '::placeholder': {
-                    color: '#aab7c4',
-                  },
-                  ':-webkit-autofill': {
-                    color: '#424770',
-                  },
-                },
-                invalid: {
-                  color: '#9e2146',
-                },
-              },
-              hidePostalCode: true,
-            }}
-            onChange={(event) => {
-              if (event.error) {
-                setCardError(event.error.message);
-              } else {
-                setCardError('');
-              }
-            }}
-          />
-        </div>
-        {cardError && (
-          <p className="text-sm text-red-600">{cardError}</p>
-        )}
-      </div>
-      
-      <div className="bg-gray-50 p-4 rounded-lg">
-        <p className="text-sm text-gray-600 mb-2">Test Card Numbers:</p>
-        <div className="space-y-1 text-xs text-gray-500">
-          <p>• Visa: 4242 4242 4242 4242</p>
-          <p>• Mastercard: 5555 5555 5555 4444</p>
-          <p>• Any future date for expiry</p>
-          <p>• Any 3-digit CVC</p>
-        </div>
-      </div>
-
-      <Button
-        type="submit"
-        disabled={!stripe || isProcessing || isConfirmingPayment || !!cardError}
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400"
-      >
-        {isProcessing || isConfirmingPayment ? 'Processing Payment...' : 'Pay Now'}
-      </Button>
-    </form>
-  );
-};
-
-export default function CheckoutPage() {
+function CheckoutPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const productId = searchParams.get('productId');
-  
+
   const [orderData, setOrderData] = useState<CreateOrderData>({
     items: [],
     shippingAddressId: 0,
@@ -163,7 +38,7 @@ export default function CheckoutPage() {
   const { mutate: createOrder, isPending: isCreatingOrder } = useCreateOrder();
   const { addresses, isLoading: isLoadingAddresses } = useAddresses();
   const { data: product, isLoading: isLoadingProduct } = useProductDetail(productId || '');
-  const { mutate: refreshStripeOnboard, isPending: isRefreshingOnboard } = useStripeRefreshOnboard();
+
 
   useEffect(() => {
     if (addresses && addresses.length > 0 && orderData.shippingAddressId === 0) {
@@ -195,7 +70,7 @@ export default function CheckoutPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!orderData.shippingAddressId) {
       toast.error('Please select a shipping address');
       return;
@@ -206,12 +81,10 @@ export default function CheckoutPage() {
       onSuccess: (order: Order) => {
         toast.success('Order created successfully!');
         setCreatedOrder(order);
-        
         if (orderData.paymentMethod === 'STRIPE_CARD') {
-          // Show Stripe payment form
           setShowPaymentForm(true);
         } else {
-          // For COD orders, redirect to success page
+          // For COD orders
           router.push(`/checkout/success?orderId=${order.orderId}`);
         }
       },
@@ -256,14 +129,14 @@ export default function CheckoutPage() {
                 <h2 className="font-metal text-2xl mb-2">Complete Payment</h2>
                 <p className="text-gray-600">Order #{createdOrder.orderId}</p>
               </div>
-              
+
               <Elements stripe={stripePromise}>
-                <StripeCardForm 
-                  order={createdOrder} 
+                <StripeCardForm
+                  order={createdOrder}
                   onPaymentSuccess={handlePaymentSuccess}
                 />
               </Elements>
-              
+
               <div className="mt-4 text-center">
                 <Button
                   variant="outline"
@@ -293,7 +166,7 @@ export default function CheckoutPage() {
               <Card variant="double">
                 <CardContent className="p-10">
                   <h3 className="font-metal text-lg mb-6">Product Details</h3>
-                  
+
                   {/* Product Image and Basic Info */}
                   <div className="flex gap-6 mb-6">
                     <div className="relative w-70 h-70 bg-gray-100 border-2 border-black flex-shrink-0">
@@ -307,7 +180,7 @@ export default function CheckoutPage() {
                     <div className="flex-1">
                       <h4 className="font-medium text-xl mb-2">{product.title}</h4>
                       <p className="text-lg font-metal text-red-900 mb-4">${product.price.toFixed(2)}</p>
-                      
+
                       {/* Product Details Table */}
                       <div className="border border-gray-200 rounded-lg overflow-hidden mb-4">
                         <table className="w-full text-sm">
@@ -340,9 +213,9 @@ export default function CheckoutPage() {
                           </tbody>
                         </table>
                       </div>
-                      
+
                       {/* Item Notes */}
-                 
+
                     </div>
                   </div>
 
@@ -395,7 +268,7 @@ export default function CheckoutPage() {
                     <MapPin className="w-5 h-5 text-red-900" />
                     <h3 className="font-metal text-lg">Shipping Address</h3>
                   </div>
-                  
+
                   {isLoadingAddresses ? (
                     <div className="text-center py-4">Loading addresses...</div>
                   ) : addresses && addresses.length > 0 ? (
@@ -403,11 +276,10 @@ export default function CheckoutPage() {
                       {addresses.map((address) => (
                         <div
                           key={address.addressId}
-                          className={`p-4 border-2 cursor-pointer transition-all ${
-                            orderData.shippingAddressId === address.addressId
-                              ? 'border-red-900 bg-red-50'
-                              : 'border-black hover:border-gray-600'
-                          }`}
+                          className={`p-4 border-2 cursor-pointer transition-all ${orderData.shippingAddressId === address.addressId
+                            ? 'border-red-900 bg-red-50'
+                            : 'border-black hover:border-gray-600'
+                            }`}
                           onClick={() => handleInputChange('shippingAddressId', address.addressId)}
                         >
                           <div className="flex items-start justify-between">
@@ -436,6 +308,22 @@ export default function CheckoutPage() {
                 </CardContent>
               </Card>
 
+              
+              {/* Order Notes Section */}
+              <Card variant="double">
+                <CardContent className="p-8">
+                  <h3 className="font-metal text-lg mb-4">Order Notes</h3>
+                  <Label htmlFor="item-notes" className="block mb-2 font-medium">Add any notes or special instructions for the seller (optional):</Label>
+                  <Textarea
+                    id="item-notes"
+                    placeholder="Add any notes or special instructions for the seller..."
+                    value={orderData.items[0]?.notes || ''}
+                    onChange={e => handleItemNotesChange(e.target.value)}
+                    className="w-full min-h-[80px] border-gray-300 focus:border-black focus:ring-0"
+                  />
+                </CardContent>
+              </Card>
+
               {/* Stripe Banking Section */}
               <Card variant="double" className="border-2 border-black">
                 <CardContent className="p-6">
@@ -444,20 +332,17 @@ export default function CheckoutPage() {
                       <CreditCard className="w-5 h-5 text-blue-600" />
                       <h3 className="font-metal text-lg">Stripe Banking Setup</h3>
                     </div>
-                    <Button 
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        router.push('/profile');
-                      }}
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
-                    >
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      Go to Profile to Setup
-                    </Button>
+                    <Link href="/profile">
+                      <button
+                        type="button"
+                        className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+                      >
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Go to Profile to Setup
+                      </button>
+                    </Link>
                   </div>
-                  
+
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <div className="flex items-start gap-3">
                       <CreditCard className="w-5 h-5 text-blue-600 mt-0.5" />
@@ -467,8 +352,8 @@ export default function CheckoutPage() {
                           Set up your Stripe banking account to receive payments and manage your business finances securely.
                         </p>
                         <div className="text-xs text-blue-600">
-                          • Secure payment processing<br/>
-                          • Direct bank transfers<br/>
+                          • Secure payment processing<br />
+                          • Direct bank transfers<br />
                           • Business account management
                         </div>
                       </div>
@@ -486,7 +371,7 @@ export default function CheckoutPage() {
                 <CardContent className="p-10">
                   <h3 className="font-metal text-lg mb-4">Order Summary</h3>
                   <div className="space-y-4">
-                
+
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span>Product Price:</span>
@@ -569,5 +454,13 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CheckoutPageContent />
+    </Suspense>
   );
 }

@@ -14,11 +14,10 @@ import { createProductSchema, CreateProductRequest } from '@/features/products/s
 import { toast } from 'sonner';
 import { CategorySelect } from '@/features/category/components/CategorySelect';
 import { BrandSelect } from '@/features/brand/components/BrandSelect';
-import { X, Plus, ImageIcon, Upload } from 'lucide-react';
+import { X, Plus, Upload } from 'lucide-react';
 import * as z from 'zod';
 import { storage } from '@/libs/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { formatVNDPrice } from '@/utils/format';
 
 export function CreateProduct() {
   const router = useRouter();
@@ -77,20 +76,6 @@ export function CreateProduct() {
     }
   };
 
-  const handleImageUrlChange = (index: number, value: string) => {
-    const newImageUrls = [...formData.imageUrls];
-    newImageUrls[index] = value;
-    setFormData(prev => ({
-      ...prev,
-      imageUrls: newImageUrls
-    }));
-    
-    // Clear image errors
-    if (errors.imageUrls) {
-      setErrors(prev => ({ ...prev, imageUrls: '' }));
-    }
-  };
-
   const addImageUrl = () => {
     setFormData(prev => ({
       ...prev,
@@ -103,16 +88,6 @@ export function CreateProduct() {
       ...prev,
       imageUrls: prev.imageUrls.filter((_, i) => i !== index)
     }));
-  };
-
-  const isValidImageUrl = (url: string) => {
-    if (!url) return false;
-    try {
-      const urlObj = new URL(url);
-      return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
-    } catch {
-      return false;
-    }
   };
 
   const handleImageUpload = async (file: File, index: number) => {
