@@ -19,6 +19,10 @@ import Link from 'next/link';
 import { CompactStripeStatus } from '@/features/payment/components/CompactStripeStatus';
 import { Elements } from '@stripe/react-stripe-js';
 import { StripeCardForm, stripePromise } from '@/features/payment/components/StripeCardForm';
+import { AddressForm } from '@/features/profile/components/AddressForm';
+import { AddressList } from '@/features/profile/components/AddressList';
+import { AddressFormData, Address } from '@/features/profile/schema';
+import { Input } from '@/components/ui/input';
 
 function CheckoutPageContent() {
   const router = useRouter();
@@ -34,11 +38,21 @@ function CheckoutPageContent() {
 
   const [createdOrder, setCreatedOrder] = useState<Order | null>(null);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [isAddingAddress, setIsAddingAddress] = useState(false);
+  const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+  const [addressFormData, setAddressFormData] = useState<AddressFormData>({
+    addressLine1: '',
+    addressLine2: '',
+    city: '',
+    state: '',
+    postalCode: '',
+    country: 'Vietnam',
+    isDefault: false
+  });
 
   const { mutate: createOrder, isPending: isCreatingOrder } = useCreateOrder();
-  const { addresses, isLoading: isLoadingAddresses } = useAddresses();
+  const { addresses, isLoading: isLoadingAddresses, createAddress, updateAddress, deleteAddress, setDefaultAddress, isCreating, isUpdating: isUpdatingAddresses, isDeleting, isSettingDefault } = useAddresses();
   const { data: product, isLoading: isLoadingProduct } = useProductDetail(productId || '');
-
 
   useEffect(() => {
     if (addresses && addresses.length > 0 && orderData.shippingAddressId === 0) {
@@ -106,6 +120,74 @@ function CheckoutPageContent() {
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleAddAddress = () => {
+    setEditingAddress(null);
+    setAddressFormData({
+      addressLine1: '',
+      addressLine2: '',
+      city: '',
+      state: '',
+      postalCode: '',
+      country: 'Vietnam',
+      isDefault: false
+    });
+    setIsAddingAddress(true);
+  };
+
+  const handleEditAddress = (address: Address) => {
+    setEditingAddress(address);
+    setAddressFormData({
+      addressLine1: address.addressLine1,
+      addressLine2: address.addressLine2 || '',
+      city: address.city,
+      state: address.state,
+      postalCode: address.postalCode,
+      country: address.country,
+      isDefault: address.isDefault
+    });
+    setIsAddingAddress(true);
+  };
+
+  const handleCancelAddress = () => {
+    setIsAddingAddress(false);
+    setEditingAddress(null);
+    setAddressFormData({
+      addressLine1: '',
+      addressLine2: '',
+      city: '',
+      state: '',
+      postalCode: '',
+      country: 'Vietnam',
+      isDefault: false
+    });
+  };
+
+  const handleAddressFieldChange = (field: keyof AddressFormData, value: string | boolean) => {
+    setAddressFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSubmitAddress = async (data: AddressFormData) => {
+    if (editingAddress) {
+      await updateAddress({ addressId: editingAddress.addressId, data });
+    } else {
+      await createAddress(data);
+    }
+    setIsAddingAddress(false);
+    setEditingAddress(null);
+    setAddressFormData({
+      addressLine1: '',
+      addressLine2: '',
+      city: '',
+      state: '',
+      postalCode: '',
+      country: 'Vietnam',
+      isDefault: false
+    });
   };
 
   if (isLoadingProduct || !product) {
@@ -264,51 +346,169 @@ function CheckoutPageContent() {
               {/* Shipping Address */}
               <Card variant="stamp">
                 <CardContent className="p-6">
-                  <div className="flex items-center gap-2 mb-4">
-                    <MapPin className="w-5 h-5 text-red-900" />
-                    <h3 className="font-metal text-lg">Shipping Address</h3>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-5 h-5 text-red-900" />
+                      <h3 className="font-metal text-lg">Shipping Address</h3>
+                    </div>
+                    {!isAddingAddress && (
+                      <Button
+                        onClick={handleAddAddress}
+                        variant="outline"
+                        size="sm"
+                        className="border-2 border-black text-black hover:bg-gray-100 font-gothic text-xs"
+                      >
+                        Add New Address
+                      </Button>
+                    )}
                   </div>
 
-                  {isLoadingAddresses ? (
-                    <div className="text-center py-4">Loading addresses...</div>
-                  ) : addresses && addresses.length > 0 ? (
-                    <div className="space-y-3">
-                      {addresses.map((address) => (
-                        <div
-                          key={address.addressId}
-                          className={`p-4 border-2 cursor-pointer transition-all ${orderData.shippingAddressId === address.addressId
-                            ? 'border-red-900 bg-red-50'
-                            : 'border-black hover:border-gray-600'
-                            }`}
-                          onClick={() => handleInputChange('shippingAddressId', address.addressId)}
-                        >
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <p className="font-medium">{address.addressLine1}</p>
-                              {address.addressLine2 && <p className="text-sm text-gray-600">{address.addressLine2}</p>}
-                              <p className="text-sm text-gray-600">
-                                {address.city}, {address.state} {address.postalCode}
-                              </p>
-                              <p className="text-sm text-gray-600">{address.country}</p>
-                            </div>
-                            {address.isDefault && (
-                              <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
-                                Default
-                              </span>
-                            )}
+                  {isAddingAddress ? (
+                    <div className="border-2 border-black p-6">
+                      <h5 className="font-metal text-xl mb-4">
+                        {editingAddress ? 'Edit Address' : 'Add New Address'}
+                      </h5>
+                      <div className="space-y-4">
+                        {/* Country Selection */}
+                        <div>
+                          <Label className="font-gothic text-sm text-black">Country</Label>
+                          <Select
+                            value={addressFormData.country}
+                            onValueChange={(value) => handleAddressFieldChange('country', value)}
+                          >
+                            <SelectTrigger className="border-black focus:border-black focus:ring-0">
+                              <SelectValue placeholder="Select country" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-white border-2 border-black">
+                              <SelectItem value="Vietnam">Vietnam</SelectItem>
+                              <SelectItem value="United States">United States</SelectItem>
+                              <SelectItem value="United Kingdom">United Kingdom</SelectItem>
+                              <SelectItem value="Canada">Canada</SelectItem>
+                              <SelectItem value="Australia">Australia</SelectItem>
+                              <SelectItem value="Other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Address Fields */}
+                        <div>
+                          <Label className="font-gothic text-sm text-black">Address Line 1</Label>
+                          <Input
+                            value={addressFormData.addressLine1}
+                            onChange={(e) => handleAddressFieldChange('addressLine1', e.target.value)}
+                            className="border-black focus:border-black focus:ring-0"
+                            placeholder="Enter your address"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label className="font-gothic text-sm text-black">City</Label>
+                            <Input
+                              value={addressFormData.city}
+                              onChange={(e) => handleAddressFieldChange('city', e.target.value)}
+                              className="border-black focus:border-black focus:ring-0"
+                              placeholder="Enter city"
+                            />
+                          </div>
+                          <div>
+                            <Label className="font-gothic text-sm text-black">State</Label>
+                            <Input
+                              value={addressFormData.state}
+                              onChange={(e) => handleAddressFieldChange('state', e.target.value)}
+                              className="border-black focus:border-black focus:ring-0"
+                              placeholder="Enter state"
+                            />
                           </div>
                         </div>
-                      ))}
+
+                        <div>
+                          <Label className="font-gothic text-sm text-black">Postal Code</Label>
+                          <Input
+                            value={addressFormData.postalCode}
+                            onChange={(e) => handleAddressFieldChange('postalCode', e.target.value)}
+                            className="border-black focus:border-black focus:ring-0"
+                            placeholder="Enter postal code"
+                          />
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex justify-end space-x-2 pt-4">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={handleCancelAddress}
+                            className="border-black text-black hover:bg-gray-100"
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            type="button"
+                            onClick={() => handleSubmitAddress(addressFormData)}
+                            className="bg-black text-white hover:bg-gray-800"
+                            disabled={isCreating || isUpdatingAddresses}
+                          >
+                            {isCreating || isUpdatingAddresses ? 'Saving...' : 'Save Address'}
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   ) : (
-                    <div className="text-center py-4 text-gray-500">
-                      No addresses found. Please add an address in your profile.
-                    </div>
+                    <>
+                      {isLoadingAddresses ? (
+                        <div className="text-center py-4">Loading addresses...</div>
+                      ) : addresses && addresses.length > 0 ? (
+                        <div className="space-y-3">
+                          {addresses.map((address) => (
+                            <div
+                              key={address.addressId}
+                              className={`p-4 border-2 cursor-pointer transition-all ${orderData.shippingAddressId === address.addressId
+                                ? 'border-red-900 bg-red-50'
+                                : 'border-black hover:border-gray-600'
+                                }`}
+                              onClick={() => handleInputChange('shippingAddressId', address.addressId)}
+                            >
+                              <div className="flex items-start justify-between">
+                                <div>
+                                  <p className="font-medium">{address.addressLine1}</p>
+                                  {address.addressLine2 && <p className="text-sm text-gray-600">{address.addressLine2}</p>}
+                                  <p className="text-sm text-gray-600">
+                                    {address.city}, {address.state} {address.postalCode}
+                                  </p>
+                                  <p className="text-sm text-gray-600">{address.country}</p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  {address.isDefault && (
+                                    <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                                      Default
+                                    </span>
+                                  )}
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleEditAddress(address);
+                                    }}
+                                    className="text-gray-500 hover:text-black"
+                                  >
+                                    Edit
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-4 text-gray-500">
+                          No addresses found. Please add an address to continue.
+                        </div>
+                      )}
+                    </>
                   )}
                 </CardContent>
               </Card>
 
-              
               {/* Order Notes Section */}
               <Card variant="double">
                 <CardContent className="p-8">

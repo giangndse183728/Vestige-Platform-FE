@@ -125,7 +125,7 @@ const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, currentPage = "
       id: 'my-orders',
       label: 'My Orders',
       icon: Package,
-      href: '/orders',
+      href: '/my-orders',
       color: 'text-gray-600 hover:text-black'
     },
     {

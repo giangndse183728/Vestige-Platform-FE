@@ -13,12 +13,15 @@ import Link from 'next/link';
 import { formatVNDPrice } from '@/utils/format';
 import Image from 'next/image';
 
-export function InventoryTab() {
+interface InventoryTabProps {
+  onSwitchToAddProduct?: () => void;
+}
+
+export function InventoryTab({ onSwitchToAddProduct }: InventoryTabProps) {
   const { data, isLoading, error } = useMyProducts();
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
 
-  // Fetch detailed product information when a product is selected for editing
   const { data: selectedProductDetail } = useMyProductDetail(
     selectedProductId?.toString() || ''
   );
@@ -140,7 +143,10 @@ export function InventoryTab() {
               <Package className="w-16 h-16 mx-auto text-gray-400 mb-4" />
               <h3 className="font-serif text-xl font-bold mb-2">No Products Yet</h3>
               <p className="text-gray-600 font-mono mb-6">Start building your inventory by adding your first product.</p>
-              <Button className="bg-black text-white hover:bg-gray-800 border-2 border-black font-serif">
+              <Button 
+                onClick={onSwitchToAddProduct}
+                className="border-2 border-black bg-red-900 hover:bg-red-800 text-white"
+              >
                 Add Your First Product
               </Button>
             </div>

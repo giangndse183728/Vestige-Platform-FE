@@ -13,6 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { CategorySelect } from '@/features/category/components/CategorySelect';
 import { useBrands } from '@/features/brand/hooks';
 import { ProductFilters } from '@/features/products/schema';
+import { Brand } from '@/features/brand/schema';
 
 interface FilterProductLayoutProps {
   children: React.ReactNode;
@@ -52,6 +53,7 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts, 
   const [selectedConditions, setSelectedConditions] = useState<string[]>(
     initialFilters?.condition ? initialFilters.condition.split(',').filter(Boolean) : []
   );
+  const [activeSelectedBrand, setActiveSelectedBrand] = useState<Brand | null>(null);
   const [isFilterExpanded, setIsFilterExpanded] = useState(true);
   const [isPriceExpanded, setIsPriceExpanded] = useState(false);
   const [isCategoryExpanded, setIsCategoryExpanded] = useState(false);
@@ -83,6 +85,14 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts, 
       : [...selectedBrands, brandValue];
     
     setSelectedBrands(newSelectedBrands);
+
+    if (newSelectedBrands.length === 1) {
+      const brandInfo = brands?.find(b => b.brandId.toString() === newSelectedBrands[0]);
+      setActiveSelectedBrand(brandInfo || null);
+    } else {
+      setActiveSelectedBrand(null);
+    }
+
     const newFilters = { 
       ...filters, 
       brand: newSelectedBrands.join(',') 
@@ -120,6 +130,7 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts, 
     setSelectedConditions([]);
     setPriceRange([0, 1000]);
     onFiltersChange(clearedFilters);
+    setActiveSelectedBrand(null);
   };
 
   const hasActiveFilters = filters.search || selectedBrands.length > 0 || selectedConditions.length > 0 || 
@@ -133,7 +144,6 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts, 
     priceRange[0] > 0 || priceRange[1] < 1000
   ].filter(Boolean).length;
 
-  // Group brands by popularity (you can adjust this logic based on your needs)
   const popularBrands = brands?.slice(0, 6) || [];
   const otherBrands = brands?.slice(6) || [];
 
@@ -475,6 +485,27 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts, 
                   </div>
                 )}
               </div>
+
+              {activeSelectedBrand && (
+                <div className="p-6 border-b-2 border-black bg-yellow-50/50">
+                  <div className="flex items-start gap-6">
+                    <div className="w-24 h-24 bg-white border-2 border-black flex-shrink-0">
+                      <img 
+                        src={activeSelectedBrand.logoUrl} 
+                        alt={`${activeSelectedBrand.name} logo`}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <div>
+                      <h3 className="font-serif text-2xl font-bold">{activeSelectedBrand.name}</h3>
+                      <p className="text-sm text-gray-600 mt-1 font-mono">
+                        Explore the collection from {activeSelectedBrand.name}. 
+                        Use the filters to find exactly what you're looking for.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Products Content */}
               <div >

@@ -32,7 +32,7 @@ export const createAddress = async (data: AddressFormData): Promise<Address> => 
 };
 
 export const updateAddress = async (addressId: number, data: AddressFormData): Promise<Address> => {
-  const response = await api.put<Address>(`/users/addresses/${addressId}`, data);
+  const response = await api.patch<Address>(`/users/addresses/${addressId}`, data);
   return response.data;
 };
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useUpdateProduct } from '../hooks/useUpdateProduct';
-import { ProductDetail } from '../schema';
+import { ProductDetail, UpdateProductRequest } from '../schema';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,11 @@ import { CategorySelect } from '@/features/category/components/CategorySelect';
 import { BrandSelect } from '@/features/brand/components/BrandSelect';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { ImageUpload } from '@/components/ui/image-upload';
+import { useImageUpload } from '@/hooks/useImageUpload';
+import * as z from 'zod';
+import { createProductSchema } from '../schema';
+
 
 interface UpdateProductModalProps {
   product: ProductDetail | null;
@@ -20,24 +25,18 @@ interface UpdateProductModalProps {
   onClose: () => void;
 }
 
-// Helper to remove all non-digit characters
-const unformatVND = (value: string) => value.replace(/\D/g, '');
+const unformatVND = (value: string) => String(value).replace(/\D/g, '');
+
+const formatVNDInput = (value: number | string) => {
+  const numeric = String(value).replace(/\D/g, '');
+  return numeric ? Number(numeric).toLocaleString('vi-VN') : '';
+};
 
 export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductModalProps) {
   const updateProductMutation = useUpdateProduct();
-  const [formData, setFormData] = useState<{
-    title: string;
-    description: string;
-    price: string;
-    originalPrice: string;
-    condition: string;
-    size: string;
-    color: string;
-    categoryId: string;
-    brandId: string;
-    imageUrls: string[];
-    status: string;
-  }>({
+  const { uploadMultipleImages, isUploading: isUploadingImages, uploadProgress } = useImageUpload({ folder: 'products' });
+
+  const [formData, setFormData] = useState({
     title: '',
     description: '',
     price: '',
@@ -47,60 +46,37 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
     color: '',
     categoryId: '',
     brandId: '',
-    imageUrls: [],
+    imageUrls: [] as string[],
+    imageFiles: [] as File[],
     status: '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    if (product) {
-      const formatVNDInput = (value: number) => {
-        const numeric = value.toString().replace(/\D/g, '');
-        return numeric ? Number(numeric).toLocaleString('vi-VN') : '';
-      };
+    if (product && isOpen) {
       setFormData({
         title: product.title || '',
         description: product.description || '',
-        price: product.price ? formatVNDInput(product.price) : '',
-        originalPrice: product.originalPrice ? formatVNDInput(product.originalPrice) : '',
+        price: formatVNDInput(product.price),
+        originalPrice: formatVNDInput(product.originalPrice),
         condition: product.condition || '',
         size: product.size || '',
         color: product.color || '',
-        categoryId: product.category.categoryId ? String(product.category.categoryId) : '',
-        brandId: product.brand.brandId ? String(product.brand.brandId) : '',
+        categoryId: String(product.category?.categoryId || ''),
+        brandId: String(product.brand?.brandId || ''),
         imageUrls: product.images.map(img => img.imageUrl) || [],
+        imageFiles: [],
         status: product.status || '',
       });
       setErrors({});
-    } else {
-      setFormData({
-        title: '',
-        description: '',
-        price: '',
-        originalPrice: '',
-        condition: '',
-        size: '',
-        color: '',
-        categoryId: '',
-        brandId: '',
-        imageUrls: [],
-        status: '',
-      });
-      setErrors({});
     }
-  }, [product]);
+  }, [product, isOpen]);
 
-  // Custom handler for price/originalPrice (same as CreateProduct)
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    let numeric = unformatVND(value);
-    numeric = numeric.replace(/^0+/, '');
-    const formatted = numeric ? Number(numeric).toLocaleString('vi-VN') : '';
-    setFormData(prev => ({
-      ...prev,
-      [name]: formatted
-    }));
+    const formatted = formatVNDInput(value);
+    setFormData(prev => ({ ...prev, [name]: formatted }));
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -108,94 +84,55 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    
-    // Clear error when user selects
+    setFormData(prev => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
-  const handleImageUrlChange = (index: number, value: string) => {
-    const newImageUrls = [...(formData.imageUrls || [])];
-    newImageUrls[index] = value;
-    setFormData(prev => ({ ...prev, imageUrls: newImageUrls }));
+  const handleImageFilesChange = (files: File[]) => {
+    setFormData(prev => ({ ...prev, imageFiles: files }));
   };
-
-  const addImageUrl = () => {
+  
+  const handleRemoveExistingUrl = (urlToRemove: string) => {
     setFormData(prev => ({
       ...prev,
-      imageUrls: [...(prev.imageUrls || []), '']
+      imageUrls: prev.imageUrls.filter(url => url !== urlToRemove)
     }));
   };
 
-  const removeImageUrl = (index: number) => {
-    const newImageUrls = [...(formData.imageUrls || [])];
-    newImageUrls.splice(index, 1);
-    setFormData(prev => ({ ...prev, imageUrls: newImageUrls }));
-  };
-
-  // Validation: parse price/originalPrice as numbers
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-    if (!formData.title?.trim()) {
-      newErrors.title = 'Title is required';
-    }
-    if (!formData.description?.trim()) {
-      newErrors.description = 'Description is required';
-    }
-    if (formData.price === undefined || Number(unformatVND(formData.price)) < 0) {
-      newErrors.price = 'Price must be greater than or equal to 0';
-    }
-    if (formData.originalPrice === undefined || Number(unformatVND(formData.originalPrice)) < 0) {
-      newErrors.originalPrice = 'Original price must be greater than or equal to 0';
-    }
-    if (!formData.condition?.trim()) {
-      newErrors.condition = 'Condition is required';
-    }
-    if (!formData.size?.trim()) {
-      newErrors.size = 'Size is required';
-    }
-    if (!formData.color?.trim()) {
-      newErrors.color = 'Color is required';
-    }
-    if (!formData.categoryId) {
-      newErrors.categoryId = 'Category is required';
-    }
-    if (!formData.brandId) {
-      newErrors.brandId = 'Brand is required';
-    }
-    const validImageUrls = formData.imageUrls?.filter(url => url?.trim()) || [];
-    if (validImageUrls.length === 0) {
-      newErrors.imageUrls = 'At least one image is required';
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // On submit, convert formatted string to number and use UpdateProductRequest
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!product) return;
-    if (!validateForm()) {
-      return;
-    }
+
+    // Reset errors
+    setErrors({});
+    
     try {
-      const filteredImageUrls = formData.imageUrls.filter((url: string) => url?.trim()) || [];
-      const submitData = {
+      // 1. Upload new images if any
+      let newImageUrls: string[] = [];
+      if (formData.imageFiles.length > 0) {
+        const uploadResults = await uploadMultipleImages(formData.imageFiles);
+        const successfulUploads = uploadResults.filter(r => r.success && r.url);
+        
+        if (successfulUploads.length < formData.imageFiles.length) {
+          toast.error('Some new images failed to upload. Please try again.');
+          return;
+        }
+        newImageUrls = successfulUploads.map(r => r.url!);
+      }
+
+      // 2. Combine image URLs
+      const finalImageUrls = [...formData.imageUrls, ...newImageUrls];
+
+      const submitData: UpdateProductRequest = {
         title: formData.title,
         description: formData.description,
         price: Number(unformatVND(formData.price)),
@@ -205,45 +142,56 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
         color: formData.color,
         categoryId: parseInt(formData.categoryId),
         brandId: parseInt(formData.brandId),
-        imageUrls: filteredImageUrls,
+        imageUrls: finalImageUrls,
         status: formData.status,
       };
+
+      createProductSchema.parse({ ...submitData, status: undefined });
+
       await updateProductMutation.mutateAsync({
         id: product.productId,
-        data: submitData
+        data: submitData,
       });
+
       toast.success('Product updated successfully!');
-      onClose();
+      handleClose();
+
     } catch (error) {
-      console.error('Error updating product:', error);
-      toast.error('Failed to update product. Please try again.');
+      if (error instanceof z.ZodError) {
+        const fieldErrors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          const field = err.path.join('.');
+          fieldErrors[field] = err.message;
+        });
+        setErrors(fieldErrors);
+        toast.error('Please fix the form errors');
+      } else {
+        console.error('Error updating product:', error);
+        toast.error('Failed to update product. Please try again.');
+      }
     }
   };
 
   const handleClose = () => {
     // Reset form when closing
     setFormData({
-      title: '',
-      description: '',
-      price: '',
-      originalPrice: '',
-      condition: '',
-      size: '',
-      color: '',
-      categoryId: '',
-      brandId: '',
-      imageUrls: [],
-      status: '',
+      title: '', description: '', price: '', originalPrice: '',
+      condition: '', size: '', color: '', categoryId: '', brandId: '',
+      imageUrls: [], imageFiles: [], status: '',
     });
     setErrors({});
     onClose();
   };
 
+  const isLoading = updateProductMutation.isPending || isUploadingImages;
+
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose} >
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()} >
       <DialogContent 
         className="sm:max-w-3xl max-h-[90vh] overflow-y-auto"
-        onPointerDownOutside={(e) => e.preventDefault()}
+        onPointerDownOutside={(e) => {
+          if (isLoading) e.preventDefault();
+        }}
       >
         <DialogHeader>
           <DialogTitle className="text-2xl font-metal font-bold">UPDATE PRODUCT</DialogTitle>
@@ -265,6 +213,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                   onChange={handleInputChange}
                   className="border-2 border-black mt-1"
                   placeholder="Enter product title..."
+                  disabled={isLoading}
                 />
                 {errors.title && <p className="text-red-600 text-xs mt-1">{errors.title}</p>}
               </div>
@@ -278,6 +227,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                   onChange={handleInputChange}
                   className="border-2 border-black mt-1 min-h-[120px]"
                   placeholder="Describe your product in detail..."
+                  disabled={isLoading}
                 />
                 {errors.description && <p className="text-red-600 text-xs mt-1">{errors.description}</p>}
               </div>
@@ -295,6 +245,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                       className="border-2 border-black pr-14 mt-1"
                       placeholder="1.000.000"
                       autoComplete="off"
+                      disabled={isLoading}
                     />
                     <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 select-none">VND</span>
                   </div>
@@ -313,6 +264,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                       className="border-2 border-black pr-14 mt-1"
                       placeholder="1.000.000"
                       autoComplete="off"
+                      disabled={isLoading}
                     />
                     <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 select-none">VND</span>
                   </div>
@@ -334,6 +286,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                   <Select
                     value={formData.condition}
                     onValueChange={(value) => handleSelectChange('condition', value)}
+                    disabled={isLoading}
                   >
                     <SelectTrigger className="border-2 border-black mt-1">
                       <SelectValue placeholder="Select condition" />
@@ -354,6 +307,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                   <Select
                     value={formData.status}
                     onValueChange={(value) => handleSelectChange('status', value)}
+                    disabled={isLoading}
                   >
                     <SelectTrigger className="border-2 border-black mt-1">
                       <SelectValue placeholder="Select status" />
@@ -377,6 +331,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                     onChange={handleInputChange}
                     className="border-2 border-black mt-1"
                     placeholder="e.g., M, L, XL, 42, etc."
+                    disabled={isLoading}
                   />
                   {errors.size && <p className="text-red-600 text-xs mt-1">{errors.size}</p>}
                 </div>
@@ -390,6 +345,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                     onChange={handleInputChange}
                     className="border-2 border-black mt-1"
                     placeholder="e.g., Black, Red, Blue, etc."
+                    disabled={isLoading}
                   />
                   {errors.color && <p className="text-red-600 text-xs mt-1">{errors.color}</p>}
                 </div>
@@ -411,6 +367,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                   value={formData.brandId}
                   onValueChange={(value) => handleSelectChange('brandId', value)}
                   required
+                  disabled={isLoading}
                 />
                 {errors.brandId && <p className="text-red-600 text-xs mt-1">{errors.brandId}</p>}
               </div>
@@ -422,35 +379,18 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
             <CardHeader className="border-b-2 border-black bg-black text-white">
               <CardTitle className="font-metal text-xl font-normal">PRODUCT IMAGES</CardTitle>
             </CardHeader>
-            <CardContent className="p-10 space-y-4">      
-              {formData.imageUrls?.map((url, index) => (
-                <div key={index} className="flex gap-2">
-                  <Input
-                    value={url}
-                    onChange={(e) => handleImageUrlChange(index, e.target.value)}
-                    placeholder={`Image URL ${index + 1}`}
-                    className="border-2 border-black"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => removeImageUrl(index)}
-                    className="border-2 border-red-600 text-red-600 hover:bg-red-50"
-                  >
-                    Remove
-                  </Button>
-                </div>
-              ))}
-              {errors.imageUrls && <p className="text-red-600 text-xs">{errors.imageUrls}</p>}
-              
-              <Button
-                type="button"
-                variant="outline"
-                onClick={addImageUrl}
-                className="border-2 border-black hover:bg-gray-50"
-              >
-                Add Image URL
-              </Button>
+            <CardContent className="p-10">
+              <ImageUpload
+                existingImageUrls={formData.imageUrls}
+                onRemoveExistingUrl={handleRemoveExistingUrl}
+                files={formData.imageFiles}
+                onFilesChange={handleImageFilesChange}
+                maxFiles={8}
+                isUploading={isUploadingImages}
+                uploadProgress={uploadProgress}
+                disabled={isLoading}
+              />
+              {errors.imageUrls && <p className="text-red-600 text-xs mt-2">{errors.imageUrls}</p>}
             </CardContent>
           </Card>
 
@@ -458,10 +398,10 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
           <div className="flex gap-4">
             <Button
               type="submit"
-              disabled={updateProductMutation.isPending}
+              disabled={isLoading}
               className="flex-1 bg-black text-white hover:bg-gray-800 border-2 border-black py-6 text-lg font-serif"
             >
-              {updateProductMutation.isPending ? 'UPDATING...' : 'UPDATE PRODUCT'}
+              {isLoading ? 'UPDATING...' : 'UPDATE PRODUCT'}
             </Button>
             
             <Button
@@ -469,6 +409,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
               variant="outline"
               onClick={handleClose}
               className="flex-1 border-2 border-black hover:bg-gray-50 py-6 text-lg font-serif"
+              disabled={isLoading}
             >
               CANCEL
             </Button>
@@ -477,4 +418,4 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
       </DialogContent>
     </Dialog>
   );
-} 
+}

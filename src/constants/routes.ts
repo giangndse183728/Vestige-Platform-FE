@@ -11,5 +11,5 @@ export const ROUTES = {
     SUBSCRIPTION: "/subscription"
   };
   
-export const ROUTES_NO_LAYOUT = ["/login", "/profile", "/seller-center", "/orders", "/admin"];
+export const ROUTES_NO_LAYOUT = ["/login", "/profile", "/seller-center", "/my-orders", "/admin"];
   

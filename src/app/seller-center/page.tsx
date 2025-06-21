@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { CreateProduct } from '@/features/products/components/CreateProduct';
 import { InventoryTab } from '@/features/products/components/InventoryTab';
+import { CustomerOrdersTab } from '@/features/order/components/CustomerOrdersTab';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Package, ShoppingCart, Plus } from 'lucide-react';
@@ -58,22 +59,11 @@ export default function SellerCenterPage() {
               </TabsList>
 
               <TabsContent value="inventory" className="space-y-6">
-                <InventoryTab />
+                <InventoryTab onSwitchToAddProduct={() => setActiveTab("add-product")} />
               </TabsContent>
 
               <TabsContent value="orders" className="space-y-6">
-                <Card variant="double" className="border-2 border-black">
-                  <CardHeader className="border-b-2 border-black bg-black text-white">
-                    <CardTitle className="font-metal text-xl font-normal">CUSTOMER ORDERS</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-10">
-                    <div className="text-center py-12">
-                      <ShoppingCart className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                      <h3 className="font-serif text-xl font-bold mb-2">No Orders Yet</h3>
-                      <p className="text-gray-600 font-mono">Customer orders will appear here when they start purchasing your products.</p>
-                    </div>
-                  </CardContent>
-                </Card>
+                <CustomerOrdersTab />
               </TabsContent>
 
               <TabsContent value="add-product" className="space-y-6">

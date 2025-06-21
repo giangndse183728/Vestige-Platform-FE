@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,16 +14,17 @@ import { createProductSchema, CreateProductRequest } from '@/features/products/s
 import { toast } from 'sonner';
 import { CategorySelect } from '@/features/category/components/CategorySelect';
 import { BrandSelect } from '@/features/brand/components/BrandSelect';
-import { X, Plus, Upload } from 'lucide-react';
+import { ImageIcon } from 'lucide-react';
 import * as z from 'zod';
-import { storage } from '@/libs/firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ImageUpload } from '@/components/ui/image-upload';
+import { useImageUpload } from '@/hooks/useImageUpload';
 
 export function CreateProduct() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [uploadingImages, setUploadingImages] = useState<boolean>(false);
+  const { uploadMultipleImages, isUploading: isUploadingImages, uploadProgress } = useImageUpload({ folder: 'products', maxFiles: 8 });
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -35,9 +36,26 @@ export function CreateProduct() {
     categoryId: '',
     brandId: '',
     status: 'ACTIVE',
-    imageUrls: [''] 
+    imageFiles: [] as File[],
   });
+  const [primaryImagePreview, setPrimaryImagePreview] = useState<string | null>(null);
 
+  useEffect(() => {
+    let objectUrl: string | null = null;
+    const firstFile = formData.imageFiles[0];
+    if (firstFile) {
+      objectUrl = URL.createObjectURL(firstFile);
+      setPrimaryImagePreview(objectUrl);
+    } else {
+      setPrimaryImagePreview(null);
+    }
+
+    return () => {
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
+  }, [formData.imageFiles]);
 
   const unformatVND = (value: string) => value.replace(/\D/g, '');
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,48 +94,8 @@ export function CreateProduct() {
     }
   };
 
-  const addImageUrl = () => {
-    setFormData(prev => ({
-      ...prev,
-      imageUrls: [...prev.imageUrls, '']
-    }));
-  };
-
-  const removeImageUrl = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      imageUrls: prev.imageUrls.filter((_, i) => i !== index)
-    }));
-  };
-
-  const handleImageUpload = async (file: File, index: number) => {
-    try {
-      setUploadingImages(true);
-      const storageRef = ref(storage, `products/${Date.now()}_${file.name}`);
-      const snapshot = await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      
-      const newImageUrls = [...formData.imageUrls];
-      newImageUrls[index] = downloadURL;
-      setFormData(prev => ({
-        ...prev,
-        imageUrls: newImageUrls
-      }));
-      
-      toast.success('Image uploaded successfully');
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      toast.error('Failed to upload image');
-    } finally {
-      setUploadingImages(false);
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      handleImageUpload(file, index);
-    }
+  const handleImageFilesChange = (files: File[]) => {
+    setFormData(prev => ({ ...prev, imageFiles: files }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -126,6 +104,24 @@ export function CreateProduct() {
     setErrors({});
 
     try {
+      let uploadedImageUrls: string[] = [];
+      if (formData.imageFiles.length > 0) {
+        if (formData.imageFiles.length > 8) {
+          toast.error('You can upload a maximum of 8 images.');
+          setIsLoading(false);
+          return;
+        }
+        const uploadResults = await uploadMultipleImages(formData.imageFiles);
+        const successfulUploads = uploadResults.filter(r => r.success && r.url);
+
+        if (successfulUploads.length < formData.imageFiles.length) {
+          toast.error('Some images failed to upload. Please check the files and try again.');
+          setIsLoading(false);
+          return;
+        }
+        uploadedImageUrls = successfulUploads.map(r => r.url!);
+      }
+
       const productData: CreateProductRequest = {
         title: formData.title,
         description: formData.description,
@@ -136,7 +132,7 @@ export function CreateProduct() {
         color: formData.color,
         categoryId: parseInt(formData.categoryId),
         brandId: parseInt(formData.brandId),
-        imageUrls: formData.imageUrls.filter(url => url.trim() !== '')
+        imageUrls: uploadedImageUrls,
       };
 
       createProductSchema.parse(productData);
@@ -173,68 +169,34 @@ export function CreateProduct() {
               <CardContent className="p-1">
                 <div className="space-y-4">
                   <div className="relative aspect-[1/1] bg-gray-100 border-2 border-black overflow-hidden">
-                    {formData.imageUrls[0] ? (
+                    {primaryImagePreview ? (
                       <Image
-                        src={formData.imageUrls[0]}
+                        src={primaryImagePreview}
                         alt="Product preview"
                         fill
                         className="object-cover"
                         onError={() => {
-                          toast.error('Failed to load image');
+                          toast.error('Failed to load image preview');
                         }}
                       />
                     ) : (
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
-                        <Upload className="w-12 h-12 mb-2" />
+                        <ImageIcon className="w-12 h-12 mb-2" />
                         <span className="text-lg font-serif">Primary Image Preview</span>
                         <span className="text-sm">Upload an image below</span>
                       </div>
                     )}
                   </div>
 
-                  {/* Image Upload Inputs */}
-                  <div className="space-y-3">
-                    <Label className="font-serif text-lg">Product Images</Label>
-                    {formData.imageUrls.map((url, index) => (
-                      <div key={index} className="flex gap-2">
-                        <div className="flex-1">
-                          <Input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleFileChange(e, index)}
-                            className="border-2 border-black font-mono text-sm"
-                            disabled={uploadingImages}
-                          />
-                        
-                        </div>
-                        {index > 0 && (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            onClick={() => removeImageUrl(index)}
-                            className="border-2 border-black hover:bg-red-50"
-                            disabled={uploadingImages}
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        )}
-                      </div>
-                    ))}
-                    
-                    {formData.imageUrls.length < 5 && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={addImageUrl}
-                        className="w-full border-2 border-black hover:bg-gray-50"
-                        disabled={uploadingImages}
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Another Image
-                      </Button>
-                    )}
-                  </div>
+                  {/* Image Upload Component */}
+                  <ImageUpload
+                    files={formData.imageFiles}
+                    onFilesChange={handleImageFilesChange}
+                    maxFiles={8}
+                    disabled={isLoading || isUploadingImages}
+                    isUploading={isUploadingImages}
+                    uploadProgress={uploadProgress}
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -245,10 +207,10 @@ export function CreateProduct() {
                 <div className="flex flex-col gap-3">
                   <Button
                     type="submit"
-                    disabled={isLoading}
+                    disabled={isLoading || isUploadingImages}
                     className="w-full bg-black text-white hover:bg-gray-800 border-2 border-black py-6 text-lg font-serif"
                   >
-                    {isLoading ? 'PUBLISHING...' : 'PUBLISH PRODUCT'}
+                    {isLoading || isUploadingImages ? 'PUBLISHING...' : 'PUBLISH PRODUCT'}
                   </Button>
                   
                   <Button
@@ -256,6 +218,7 @@ export function CreateProduct() {
                     variant="outline"
                     onClick={() => router.push('/seller-center')}
                     className="w-full border-2 border-black hover:bg-gray-50 py-6 text-lg font-serif"
+                    disabled={isLoading || isUploadingImages}
                   >
                     CANCEL
                   </Button>
