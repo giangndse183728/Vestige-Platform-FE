@@ -3,6 +3,7 @@ import { useAdminProductActions } from '@/features/products/hooks/useAdminProduc
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   Dialog,
   DialogContent,
@@ -11,7 +12,7 @@ import {
   DialogDescription,
   DialogClose,
 } from '@/components/ui/dialog';
-import { Trash2, Pencil } from 'lucide-react';
+import { Trash2, Pencil, Search } from 'lucide-react';
 import { Dialog as UIDialog, DialogContent as UIDialogContent, DialogHeader as UIDialogHeader, DialogTitle as UIDialogTitle } from '@/components/ui/dialog';
 
 export default function ProductManager() {
@@ -31,6 +32,7 @@ export default function ProductManager() {
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [editForm, setEditForm] = useState({
     title: '',
     description: '',
@@ -51,6 +53,15 @@ export default function ProductManager() {
     displayOrder: '',
     isPrimary: false,
     active: true,
+  });
+
+  // Filter products based on search query
+  const filteredProducts = allProducts?.filter((product) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      product.productId.toString().includes(query) ||
+      product.title.toLowerCase().includes(query)
+    );
   });
 
   useEffect(() => {
@@ -187,7 +198,20 @@ export default function ProductManager() {
           <h2 className="text-lg font-semibold text-gray-900">Products</h2>
           <p className="text-sm text-gray-500">Manage all products and their statuses</p>
         </div>
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <div className="relative flex-1 sm:flex-none">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              type="search"
+              placeholder="Search by product ID or name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 w-64"
+            />
+          </div>
+        </div>
       </div>
+
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
           {allProductsLoading ? (
@@ -210,8 +234,8 @@ export default function ProductManager() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {allProducts && allProducts.length > 0 ? (
-                  allProducts.map((product) => (
+                {filteredProducts && filteredProducts.length > 0 ? (
+                  filteredProducts.map((product) => (
                     <tr key={product.productId} className="hover:bg-gray-50">
                       <td className="py-4 px-6 text-sm text-gray-900">{product.productId}</td>
                       <td className="py-4 px-6 text-sm text-gray-900">{product.title}</td>
