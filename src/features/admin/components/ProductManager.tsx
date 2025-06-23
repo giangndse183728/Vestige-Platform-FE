@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { Trash2, Pencil, Search } from 'lucide-react';
 import { Dialog as UIDialog, DialogContent as UIDialogContent, DialogHeader as UIDialogHeader, DialogTitle as UIDialogTitle } from '@/components/ui/dialog';
+import { toast } from 'sonner';
 
 export default function ProductManager() {
   const {
@@ -79,6 +80,10 @@ export default function ProductManager() {
     setSelectedProduct(null);
   };
 
+  const handleCloseEditModal = () => {
+    setIsEditMode(false);
+  };
+
   const handleDelete = async (productId: number) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
@@ -104,7 +109,7 @@ export default function ProductManager() {
         categoryId: selectedProduct.categoryId ? String(selectedProduct.categoryId) : '',
         brandId: selectedProduct.brandId ? String(selectedProduct.brandId) : '',
       });
-      setIsEditMode(true);
+      setTimeout(() => setIsEditMode(true), 0);
     }
   };
 
@@ -133,9 +138,12 @@ export default function ProductManager() {
         forceSoldStatus: selectedProduct.forceSoldStatus || false,
       };
       await updateProduct(selectedProduct.productId, payload);
+      toast.success('Product updated successfully!');
       setIsEditMode(false);
-      setIsModalOpen(false);
-      fetchAllProducts();
+      // Fetch all products and update selectedProduct with the latest info
+      const data = await fetchAllProducts();
+      const updated = data?.content?.find((p: any) => p.productId === selectedProduct.productId);
+      if (updated) setSelectedProduct(updated);
     } catch (err: any) {
       alert('Failed to update product: ' + (err.message || 'Unknown error'));
     }
@@ -413,7 +421,7 @@ export default function ProductManager() {
                     </div>
                     <div className="flex gap-2">
                       <Button type="submit" size="sm" variant="default" disabled={updateLoading}>Save</Button>
-                      <Button type="button" size="sm" variant="outline" onClick={() => setIsEditMode(false)}>Cancel</Button>
+                      <Button type="button" size="sm" variant="outline" onClick={handleCloseEditModal}>Cancel</Button>
                     </div>
                   </form>
                 ) : (
@@ -497,127 +505,61 @@ export default function ProductManager() {
       </UIDialog>
       {/* Edit Product Modal */}
       <UIDialog open={isEditMode} onOpenChange={setIsEditMode}>
-        <UIDialogContent className="max-w-22xl max-h-[70vh] overflow-y-auto">
+        <UIDialogContent style={{ width: '90vw', maxWidth: 900, height: 'auto', maxHeight: '70vh', overflowY: 'auto' }} className="h-auto">
           <UIDialogHeader>
             <UIDialogTitle>Edit Product</UIDialogTitle>
           </UIDialogHeader>
-          <form onSubmit={handleEditSubmit} className="space-y-4">
-            <div>
-              <label className="font-semibold">Title:</label>
-              <input
-                name="title"
-                value={editForm.title}
-                onChange={handleEditChange}
-                className="border rounded px-2 py-1 w-full"
-                required
-              />
+          <form onSubmit={handleEditSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div className="flex flex-col gap-2">
+              <label htmlFor="title">Title:</label>
+              <input id="title" name="title" value={editForm.title} onChange={handleEditChange} className="border rounded px-2 py-1" required />
             </div>
-            <div>
-              <label className="font-semibold">Description:</label>
-              <input
-                name="description"
-                value={editForm.description}
-                onChange={handleEditChange}
-                className="border rounded px-2 py-1 w-full"
-                required
-              />
+            <div className="flex flex-col gap-2 md:col-span-2">
+              <label htmlFor="description">Description:</label>
+              <input id="description" name="description" value={editForm.description} onChange={handleEditChange} className="border rounded px-2 py-1" required />
             </div>
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <label className="font-semibold">Price:</label>
-                <input
-                  name="price"
-                  type="number"
-                  value={editForm.price}
-                  onChange={handleEditChange}
-                  className="border rounded px-2 py-1 w-full"
-                  required
-                />
-              </div>
-              <div className="flex-1">
-                <label className="font-semibold">Original Price:</label>
-                <input
-                  name="originalPrice"
-                  type="number"
-                  value={editForm.originalPrice}
-                  onChange={handleEditChange}
-                  className="border rounded px-2 py-1 w-full"
-                />
-              </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="price">Price:</label>
+              <input id="price" name="price" value={editForm.price} onChange={handleEditChange} className="border rounded px-2 py-1" required />
             </div>
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <label className="font-semibold">Size:</label>
-                <input
-                  name="size"
-                  value={editForm.size}
-                  onChange={handleEditChange}
-                  className="border rounded px-2 py-1 w-full"
-                />
-              </div>
-              <div className="flex-1">
-                <label className="font-semibold">Color:</label>
-                <input
-                  name="color"
-                  value={editForm.color}
-                  onChange={handleEditChange}
-                  className="border rounded px-2 py-1 w-full"
-                />
-              </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="originalPrice">Original Price:</label>
+              <input id="originalPrice" name="originalPrice" value={editForm.originalPrice} onChange={handleEditChange} className="border rounded px-2 py-1" required />
             </div>
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <label className="font-semibold">Status:</label>
-                <select
-                  name="status"
-                  value={editForm.status}
-                  onChange={handleEditChange}
-                  className="border rounded px-2 py-1 w-full"
-                >
-                  <option value="ACTIVE">ACTIVE</option>
-                  <option value="PENDING_PAYMENT">PENDING_PAYMENT</option>
-                  <option value="SOLD">SOLD</option>
-                  <option value="DELETED">DELETED</option>
-                </select>
-              </div>
-              <div className="flex-1">
-                <label className="font-semibold">Condition:</label>
-                <select
-                  name="condition"
-                  value={editForm.condition}
-                  onChange={handleEditChange}
-                  className="border rounded px-2 py-1 w-full"
-                >
-                  <option value="NEW">NEW</option>
-                  <option value="USED">USED</option>
-                </select>
-              </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="size">Size:</label>
+              <input id="size" name="size" value={editForm.size} onChange={handleEditChange} className="border rounded px-2 py-1" required />
             </div>
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <label className="font-semibold">Category ID:</label>
-                <input
-                  name="categoryId"
-                  type="number"
-                  value={editForm.categoryId}
-                  onChange={handleEditChange}
-                  className="border rounded px-2 py-1 w-full"
-                />
-              </div>
-              <div className="flex-1">
-                <label className="font-semibold">Brand ID:</label>
-                <input
-                  name="brandId"
-                  type="number"
-                  value={editForm.brandId}
-                  onChange={handleEditChange}
-                  className="border rounded px-2 py-1 w-full"
-                />
-              </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="color">Color:</label>
+              <input id="color" name="color" value={editForm.color} onChange={handleEditChange} className="border rounded px-2 py-1" required />
             </div>
-            <div className="flex gap-2">
-              <Button type="submit" size="sm" variant="default" disabled={updateLoading}>Save</Button>
-              <Button type="button" size="sm" variant="outline" onClick={() => setIsEditMode(false)}>Cancel</Button>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="status">Status:</label>
+              <select id="status" name="status" value={editForm.status} onChange={handleEditChange} className="border rounded px-2 py-1" required>
+                <option value="ACTIVE">ACTIVE</option>
+                <option value="INACTIVE">INACTIVE</option>
+                <option value="SOLD">SOLD</option>
+              </select>
+            </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="condition">Condition:</label>
+              <select id="condition" name="condition" value={editForm.condition} onChange={handleEditChange} className="border rounded px-2 py-1" required>
+                <option value="NEW">NEW</option>
+                <option value="USED">USED</option>
+              </select>
+            </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="categoryId">Category ID:</label>
+              <input id="categoryId" name="categoryId" value={editForm.categoryId} onChange={handleEditChange} className="border rounded px-2 py-1" required />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="brandId">Brand ID:</label>
+              <input id="brandId" name="brandId" value={editForm.brandId} onChange={handleEditChange} className="border rounded px-2 py-1" required />
+            </div>
+            <div className="md:col-span-2 flex justify-end gap-2 mt-2">
+              <button type="submit" className="px-4 py-2 bg-black text-white rounded">Save</button>
+              <button type="button" className="px-4 py-2 border rounded" onClick={handleCloseEditModal}>Cancel</button>
             </div>
           </form>
         </UIDialogContent>
