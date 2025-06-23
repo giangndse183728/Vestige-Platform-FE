@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getAllProductStatuses, deleteProductByAdmin, updateProductByAdmin } from '@/features/products/services';
+import { useAdminProductActions } from '@/features/products/hooks/useAdminProductActions';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -12,11 +12,22 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { Trash2, Pencil } from 'lucide-react';
+import { Dialog as UIDialog, DialogContent as UIDialogContent, DialogHeader as UIDialogHeader, DialogTitle as UIDialogTitle } from '@/components/ui/dialog';
 
 export default function ProductManager() {
-  const [products, setProducts] = useState<any[] | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    allProducts,
+    allProductsLoading,
+    allProductsError,
+    fetchAllProducts,
+    deleteProduct,
+    deleteLoading,
+    updateProduct,
+    updateLoading,
+    updateProductImages,
+    imagesLoading,
+  } = useAdminProductActions();
+
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -33,20 +44,18 @@ export default function ProductManager() {
     brandId: '',
   });
 
+  const [isImageEditMode, setIsImageEditMode] = useState(false);
+  const [imageForm, setImageForm] = useState({
+    imageId: '',
+    imageUrl: '',
+    displayOrder: '',
+    isPrimary: false,
+    active: true,
+  });
+
   useEffect(() => {
-    async function fetchProducts() {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await getAllProductStatuses();
-        setProducts(data.content || []);
-      } catch (err: any) {
-        setError(err.message || 'Unknown error');
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchProducts();
+    fetchAllProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleViewDetail = (product: any) => {
@@ -62,8 +71,8 @@ export default function ProductManager() {
   const handleDelete = async (productId: number) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
-        await deleteProductByAdmin(productId);
-        setProducts((prev) => prev ? prev.filter(p => p.productId !== productId) : prev);
+        await deleteProduct(productId);
+        fetchAllProducts();
       } catch (err: any) {
         alert('Failed to delete product: ' + (err.message || 'Unknown error'));
       }
@@ -96,21 +105,78 @@ export default function ProductManager() {
     e.preventDefault();
     if (!selectedProduct) return;
     try {
-      await updateProductByAdmin(selectedProduct.productId, {
-        ...selectedProduct,
-        ...editForm,
+      const payload = {
+        title: editForm.title,
+        description: editForm.description,
         price: Number(editForm.price),
         originalPrice: Number(editForm.originalPrice),
+        condition: editForm.condition,
+        size: editForm.size,
+        color: editForm.color,
+        status: editForm.status,
         categoryId: Number(editForm.categoryId),
         brandId: Number(editForm.brandId),
-      });
+        imageUrls: selectedProduct.imageUrls || [],
+        adminNotes: selectedProduct.adminNotes || '',
+        sellerId: selectedProduct.sellerId ? Number(selectedProduct.sellerId) : undefined,
+        forceSoldStatus: selectedProduct.forceSoldStatus || false,
+      };
+      await updateProduct(selectedProduct.productId, payload);
       setIsEditMode(false);
       setIsModalOpen(false);
-      // Refresh products
-      const data = await getAllProductStatuses();
-      setProducts(data.content || []);
+      fetchAllProducts();
     } catch (err: any) {
       alert('Failed to update product: ' + (err.message || 'Unknown error'));
+    }
+  };
+
+  const handleImageEditOpen = () => {
+    if (selectedProduct && selectedProduct.images && selectedProduct.images.length > 0) {
+      // Lấy ảnh chính đầu tiên làm mẫu
+      const img = selectedProduct.images[0];
+      setImageForm({
+        imageId: img.imageId || '',
+        imageUrl: img.imageUrl || '',
+        displayOrder: img.displayOrder?.toString() || '',
+        isPrimary: img.isPrimary || false,
+        active: img.active ?? true,
+      });
+    } else {
+      setImageForm({ imageId: '', imageUrl: '', displayOrder: '', isPrimary: false, active: true });
+    }
+    setIsImageEditMode(true);
+  };
+
+  const handleImageFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    if (type === 'checkbox') {
+      setImageForm((prev) => ({
+        ...prev,
+        [name]: (e.target as HTMLInputElement).checked,
+      }));
+    } else {
+      setImageForm((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
+
+  const handleImageUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedProduct) return;
+    try {
+      await updateProductImages(selectedProduct.productId, {
+        imageId: Number(imageForm.imageId),
+        imageUrl: imageForm.imageUrl,
+        displayOrder: Number(imageForm.displayOrder),
+        isPrimary: imageForm.isPrimary,
+        active: imageForm.active,
+      });
+      setIsImageEditMode(false);
+      fetchAllProducts();
+    } catch (err: any) {
+      alert('Failed to update product image: ' + (err.message || 'Unknown error'));
     }
   };
 
@@ -124,12 +190,12 @@ export default function ProductManager() {
       </div>
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
-          {loading ? (
+          {allProductsLoading ? (
             <div className="flex items-center justify-center h-64">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
             </div>
-          ) : error ? (
-            <div className="text-red-600 py-8 text-center">{error}</div>
+          ) : allProductsError ? (
+            <div className="text-red-600 py-8 text-center">{allProductsError}</div>
           ) : (
             <table className="w-full">
               <thead>
@@ -144,8 +210,8 @@ export default function ProductManager() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {products && products.length > 0 ? (
-                  products.map((product) => (
+                {allProducts && allProducts.length > 0 ? (
+                  allProducts.map((product) => (
                     <tr key={product.productId} className="hover:bg-gray-50">
                       <td className="py-4 px-6 text-sm text-gray-900">{product.productId}</td>
                       <td className="py-4 px-6 text-sm text-gray-900">{product.title}</td>
@@ -164,6 +230,7 @@ export default function ProductManager() {
                           size="icon"
                           onClick={() => handleDelete(product.productId)}
                           className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 ml-2"
+                          disabled={deleteLoading}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -321,7 +388,7 @@ export default function ProductManager() {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button type="submit" size="sm" variant="default">Save</Button>
+                      <Button type="submit" size="sm" variant="default" disabled={updateLoading}>Save</Button>
                       <Button type="button" size="sm" variant="outline" onClick={() => setIsEditMode(false)}>Cancel</Button>
                     </div>
                   </form>
@@ -359,7 +426,10 @@ export default function ProductManager() {
                     <div className="border-t pt-3 text-xs text-gray-500">
                       <span className="font-semibold">Created:</span> {selectedProduct.createdAt}
                     </div>
-                    <Button size="sm" variant="outline" className="self-end mt-4" onClick={handleEditOpen}>Edit</Button>
+                    <div className="flex flex-row gap-2 self-end mt-4">
+                      <Button size="sm" variant="outline" onClick={handleEditOpen}>Edit</Button>
+                      <Button size="sm" variant="outline" onClick={handleImageEditOpen}>Update Image</Button>
+                    </div>
                   </>
                 )}
               </div>
@@ -367,6 +437,167 @@ export default function ProductManager() {
           )}
         </DialogContent>
       </Dialog>
+      {/* Image Update Modal */}
+      <UIDialog open={isImageEditMode} onOpenChange={setIsImageEditMode}>
+        <UIDialogContent className="max-w-md">
+          <UIDialogHeader>
+            <UIDialogTitle>Update Product Image</UIDialogTitle>
+          </UIDialogHeader>
+          <form onSubmit={handleImageUpdate} className="space-y-2">
+            <div>
+              <label className="font-semibold">Image ID:</label>
+              <input name="imageId" value={imageForm.imageId} onChange={handleImageFormChange} className="border rounded px-2 py-1 w-full" required />
+            </div>
+            <div>
+              <label className="font-semibold">Image URL:</label>
+              <input name="imageUrl" value={imageForm.imageUrl} onChange={handleImageFormChange} className="border rounded px-2 py-1 w-full" required />
+            </div>
+            <div>
+              <label className="font-semibold">Display Order:</label>
+              <input name="displayOrder" type="number" value={imageForm.displayOrder} onChange={handleImageFormChange} className="border rounded px-2 py-1 w-full" required />
+            </div>
+            <div>
+              <label className="font-semibold">Is Primary:</label>
+              <input name="isPrimary" type="checkbox" checked={imageForm.isPrimary} onChange={handleImageFormChange} className="ml-2" />
+            </div>
+            <div>
+              <label className="font-semibold">Active:</label>
+              <input name="active" type="checkbox" checked={imageForm.active} onChange={handleImageFormChange} className="ml-2" />
+            </div>
+            <div className="flex gap-2">
+              <Button type="submit" size="sm" variant="default" disabled={imagesLoading}>Save Image</Button>
+              <Button type="button" size="sm" variant="outline" onClick={() => setIsImageEditMode(false)}>Cancel</Button>
+            </div>
+          </form>
+        </UIDialogContent>
+      </UIDialog>
+      {/* Edit Product Modal */}
+      <UIDialog open={isEditMode} onOpenChange={setIsEditMode}>
+        <UIDialogContent className="max-w-22xl max-h-[70vh] overflow-y-auto">
+          <UIDialogHeader>
+            <UIDialogTitle>Edit Product</UIDialogTitle>
+          </UIDialogHeader>
+          <form onSubmit={handleEditSubmit} className="space-y-4">
+            <div>
+              <label className="font-semibold">Title:</label>
+              <input
+                name="title"
+                value={editForm.title}
+                onChange={handleEditChange}
+                className="border rounded px-2 py-1 w-full"
+                required
+              />
+            </div>
+            <div>
+              <label className="font-semibold">Description:</label>
+              <input
+                name="description"
+                value={editForm.description}
+                onChange={handleEditChange}
+                className="border rounded px-2 py-1 w-full"
+                required
+              />
+            </div>
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <label className="font-semibold">Price:</label>
+                <input
+                  name="price"
+                  type="number"
+                  value={editForm.price}
+                  onChange={handleEditChange}
+                  className="border rounded px-2 py-1 w-full"
+                  required
+                />
+              </div>
+              <div className="flex-1">
+                <label className="font-semibold">Original Price:</label>
+                <input
+                  name="originalPrice"
+                  type="number"
+                  value={editForm.originalPrice}
+                  onChange={handleEditChange}
+                  className="border rounded px-2 py-1 w-full"
+                />
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <label className="font-semibold">Size:</label>
+                <input
+                  name="size"
+                  value={editForm.size}
+                  onChange={handleEditChange}
+                  className="border rounded px-2 py-1 w-full"
+                />
+              </div>
+              <div className="flex-1">
+                <label className="font-semibold">Color:</label>
+                <input
+                  name="color"
+                  value={editForm.color}
+                  onChange={handleEditChange}
+                  className="border rounded px-2 py-1 w-full"
+                />
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <label className="font-semibold">Status:</label>
+                <select
+                  name="status"
+                  value={editForm.status}
+                  onChange={handleEditChange}
+                  className="border rounded px-2 py-1 w-full"
+                >
+                  <option value="ACTIVE">ACTIVE</option>
+                  <option value="PENDING_PAYMENT">PENDING_PAYMENT</option>
+                  <option value="SOLD">SOLD</option>
+                  <option value="DELETED">DELETED</option>
+                </select>
+              </div>
+              <div className="flex-1">
+                <label className="font-semibold">Condition:</label>
+                <select
+                  name="condition"
+                  value={editForm.condition}
+                  onChange={handleEditChange}
+                  className="border rounded px-2 py-1 w-full"
+                >
+                  <option value="NEW">NEW</option>
+                  <option value="USED">USED</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <label className="font-semibold">Category ID:</label>
+                <input
+                  name="categoryId"
+                  type="number"
+                  value={editForm.categoryId}
+                  onChange={handleEditChange}
+                  className="border rounded px-2 py-1 w-full"
+                />
+              </div>
+              <div className="flex-1">
+                <label className="font-semibold">Brand ID:</label>
+                <input
+                  name="brandId"
+                  type="number"
+                  value={editForm.brandId}
+                  onChange={handleEditChange}
+                  className="border rounded px-2 py-1 w-full"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button type="submit" size="sm" variant="default" disabled={updateLoading}>Save</Button>
+              <Button type="button" size="sm" variant="outline" onClick={() => setIsEditMode(false)}>Cancel</Button>
+            </div>
+          </form>
+        </UIDialogContent>
+      </UIDialog>
     </div>
   );
 } 

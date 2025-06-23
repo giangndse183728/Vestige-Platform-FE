@@ -117,6 +117,11 @@ export interface ProductFilters {
   brand?: string;
   condition?: string;
   sortDir?: string;
+  sortBy?: string;
+  status?: string;
+  sellerId?: string;
+  page?: string;
+  size?: string;
 }
 
 export type Product = z.infer<typeof productSchema>;
