@@ -1,14 +1,31 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Product } from '../schema';
 import { Eye, Heart } from 'lucide-react';
 import { formatVNDPrice } from '@/utils/format';
+import { useWishlistStore } from '@/features/wishlist/store';
+import { cn } from '@/utils/cn';
 
 interface ProductCardProps {
   product: Product;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const { addToWishlist, removeFromWishlist, isProductInWishlist } = useWishlistStore();
+  const isInWishlist = isProductInWishlist(product.productId);
+
+  const handleWishlistToggle = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault(); // Prevent navigating to product page
+    e.stopPropagation();
+    if (isInWishlist) {
+      removeFromWishlist(product.productId);
+    } else {
+      addToWishlist(product);
+    }
+  };
+
   const isValidUrl = (url: string) => {
     try {
       new URL(url);
@@ -62,10 +79,10 @@ export function ProductCard({ product }: ProductCardProps) {
                 <Eye className="w-4 h-4" />
                 {product.viewsCount}
               </span>
-              <span className="flex items-center gap-1">
-                <Heart className="w-4 h-4" />
-                {product.likesCount}
-              </span>
+              <button onClick={handleWishlistToggle} className="flex items-center gap-1 z-20">
+                <Heart className={cn("w-4 h-4", isInWishlist ? 'text-red-500 fill-current' : '')} />
+                <span>{product.likesCount + (isInWishlist ? 1 : 0)}</span>
+              </button>
             </div>
           </div>
         </div>

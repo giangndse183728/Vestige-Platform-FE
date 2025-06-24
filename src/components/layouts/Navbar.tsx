@@ -249,9 +249,11 @@ const Navbar = () => {
               <button className="p-2 text-black/80 hover:text-red-900">
                 <Search className="h-5 w-5" />
               </button>
+              <Link href="/wishlist" className=" text-black/80 hover:text-red-900 relative">
               <button className="p-2 text-black/80 hover:text-red-900">
                 <Heart className="h-5 w-5" />
               </button>
+              </Link>
               <Link href="/cart" className="p-2 text-black/80 hover:text-red-900 relative">
                 <ShoppingBag className="h-5 w-5" />
                 <span className="absolute top-0 right-0 h-4 w-4 rounded-full bg-red-900/90 text-white text-[10px] flex items-center justify-center font-medium shadow-sm">
