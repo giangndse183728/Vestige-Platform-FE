@@ -17,6 +17,7 @@ import { ImageUpload } from '@/components/ui/image-upload';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import * as z from 'zod';
 import { createProductSchema } from '../schema';
+import { formatVNDInput, unformatVND } from '@/utils/format';
 
 
 interface UpdateProductModalProps {
@@ -24,13 +25,6 @@ interface UpdateProductModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
-const unformatVND = (value: string) => String(value).replace(/\D/g, '');
-
-const formatVNDInput = (value: number | string) => {
-  const numeric = String(value).replace(/\D/g, '');
-  return numeric ? Number(numeric).toLocaleString('vi-VN') : '';
-};
 
 export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductModalProps) {
   const updateProductMutation = useUpdateProduct();
@@ -75,8 +69,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const formatted = formatVNDInput(value);
-    setFormData(prev => ({ ...prev, [name]: formatted }));
+    setFormData(prev => ({ ...prev, [name]: formatVNDInput(value) }));
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -111,12 +104,9 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!product) return;
-
-    // Reset errors
     setErrors({});
     
     try {
-      // 1. Upload new images if any
       let newImageUrls: string[] = [];
       if (formData.imageFiles.length > 0) {
         const uploadResults = await uploadMultipleImages(formData.imageFiles);
@@ -356,7 +346,6 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                 <CategorySelect
                   value={formData.categoryId}
                   onValueChange={(value) => handleSelectChange('categoryId', value)}
-                  required
                 />
                 {errors.categoryId && <p className="text-red-600 text-xs mt-1">{errors.categoryId}</p>}
               </div>
@@ -366,7 +355,6 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                 <BrandSelect
                   value={formData.brandId}
                   onValueChange={(value) => handleSelectChange('brandId', value)}
-                  required
                   disabled={isLoading}
                 />
                 {errors.brandId && <p className="text-red-600 text-xs mt-1">{errors.brandId}</p>}

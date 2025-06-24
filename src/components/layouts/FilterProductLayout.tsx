@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, X, Heart, DollarSign, Tag, Package, Filter, ChevronDown, ChevronUp } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -14,12 +14,11 @@ import { CategorySelect } from '@/features/category/components/CategorySelect';
 import { useBrands } from '@/features/brand/hooks';
 import { ProductFilters } from '@/features/products/schema';
 import { Brand } from '@/features/brand/schema';
+import { useFiltersStore } from '@/features/products/hooks/useFilters';
+import { formatVNDPrice } from '@/utils/format';
 
 interface FilterProductLayoutProps {
   children: React.ReactNode;
-  onFiltersChange: (filters: ProductFilters) => void;
-  totalProducts?: number;
-  initialFilters?: ProductFilters;
 }
 
 const conditions = [
@@ -30,29 +29,20 @@ const conditions = [
   { value: 'USED_FAIR', label: 'Fair', hearts: 2, description: 'Noticeable wear' }
 ];
 
-export function FilterProductLayout({ children, onFiltersChange, totalProducts, initialFilters }: FilterProductLayoutProps) {
+export function FilterProductLayout({ children }: FilterProductLayoutProps) {
   const { data: brands, isLoading: isLoadingBrands } = useBrands();
   
-  const [filters, setFilters] = useState<ProductFilters>(initialFilters || {
-    search: '',
-    minPrice: '',
-    maxPrice: '',
-    category: '',
-    brand: '',
-    condition: '',
-    sortDir: 'desc'
-  });
-
+  const {
+    filters,
+    totalProducts,
+    updateFilter,
+    clearFilters: clearStoreFilters
+  } = useFiltersStore();
+  
   const [priceRange, setPriceRange] = useState([
-    initialFilters?.minPrice ? parseInt(initialFilters.minPrice) : 0,
-    initialFilters?.maxPrice ? parseInt(initialFilters.maxPrice) : 1000
+    filters.minPrice ? parseInt(filters.minPrice) : 0,
+    filters.maxPrice ? parseInt(filters.maxPrice) : 100000000
   ]);
-  const [selectedBrands, setSelectedBrands] = useState<string[]>(
-    initialFilters?.brand ? initialFilters.brand.split(',').filter(Boolean) : []
-  );
-  const [selectedConditions, setSelectedConditions] = useState<string[]>(
-    initialFilters?.condition ? initialFilters.condition.split(',').filter(Boolean) : []
-  );
   const [activeSelectedBrand, setActiveSelectedBrand] = useState<Brand | null>(null);
   const [isFilterExpanded, setIsFilterExpanded] = useState(true);
   const [isPriceExpanded, setIsPriceExpanded] = useState(false);
@@ -60,23 +50,23 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts, 
   const [isBrandsExpanded, setIsBrandsExpanded] = useState(false);
   const [isConditionsExpanded, setIsConditionsExpanded] = useState(false);
 
+  const selectedBrands = filters.brand ? filters.brand.split(',').filter(Boolean) : [];
+  const selectedConditions = filters.condition ? filters.condition.split(',').filter(Boolean) : [];
+
+  useEffect(() => {
+    setPriceRange([
+      filters.minPrice ? parseInt(filters.minPrice) : 0,
+      filters.maxPrice ? parseInt(filters.maxPrice) : 100000000,
+    ]);
+  }, [filters.minPrice, filters.maxPrice]);
+
   const handleFilterChange = (key: keyof ProductFilters, value: string) => {
-    // Convert "all" to empty string for API compatibility
-    const apiValue = value === 'all' ? '' : value;
-    const newFilters = { ...filters, [key]: apiValue };
-    setFilters(newFilters);
-    onFiltersChange(newFilters);
+    updateFilter(key, value);
   };
 
-  const handlePriceRangeChange = (value: number[]) => {
-    setPriceRange(value);
-    const newFilters = { 
-      ...filters, 
-      minPrice: value[0].toString(), 
-      maxPrice: value[1].toString() 
-    };
-    setFilters(newFilters);
-    onFiltersChange(newFilters);
+  const handlePriceRangeCommit = (value: number[]) => {
+    updateFilter('minPrice', value[0].toString());
+    updateFilter('maxPrice', value[1].toString());
   };
 
   const handleBrandToggle = (brandValue: string) => {
@@ -84,8 +74,6 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts, 
       ? selectedBrands.filter(b => b !== brandValue)
       : [...selectedBrands, brandValue];
     
-    setSelectedBrands(newSelectedBrands);
-
     if (newSelectedBrands.length === 1) {
       const brandInfo = brands?.find(b => b.brandId.toString() === newSelectedBrands[0]);
       setActiveSelectedBrand(brandInfo || null);
@@ -93,12 +81,7 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts, 
       setActiveSelectedBrand(null);
     }
 
-    const newFilters = { 
-      ...filters, 
-      brand: newSelectedBrands.join(',') 
-    };
-    setFilters(newFilters);
-    onFiltersChange(newFilters);
+    updateFilter('brand', newSelectedBrands.join(','));
   };
 
   const handleConditionToggle = (conditionValue: string) => {
@@ -106,42 +89,23 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts, 
       ? selectedConditions.filter(c => c !== conditionValue)
       : [...selectedConditions, conditionValue];
     
-    setSelectedConditions(newSelectedConditions);
-    const newFilters = { 
-      ...filters, 
-      condition: newSelectedConditions.join(',') 
-    };
-    setFilters(newFilters);
-    onFiltersChange(newFilters);
+    updateFilter('condition', newSelectedConditions.join(','));
   };
 
   const clearFilters = () => {
-    const clearedFilters: ProductFilters = {
-      search: '',
-      minPrice: '',
-      maxPrice: '',
-      category: '',
-      brand: '',
-      condition: '',
-      sortDir: 'desc'
-    };
-    setFilters(clearedFilters);
-    setSelectedBrands([]);
-    setSelectedConditions([]);
-    setPriceRange([0, 1000]);
-    onFiltersChange(clearedFilters);
+    clearStoreFilters();
     setActiveSelectedBrand(null);
   };
 
   const hasActiveFilters = filters.search || selectedBrands.length > 0 || selectedConditions.length > 0 || 
-    filters.category || priceRange[0] > 0 || priceRange[1] < 1000;
+    (filters.category && filters.category !== 'all') || (filters.minPrice && parseInt(filters.minPrice) > 0) || (filters.maxPrice && parseInt(filters.maxPrice) < 100000000);
 
   const activeFilterCount = [
-    filters.search,
+    !!filters.search,
     selectedBrands.length > 0,
     selectedConditions.length > 0,
-    filters.category,
-    priceRange[0] > 0 || priceRange[1] < 1000
+    !!(filters.category && filters.category !== 'all'),
+    (filters.minPrice && parseInt(filters.minPrice) > 0) || (filters.maxPrice && parseInt(filters.maxPrice) < 100000000)
   ].filter(Boolean).length;
 
   const popularBrands = brands?.slice(0, 6) || [];
@@ -151,11 +115,9 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts, 
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50">
       <div className="container mx-auto py-6">
         <div className="flex flex-col lg:flex-row">
-          {/* Enhanced Sidebar Filters - Sticky */}
           <aside className="lg:w-80 w-full">
             <div className="lg:sticky lg:top-16">
               <div className="bg-white border-b-4 border-black shadow-lg">
-                {/* Filter Header */}
                 <div className="bg-black text-white p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -180,7 +142,6 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts, 
 
                 {isFilterExpanded && (
                   <div className="p-6 space-y-8 max-h-[calc(100vh-120px)] overflow-y-auto">
-                    {/* Price Range Slider - Collapsible */}
                     <div className="space-y-4">
                       <Button
                         variant="ghost"
@@ -201,15 +162,17 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts, 
                         <div className="px-2">
                           <Slider
                             value={priceRange}
-                            onValueChange={handlePriceRangeChange}
-                            max={1000}
+                            onValueChange={setPriceRange}
+                            onValueCommit={handlePriceRangeCommit}
+                            max={100000000}
                             min={0}
-                            step={10}
+                            step={100000}
+                            thumbClassName="border-black bg-white"
                             className="w-full"
                           />
                           <div className="flex justify-between mt-2 text-sm font-mono">
-                            <span className="bg-gray-100 px-2 py-1 border">${priceRange[0]}</span>
-                            <span className="bg-gray-100 px-2 py-1 border">${priceRange[1]}</span>
+                            <span className="bg-gray-100 px-2 py-1 border">{formatVNDPrice(priceRange[0])}</span>
+                            <span className="bg-gray-100 px-2 py-1 border">{formatVNDPrice(priceRange[1])}</span>
                           </div>
                         </div>
                       )}
@@ -217,7 +180,6 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts, 
 
                     <Separator className="border-dotted" />
 
-                    {/* Category - Collapsible */}
                     <div className="space-y-3">
                       <Button
                         variant="ghost"
@@ -238,7 +200,6 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts, 
                         <CategorySelect
                           value={filters.category || 'all'}
                           onValueChange={(value) => handleFilterChange('category', value)}
-                          label=""
                           showAllOption={true}
                         />
                       )}
@@ -246,7 +207,6 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts, 
 
                     <Separator className="border-dotted" />
 
-                    {/* Brands with Checkboxes - Collapsible */}
                     <div className="space-y-3">
                       <Button
                         variant="ghost"
@@ -270,7 +230,6 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts, 
                             <div className="text-sm text-gray-500">Loading brands...</div>
                           ) : brands && brands.length > 0 ? (
                             <>
-                              {/* Popular Brands */}
                               {popularBrands.length > 0 && (
                                 <div>
                                   <h4 className="text-xs font-serif font-semibold mb-2 text-gray-600 uppercase tracking-wide">
@@ -297,7 +256,6 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts, 
                                 </div>
                               )}
 
-                              {/* Other Brands */}
                               {otherBrands.length > 0 && (
                                 <div>
                                   <h4 className="text-xs font-serif font-semibold mb-2 text-gray-600 uppercase tracking-wide">
@@ -333,7 +291,6 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts, 
 
                     <Separator className="border-dotted" />
 
-                    {/* Condition with Hearts - Collapsible */}
                     <div className="space-y-3">
                       <Button
                         variant="ghost"
@@ -397,10 +354,8 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts, 
             </div>
           </aside>
 
-          {/* Main Content */}
           <main className="flex-1">
             <div className="bg-white border-2 border-black shadow-lg">
-              {/* Search Header */}
               <div className="bg-gradient-to-r from-gray-100 to-gray-200 border-b-2 border-black p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-4">
@@ -429,7 +384,6 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts, 
                     />
                   </div>
                   
-                  {/* Sort Direction */}
                   <div className="flex items-center gap-2">
                
                     <Select
@@ -447,7 +401,6 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts, 
                   </div>
                 </div>
                 
-                {/* Active Filters Display */}
                 {hasActiveFilters && (
                   <div className="mt-4 flex flex-wrap items-center gap-2">
                     {filters.search && (
@@ -468,9 +421,9 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts, 
                         {conditions.find(c => c.value === condition)?.label}
                       </Badge>
                     ))}
-                    {(priceRange[0] > 0 || priceRange[1] < 1000) && (
+                    {(priceRange[0] > 0 || priceRange[1] < 100000000) && (
                       <Badge variant="outline" className="border-2 border-purple-600 text-purple-600 font-serif">
-                        ${priceRange[0]} - ${priceRange[1]}
+                        {formatVNDPrice(priceRange[0])} - {formatVNDPrice(priceRange[1])}
                       </Badge>
                     )}
                     <Button
@@ -507,7 +460,6 @@ export function FilterProductLayout({ children, onFiltersChange, totalProducts, 
                 </div>
               )}
 
-              {/* Products Content */}
               <div >
                 {children}
               </div>

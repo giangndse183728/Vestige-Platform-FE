@@ -14,5 +14,6 @@ export const useProducts = (filters?: ProductFilters) => {
   return useQuery({
     queryKey: productKeys.filtered(filters || {}),
     queryFn: () => getProducts(filters),
+    refetchOnMount: 'always',
   });
 };

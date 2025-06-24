@@ -9,6 +9,15 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const isValidUrl = (url: string) => {
+    try {
+      new URL(url);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+
   return (
     <Link href={`/products/${product.productId}`}>
       <div className="group relative bg-white/90 backdrop-blur-sm overflow-hidden border-2 border-black -mr-[2px] -mb-[2px]">
@@ -17,13 +26,23 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
         
         <div className="relative aspect-[1/1] overflow-hidden bg-gray-100">
-          <Image 
-            src={product.primaryImageUrl}
-            alt={product.title}
-            width={600}
-            height={600}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-          />
+          {product.primaryImageUrl && isValidUrl(product.primaryImageUrl) ? (
+            <Image 
+              src={product.primaryImageUrl}
+              alt={product.title}
+              width={600}
+              height={600}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            />
+          ) : (
+            <Image
+              src="/placeholder.png"
+              alt="No image available"
+              width={600}
+              height={600}
+              className="w-full h-full object-contain opacity-60"
+            />
+          )}
         </div>
         
         <div className="p-6">

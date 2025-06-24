@@ -9,6 +9,7 @@ import { ActualOrder, OrderStatus, EscrowStatus } from '@/features/order/schema'
 import { format } from 'date-fns';
 import { Eye, Package, Truck, CheckCircle, XCircle, Clock, DollarSign } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const getStatusIcon = (status: OrderStatus) => {
   switch (status) {
@@ -230,10 +231,12 @@ export function CustomerOrdersTab() {
 
               {/* Action Buttons */}
               <div className="flex gap-3 mt-6 pt-4 border-t-2 border-black">
-                <Button variant="outline" size="sm" className="border-2 border-black">
-                  <Eye className="w-4 h-4 mr-2" />
-                  View Details
-                </Button>
+                <Link href={`/my-orders/${order.orderId}`}>
+                  <Button variant="outline" size="sm" className="border-2 border-black">
+                    <Eye className="w-4 h-4 mr-2" />
+                    View Details
+                  </Button>
+                </Link>
                 {order.status === 'PENDING' && (
                   <Button size="sm" className="bg-black text-white hover:bg-gray-800 border-2 border-black">
                     <CheckCircle className="w-4 h-4 mr-2" />
