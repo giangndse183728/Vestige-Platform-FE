@@ -4,7 +4,7 @@ import { SubscriptionPlans } from "@/components/subscription/SubscriptionPlans";
 
 function About() {
   return (
-    <div className="mx-auto my-8 max-w-8xl px-6 bg-[#f8f7f3]/80">
+    <div className="mx-auto my-8 max-w-8xl px-6 bg-white/80">
       {/* Newspaper Header */}
       <div className="border-t-3 border-b-1 border-black mb-8">
         <div className="text-center py-6 border-b-1 border-black">

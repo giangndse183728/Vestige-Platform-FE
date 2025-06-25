@@ -18,6 +18,7 @@ import { ImageIcon } from 'lucide-react';
 import * as z from 'zod';
 import { ImageUpload } from '@/components/ui/image-upload';
 import { useImageUpload } from '@/hooks/useImageUpload';
+import { formatVNDInput, unformatVND } from '@/utils/format';
 
 export function CreateProduct() {
   const router = useRouter();
@@ -57,14 +58,11 @@ export function CreateProduct() {
     };
   }, [formData.imageFiles]);
 
-  const unformatVND = (value: string) => value.replace(/\D/g, '');
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const numeric = unformatVND(value);
-    const formatted = numeric ? Number(numeric).toLocaleString('vi-VN') : '';
     setFormData(prev => ({
       ...prev,
-      [name]: formatted
+      [name]: formatVNDInput(value)
     }));
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
@@ -378,7 +376,6 @@ export function CreateProduct() {
                   <CategorySelect
                     value={formData.categoryId}
                     onValueChange={(value) => handleSelectChange('categoryId', value)}
-                    required
                   />
                   {errors.categoryId && <p className="text-red-600 text-xs mt-1">{errors.categoryId}</p>}
                 </div>
@@ -388,7 +385,6 @@ export function CreateProduct() {
                   <BrandSelect
                     value={formData.brandId}
                     onValueChange={(value) => handleSelectChange('brandId', value)}
-                    required
                   />
                   {errors.brandId && <p className="text-red-600 text-xs mt-1">{errors.brandId}</p>}
                 </div>

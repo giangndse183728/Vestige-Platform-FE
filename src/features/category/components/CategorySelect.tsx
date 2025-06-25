@@ -1,23 +1,30 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
-import { useCategories } from '../hooks';
+import * as React from 'react';
+import { Check, ChevronsUpDown, CornerDownRight } from 'lucide-react';
+
+import { cn } from '@/utils/cn';
+import { Button } from '@/components/ui/button';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+} from '@/components/ui/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { useCategories } from '../hooks';
 import { Category } from '../schema';
 
 interface CategorySelectProps {
   value: string;
   onValueChange: (value: string) => void;
-  label?: string;
-  required?: boolean;
   showAllOption?: boolean;
 }
 
@@ -26,124 +33,124 @@ export function CategorySelect({
   onValueChange,
   showAllOption = false,
 }: CategorySelectProps) {
-  const { data, isLoading } = useCategories();
-  const categories = data || [];
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
+  const [open, setOpen] = React.useState(false);
+  const { data: categories, isLoading } = useCategories();
 
-  const uniqueCategories = categories.filter((category: Category) => {
-    if (category.parent === null) return true;
-    return !categories.some((c: Category) => 
-      c.children?.some((child: Category) => child.categoryId === category.categoryId)
+  const { parentCategories, allLabels } = React.useMemo(() => {
+    const parentCategories: Category[] = (categories || []).filter(
+      (category: Category) => category.parent === null
     );
-  });
 
-  // Create flattened options for easier searching
-  const allOptions = useMemo(() => {
-    const options: Array<{ value: string; label: string; searchText: string }> = [];
-    
-    if (showAllOption) {
-      options.push({
-        value: 'all',
-        label: 'All Categories',
-        searchText: 'all categories'
-      });
-    }
-
-    uniqueCategories.forEach((category: Category) => {
-      // Add parent category
-      options.push({
-        value: category.categoryId.toString(),
-        label: category.name,
-        searchText: category.name.toLowerCase()
-      });
-
-      // Add child categories
-      category.children?.forEach((child: Category) => {
-        options.push({
-          value: child.categoryId.toString(),
-          label: `${category.name} > ${child.name}`,
-          searchText: `${category.name} ${child.name}`.toLowerCase()
-        });
+    const allLabels: { [key: string]: string } = {};
+    parentCategories.forEach((p) => {
+      allLabels[p.categoryId.toString()] = p.name;
+      p.children?.forEach((c) => {
+        allLabels[c.categoryId.toString()] = `${p.name} > ${c.name}`;
       });
     });
-
-    return options;
-  }, [uniqueCategories, showAllOption]);
-
-  // Filter options based on search term
-  const filteredOptions = useMemo(() => {
-    if (!searchTerm.trim()) return allOptions;
-    
-    return allOptions.filter(option =>
-      option.searchText.includes(searchTerm.toLowerCase())
-    );
-  }, [allOptions, searchTerm]);
-
-  // Memoized search input change handler
-  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  }, []);
-
-  // Handle open change - clear search when closed
-  const handleOpenChange = useCallback((open: boolean) => {
-    setIsOpen(open);
-    if (!open) {
-      setSearchTerm('');
+    if (showAllOption) {
+      allLabels['all'] = 'All Categories';
     }
-  }, []);
+
+    return { parentCategories, allLabels };
+  }, [categories, showAllOption]);
+
+  const selectedLabel = allLabels[value] || 'Select category...';
 
   return (
-    <div className="space-y-2">
-      <Select
-        value={value}
-        onValueChange={onValueChange}
-        disabled={isLoading}
-        open={isOpen}
-        onOpenChange={handleOpenChange}
-      >
-        <SelectTrigger className="border-2 border-black rounded-none bg-transparent">
-          <SelectValue placeholder="Select category" />
-        </SelectTrigger>
-        <SelectContent className="rounded-none bg-white">
-          {/* Search Input */}
-          <div className="flex items-center border-b px-3 pb-2 sticky top-0 bg-white z-10">
-            <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-            <Input
-              placeholder="Search categories..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="h-8 w-full bg-transparent border-0 focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-none"
-              // Prevent the select from closing when clicking on input
-              onMouseDown={(e) => e.stopPropagation()}
-              onKeyDown={(e) => {
-                // Prevent select from handling these keys
-                if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter') {
-                  e.stopPropagation();
-                }
-              }}
-            />
-          </div>
-          
-          {/* Options */}
-          <div className="max-h-[200px] overflow-y-auto">
-            {filteredOptions.length === 0 ? (
-              <div className="py-6 text-center text-sm text-muted-foreground">
-                No categories found.
-              </div>
-            ) : (
-              filteredOptions.map((option) => (
-                <SelectItem 
-                  key={option.value}
-                  value={option.value}
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full justify-between border-2 border-black rounded-none bg-transparent"
+          disabled={isLoading}
+        >
+          {selectedLabel}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-0 rounded-none">
+        <Command>
+          <CommandInput placeholder="Search categories..." />
+          <CommandList>
+            <CommandEmpty>No category found.</CommandEmpty>
+            
+            {showAllOption && (
+              <>
+                <CommandItem
+                  key="all"
+                  value="All Categories"
+                  onSelect={() => {
+                    onValueChange('all');
+                    setOpen(false);
+                  }}
+                   className="font-semibold font-serif text-red-900"
                 >
-                  {option.label}
-                </SelectItem>
-              ))
+                  All Categories
+                  <Check
+                    className={cn(
+                      'ml-auto h-4 w-4',
+                      value === 'all' ? 'opacity-100' : 'opacity-0'
+                    )}
+                  />
+                </CommandItem>
+               
+              </>
             )}
-          </div>
-        </SelectContent>
-      </Select>
-    </div>
+
+            {parentCategories.map((parent) => (
+              <React.Fragment key={parent.categoryId}>
+                <CommandSeparator className="bg-gray-200" />
+                <CommandGroup>
+                  <CommandItem
+                    key={parent.categoryId}
+                    value={parent.name}
+                    onSelect={() => {
+                      onValueChange(parent.categoryId.toString());
+                      setOpen(false);
+                    }}
+                    className="font-semibold font-serif text-red-900"
+                  >
+                    {parent.name}
+                    <Check
+                      className={cn(
+                        'ml-auto h-4 w-4',
+                        value === parent.categoryId.toString()
+                          ? 'opacity-100'
+                          : 'opacity-0'
+                      )}
+                    />
+                  </CommandItem>
+                  {parent.children?.map((child) => (
+                    <CommandItem
+                      key={child.categoryId}
+                      value={`${parent.name} > ${child.name}`}
+                      onSelect={() => {
+                        onValueChange(child.categoryId.toString());
+                        setOpen(false);
+                      }}
+                      className="pl-8 text-muted-foreground"
+                    >
+                      <CornerDownRight className="mr-2 h-4 w-4" />
+                      {child.name}
+                      <Check
+                        className={cn(
+                          'ml-auto h-4 w-4',
+                          value === child.categoryId.toString()
+                            ? 'opacity-100'
+                            : 'opacity-0'
+                        )}
+                      />
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </React.Fragment>
+            ))}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 }

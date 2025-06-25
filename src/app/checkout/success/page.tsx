@@ -64,7 +64,7 @@ function CheckoutSuccessPageContent() {
 
   return (
     <div className="min-h-screen bg-[#f8f7f3]/80">
-      <div className="max-5xl mx-auto p-6 mt-8">
+      <div className="max-5xl mx-auto p-10 mt-8">
         {/* Success Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
@@ -88,7 +88,7 @@ function CheckoutSuccessPageContent() {
           <div className="lg:col-span-2 space-y-6">
             {/* Order Summary */}
             <Card variant="double">
-              <CardContent className="p-6">
+              <CardContent className="p-10">
                 <div className="flex items-center gap-2 mb-4">
                   <Package className="w-5 h-5 text-red-900" />
                   <h2 className="font-metal text-xl">Order Summary</h2>
@@ -129,7 +129,7 @@ function CheckoutSuccessPageContent() {
 
             {/* Shipping Address */}
             <Card variant="decorated">
-              <CardContent className="p-6">
+              <CardContent className="p-10">
                 <div className="flex items-center gap-2 mb-4">
                   <MapPin className="w-5 h-5 text-red-900" />
                   <h3 className="font-metal text-lg">Shipping Address</h3>
@@ -152,7 +152,7 @@ function CheckoutSuccessPageContent() {
           <div className="lg:col-span-1">
             <div className="sticky top-20">
               <Card variant="decorated">
-                <CardContent className="p-6">
+                <CardContent className="p-10">
                   <h3 className="font-metal text-lg mb-4">Order Details</h3>
                   
                   <div className="space-y-3">

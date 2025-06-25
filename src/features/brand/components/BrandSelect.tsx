@@ -1,36 +1,43 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
+import * as React from 'react';
+import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
+
+import { cn } from '@/utils/cn';
+import { Button } from '@/components/ui/button';
+import {
+  Command,
+  CommandEmpty,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { useBrands } from '../hooks';
-import { Loader2, Search } from 'lucide-react';
 
 interface BrandSelectProps {
   value: string;
   onValueChange: (value: string) => void;
   placeholder?: string;
-  required?: boolean;
   disabled?: boolean;
 }
 
-export function BrandSelect({ 
-  value, 
-  onValueChange, 
-  placeholder = "Select brand",
-  disabled = false 
+export function BrandSelect({
+  value,
+  onValueChange,
+  placeholder = 'Select brand',
+  disabled = false,
 }: BrandSelectProps) {
+  const [open, setOpen] = React.useState(false);
   const { data: brands, isLoading, error } = useBrands();
-  const [searchTerm, setSearchTerm] = useState('');
 
-  // Filter brands based on search term
-  const filteredBrands = useMemo(() => {
-    if (!brands || !searchTerm.trim()) return brands || [];
-    
-    return brands.filter(brand =>
-      brand.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [brands, searchTerm]);
+  const selectedBrand = brands?.find(
+    (brand) => brand.brandId.toString() === value
+  );
 
   if (isLoading) {
     return (
@@ -50,41 +57,47 @@ export function BrandSelect({
   }
 
   return (
-    <Select 
-      value={value} 
-      onValueChange={onValueChange} 
-      disabled={disabled}
-    >
-      <SelectTrigger className="border-2 border-black mt-1">
-        <SelectValue placeholder={placeholder} />
-      </SelectTrigger>
-      <SelectContent>
-        {/* Search Input */}
-        <div className="flex items-center border-b px-3 pb-2">
-          <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-          <Input
-            placeholder="Search brands..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="h-8 w-full bg-transparent border-0 focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-          />
-        </div>
-        
-        {/* Brand Options */}
-        <div className="max-h-[200px] overflow-y-auto">
-          {filteredBrands.length === 0 ? (
-            <div className="py-6 text-center text-sm text-muted-foreground">
-              {searchTerm.trim() ? 'No brands found.' : 'No brands available.'}
-            </div>
-          ) : (
-            filteredBrands.map((brand) => (
-              <SelectItem key={brand.brandId} value={brand.brandId.toString()}>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full justify-between border-2 border-black mt-1"
+          disabled={disabled || isLoading}
+        >
+          {selectedBrand ? selectedBrand.name : placeholder}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+        <Command>
+          <CommandInput placeholder="Search brands..." />
+          <CommandList>
+            <CommandEmpty>No brand found.</CommandEmpty>
+            {(brands || []).map((brand) => (
+              <CommandItem
+                key={brand.brandId}
+                value={brand.name}
+                onSelect={(currentValue) => {
+                  onValueChange(
+                    brand.brandId.toString() === value ? '' : brand.brandId.toString()
+                  );
+                  setOpen(false);
+                }}
+              >
+                <Check
+                  className={cn(
+                    'mr-2 h-4 w-4',
+                    value === brand.brandId.toString() ? 'opacity-100' : 'opacity-0'
+                  )}
+                />
                 {brand.name}
-              </SelectItem>
-            ))
-          )}
-        </div>
-      </SelectContent>
-    </Select>
+              </CommandItem>
+            ))}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 }
