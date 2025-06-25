@@ -9,7 +9,7 @@ export const signupBaseSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   username: z.string().min(5, { message: "Username must be at least 5 characters" }),
   password: z.string()
-    .min(6, { message: "Password must be at least 6 characters" })
+    .min(8, { message: "Password must be at least 8 characters" })
     .refine((val) => /[A-Z]/.test(val), { message: "Password must contain at least one uppercase letter" })
     .refine((val) => /[a-z]/.test(val), { message: "Password must contain at least one lowercase letter" })
     .refine((val) => /[0-9]/.test(val), { message: "Password must contain at least one number" })

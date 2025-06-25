@@ -36,7 +36,7 @@ function About() {
             <div>
               <img 
                 className="w-full border-2 border-black mb-3" 
-                src="/rick.png" 
+                src="/team.jpg" 
                 alt="Vestige Fashion Platform" 
               />
               <p className="text-xs font-gothic text-gray-500 italic text-center">

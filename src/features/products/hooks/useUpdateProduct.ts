@@ -10,7 +10,6 @@ export const useUpdateProduct = () => {
     mutationFn: ({ id, data }: { id: number; data: UpdateProductRequest }) =>
       updateProduct(id, data),
     onSuccess: () => {
-      // Invalidate and refetch my products
       queryClient.invalidateQueries({ queryKey: myProductKeys.all });
     },
   });
