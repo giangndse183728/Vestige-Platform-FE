@@ -229,7 +229,7 @@ export default function ProductManager() {
                       </td>
                       <td className="py-4 px-6 text-sm text-gray-900">{product.brandName || '-'}</td>
                       <td className="py-4 px-6 text-sm text-gray-900">{product.categoryName || '-'}</td>
-                      <td className="py-4 px-6 text-sm text-gray-900">${product.price}</td>
+                      <td className="py-4 px-6 text-sm text-gray-900">{product.price} VND</td>
                       <td className="py-4 px-6 text-right">
                         <Button size="sm" variant="outline" onClick={() => handleViewDetail(product)}>
                           View Detail
@@ -275,16 +275,18 @@ export default function ProductManager() {
                   <div><span className="font-semibold">Color:</span> {selectedProduct.color}</div>
                 </div>
                 <div className="border-t pt-3 grid grid-cols-2 gap-x-8 gap-y-2 items-center">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-semibold">Price:</span>
-                    <span className="text-2xl font-bold text-black">${selectedProduct.price}</span>
+                    <span className="text-2xl font-bold text-black">{selectedProduct.price} VND</span>
                   </div>
                   {selectedProduct.hasDiscount && (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-semibold">Original Price:</span>
-                      <span className="line-through text-gray-400 text-lg">${selectedProduct.originalPrice}</span>
-                      <span className="font-semibold ml-4">Discount:</span>
-                      <span className="font-bold text-red-600">-{selectedProduct.discountPercentage}%</span>
+                      <span className="line-through text-gray-400 text-base">{selectedProduct.originalPrice} VND</span>
+                      <span className="flex items-center gap-1 ml-2">
+                        <span className="font-semibold text-xs">Discount:</span>
+                        <span className="font-bold text-red-600 text-base">-{selectedProduct.discountPercentage}%</span>
+                      </span>
                     </div>
                   )}
                 </div>
