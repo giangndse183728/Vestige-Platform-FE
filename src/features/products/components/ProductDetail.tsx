@@ -73,12 +73,25 @@ export function ProductDetail({ product }: ProductDetailProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const router = useRouter();
 
+  const isValidUrl = (url: string) => {
+    try {
+      new URL(url);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+
   const handleAddToCart = () => {
+    const validImageUrl = product.images[0]?.imageUrl && isValidUrl(product.images[0].imageUrl) 
+      ? product.images[0].imageUrl 
+      : '/placeholder.png';
+
     addToCart({
       productId: product.productId,
       title: product.title,
       price: product.price,
-      imageUrl: product.images[0]?.imageUrl || '/rick.png',
+      imageUrl: validImageUrl,
       size: product.size || null,
       color: product.color || null,
       seller: {
@@ -125,7 +138,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
         {/* Product Images */}
         <div className="space-y-4">
           <div className="relative aspect-[1/1] bg-gray-100 overflow-hidden border-2 border-black -mr-[2px] -mb-[2px]">
-            {product.images.length > 0 ? (
+            {product.images.length > 0 && isValidUrl(product.images[selectedImageIndex].imageUrl) ? (
               <Image
                 src={product.images[selectedImageIndex].imageUrl}
                 alt={product.title}
@@ -134,7 +147,12 @@ export function ProductDetail({ product }: ProductDetailProps) {
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                <span className="text-lg">No Image Available</span>
+                <Image
+                  src="/file.svg"
+                  alt="No image available"
+                  fill
+                  className="object-contain opacity-60 p-12"
+                />
               </div>
             )}
             {product.hasDiscount && (
@@ -152,20 +170,32 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 }`}
                 onClick={() => setSelectedImageIndex(index)}
               >
-                <Image
-                  src={image.imageUrl}
-                  alt={`${product.title} - Image ${image.displayOrder}`}
-                  fill
-                  className="object-cover"
-                />
+                {isValidUrl(image.imageUrl) ? (
+                  <Image
+                    src={image.imageUrl}
+                    alt={`${product.title} - Image ${image.displayOrder}`}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <Image
+                    src="/file.svg"
+                    alt="No image available"
+                    fill
+                    className="object-contain opacity-60 p-4"
+                  />
+                )}
               </div>
             ))}
             
             {Array.from({ length: Math.max(0, 4 - product.images.length) }).map((_, index) => (
               <div key={`placeholder-${index}`} className="relative aspect-[4/3] bg-gray-100 overflow-hidden border-2 border-black -mr-[2px] -mb-[2px]">
-                <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                  <span className="text-sm">No Image</span>
-                </div>
+                <Image
+                  src="/file.svg"
+                  alt="No image available"
+                  fill
+                  className="object-contain opacity-60 p-4"
+                />
               </div>
             ))}
           </div>

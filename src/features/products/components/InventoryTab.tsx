@@ -131,7 +131,7 @@ export function InventoryTab({ onSwitchToAddProduct }: InventoryTabProps) {
           <div className="flex items-center justify-between">
             <CardTitle className="font-metal text-xl font-normal">MY INVENTORY</CardTitle>
             {totalProducts > 0 && (
-              <Badge variant="outline" className="border-2 border-white text-white font-serif">
+              <Badge variant="outline" className="border-2 border-white text-white font-serif rounded-none">
                 {totalProducts} {totalProducts === 1 ? 'item' : 'items'}
               </Badge>
             )}
@@ -154,12 +154,11 @@ export function InventoryTab({ onSwitchToAddProduct }: InventoryTabProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {products.map((product: Product) => (
                 <div key={product.productId} className="group relative bg-white/90 backdrop-blur-sm overflow-hidden border-2 border-black -mr-[2px] -mb-[2px]">
-                  {/* Status Badge */}
+
                   <div className="absolute top-0 right-0 z-10 px-3 py-1 bg-black text-white text-xs font-metal uppercase shadow-sm">
                     {product.condition}
                   </div>
                   
-                  {/* Status Badge - Top Left */}
                   <div className={`absolute top-0 left-0 z-10 px-3 py-1 text-xs font-metal uppercase shadow-sm ${getStatusColor(product.status || 'INACTIVE')}`}>
                     {product.status || 'INACTIVE'}
                   </div>

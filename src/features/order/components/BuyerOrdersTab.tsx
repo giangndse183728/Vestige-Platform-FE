@@ -261,14 +261,14 @@ export function BuyerOrdersTab() {
                                 }`}>
                                   {item.itemStatus}
                                 </Badge>
-                                <Badge className={`text-xs ${
+                                {/* <Badge className={`text-xs ${
                                   item.escrowStatus === 'HOLDING' ? 'bg-yellow-100 text-yellow-800' :
                                   item.escrowStatus === 'RELEASED' ? 'bg-green-100 text-green-800' :
                                   item.escrowStatus === 'CANCELLED' ? 'bg-red-100 text-red-800' :
                                   'bg-gray-100 text-gray-800'
                                 }`}>
                                   {item.escrowStatus}
-                                </Badge>
+                                </Badge> */}
                               </div>
                             </div>
                             <div className="text-right">
@@ -287,10 +287,6 @@ export function BuyerOrdersTab() {
                         <div>
                           <div className="text-xs text-gray-500 mb-1 font-gothic">Shipping Fee</div>
                           <div className="font-medium font-metal">{formatVNDPrice(order.totalShippingFee)}</div>
-                        </div>
-                        <div>
-                          <div className="text-xs text-gray-500 mb-1 font-gothic">Platform Fee</div>
-                          <div className="font-medium font-metal">{formatVNDPrice(order.totalPlatformFee)}</div>
                         </div>
                         <div>
                           <div className="text-xs text-gray-500 mb-1 font-gothic">Order Date</div>
@@ -326,10 +322,12 @@ export function BuyerOrdersTab() {
                           <DollarSign className="w-4 h-4 mr-2" />
                           View Receipt
                         </Button>
-                        <Button size="sm" className="flex-1 border-2 border-black bg-red-900 hover:bg-red-800 text-white font-gothic">
-                          View Details
-                          <ArrowRight className="w-4 h-4 ml-2" />
-                        </Button>
+                        <Link href={`/my-orders/${order.orderId}`}>
+                          <Button size="sm" className="flex-1 border-2 border-black bg-red-900 hover:bg-red-800 text-white font-gothic">
+                            View Details
+                            <ArrowRight className="w-4 h-4 ml-2" />
+                          </Button>
+                        </Link>
                       </div>
                     </CardContent>
                   </Card>

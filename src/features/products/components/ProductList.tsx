@@ -2,14 +2,13 @@
 
 import { useProducts } from "../hooks/useProducts";
 import { ProductCard } from './ProductCard';
-import { useFilters } from "../hooks/useFilters";
+import { useFiltersStore } from "../hooks/useFilters";
 import { useEffect } from 'react';
 
 export function ProductList() {
-  const { filters, setTotalProducts } = useFilters();
+  const { filters, setTotalProducts } = useFiltersStore();
   const { data, isLoading, error } = useProducts(filters);
 
-  // Update total products count when data changes
   useEffect(() => {
     if (data?.pagination?.totalElements !== undefined) {
       setTotalProducts(data.pagination.totalElements);

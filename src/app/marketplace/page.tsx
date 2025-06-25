@@ -1,18 +1,38 @@
-import { ProductList } from "@/features/products/components/ProductList";
-import { generateSEOMetadata } from "@/libs/seo";
+'use client';
 
-export const metadata = generateSEOMetadata({
-  title: "Marketplace | VESTIGE",
-  description: "Explore and shop fashion items from the VESTIGE community. Find outfits, accessories, and more from verified users.",
-  keywords: ["marketplace", "fashion", "vestige", "shop", "style", "outfits"],
-  image: {
-    url: "/banner.png",
-    width: 1200,
-    height: 630,
-    alt: "VESTIGE Fashion Marketplace"
-  }
-});
+import { ProductList } from "@/features/products/components/ProductList";
+import { useSearchParams } from 'next/navigation';
+import { useEffect, Suspense } from 'react';
+import { useFiltersStore } from '@/features/products/hooks/useFilters';
+
+function MarketplaceContent() {
+  const searchParams = useSearchParams();
+  const { updateFilter } = useFiltersStore();
+
+  useEffect(() => {
+    const brandParam = searchParams.get('brand');
+    const categoryParam = searchParams.get('category');
+    
+    if (brandParam) {
+      updateFilter('brand', brandParam);
+    }
+    
+    if (categoryParam) {
+      updateFilter('category', categoryParam);
+    }
+  }, [searchParams, updateFilter]);
+
+  return (
+    <div>
+      <ProductList />
+    </div>
+  );
+}
 
 export default function ProductsPage() {
-  return <ProductList />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <MarketplaceContent />
+    </Suspense>
+  );
 }

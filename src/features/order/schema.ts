@@ -47,15 +47,15 @@ export const orderItemDetailSchema = z.object({
   price: z.number(),
   platformFee: z.number(),
   feePercentage: z.number(),
+  notes: z.string().optional(),
   status: orderStatusEnum,
   escrowStatus: escrowStatusEnum,
-  notes: z.string().optional(),
   product: orderProductSchema,
   seller: sellerSchema,
   transaction: transactionSchema,
 });
 
-// New schema for the actual API response structure
+
 export const orderItemSummarySchema = z.object({
   productId: z.number(),
   productTitle: z.string(),
