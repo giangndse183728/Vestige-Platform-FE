@@ -74,7 +74,7 @@ export default function LoginForm() {
                         <div className="relative">
                           <User className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
                           <Input 
-                            placeholder="your.name@example.com" 
+                            placeholder="Username" 
                             className="border-black/20 focus-visible:ring-red-800/20 rounded-none pl-10" 
                             {...field} 
                           />
