@@ -13,7 +13,6 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { Trash2, Pencil, Search } from 'lucide-react';
-import { Dialog as UIDialog, DialogContent as UIDialogContent, DialogHeader as UIDialogHeader, DialogTitle as UIDialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 
 export default function ProductManager() {
@@ -26,8 +25,6 @@ export default function ProductManager() {
     deleteLoading,
     updateProduct,
     updateLoading,
-    updateProductImages,
-    imagesLoading,
   } = useAdminProductActions();
 
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
@@ -46,15 +43,7 @@ export default function ProductManager() {
     categoryId: '',
     brandId: '',
   });
-
-  const [isImageEditMode, setIsImageEditMode] = useState(false);
-  const [imageForm, setImageForm] = useState({
-    imageId: '',
-    imageUrl: '',
-    displayOrder: '',
-    isPrimary: false,
-    active: true,
-  });
+  const [activeTab, setActiveTab] = useState<'pending' | 'inactive' | 'active' | 'sold' | 'all'>('all');
 
   // Filter products based on search query
   const filteredProducts = allProducts?.filter((product) => {
@@ -64,6 +53,30 @@ export default function ProductManager() {
       product.title.toLowerCase().includes(query)
     );
   });
+
+  // Các status cho từng tab (thêm Inactive)
+  const statusTabs = [
+    { key: 'pending', label: 'Pending Approval', statuses: ['PENDING_PAYMENT', 'DRAFT'] },
+    { key: 'inactive', label: 'Inactive', statuses: ['INACTIVE'] },
+    { key: 'active', label: 'Active', statuses: ['ACTIVE'] },
+    { key: 'sold', label: 'Sold', statuses: ['SOLD'] },
+    { key: 'all', label: 'All Products', statuses: [] },
+  ];
+
+  // Lọc sản phẩm theo tab
+  const displayedProducts = activeTab === 'all'
+    ? filteredProducts
+    : filteredProducts?.filter((product) => {
+        const tab = statusTabs.find(t => t.key === activeTab);
+        return tab && tab.statuses.includes(product.status);
+      });
+
+  // Tính số lượng sản phẩm cho từng tab
+  const getTabCount = (tabKey: string) => {
+    if (tabKey === 'all') return filteredProducts?.length || 0;
+    const tab = statusTabs.find(t => t.key === tabKey);
+    return filteredProducts?.filter(product => tab && tab.statuses.includes(product.status)).length || 0;
+  };
 
   useEffect(() => {
     fetchAllProducts();
@@ -149,56 +162,6 @@ export default function ProductManager() {
     }
   };
 
-  const handleImageEditOpen = () => {
-    if (selectedProduct && selectedProduct.images && selectedProduct.images.length > 0) {
-      // Lấy ảnh chính đầu tiên làm mẫu
-      const img = selectedProduct.images[0];
-      setImageForm({
-        imageId: img.imageId || '',
-        imageUrl: img.imageUrl || '',
-        displayOrder: img.displayOrder?.toString() || '',
-        isPrimary: img.isPrimary || false,
-        active: img.active ?? true,
-      });
-    } else {
-      setImageForm({ imageId: '', imageUrl: '', displayOrder: '', isPrimary: false, active: true });
-    }
-    setIsImageEditMode(true);
-  };
-
-  const handleImageFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-    if (type === 'checkbox') {
-      setImageForm((prev) => ({
-        ...prev,
-        [name]: (e.target as HTMLInputElement).checked,
-      }));
-    } else {
-      setImageForm((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
-  };
-
-  const handleImageUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedProduct) return;
-    try {
-      await updateProductImages(selectedProduct.productId, {
-        imageId: Number(imageForm.imageId),
-        imageUrl: imageForm.imageUrl,
-        displayOrder: Number(imageForm.displayOrder),
-        isPrimary: imageForm.isPrimary,
-        active: imageForm.active,
-      });
-      setIsImageEditMode(false);
-      fetchAllProducts();
-    } catch (err: any) {
-      alert('Failed to update product image: ' + (err.message || 'Unknown error'));
-    }
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -219,7 +182,21 @@ export default function ProductManager() {
           </div>
         </div>
       </div>
-
+      {/* Tabs filter */}
+      <div className="flex gap-2 mb-2">
+        {statusTabs.map(tab => (
+          <button
+            key={tab.key}
+            className={`px-4 py-2 rounded-t font-semibold border-b-2 ${activeTab === tab.key ? 'border-black text-black bg-white' : 'border-transparent text-gray-500 bg-gray-50'}`}
+            onClick={() => setActiveTab(tab.key as typeof activeTab)}
+          >
+            {tab.label}
+            <span className="ml-2 inline-block min-w-[1.5em] px-2 py-0.5 text-xs font-bold rounded-full bg-gray-200 text-gray-700 align-middle">
+              {getTabCount(tab.key)}
+            </span>
+          </button>
+        ))}
+      </div>
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
           {allProductsLoading ? (
@@ -242,8 +219,8 @@ export default function ProductManager() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {filteredProducts && filteredProducts.length > 0 ? (
-                  filteredProducts.map((product) => (
+                {displayedProducts && displayedProducts.length > 0 ? (
+                  displayedProducts.map((product) => (
                     <tr key={product.productId} className="hover:bg-gray-50">
                       <td className="py-4 px-6 text-sm text-gray-900">{product.productId}</td>
                       <td className="py-4 px-6 text-sm text-gray-900">{product.title}</td>
@@ -256,15 +233,6 @@ export default function ProductManager() {
                       <td className="py-4 px-6 text-right">
                         <Button size="sm" variant="outline" onClick={() => handleViewDetail(product)}>
                           View Detail
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(product.productId)}
-                          className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 ml-2"
-                          disabled={deleteLoading}
-                        >
-                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </td>
                     </tr>
@@ -296,274 +264,80 @@ export default function ProductManager() {
               </div>
               {/* Details */}
               <div className="flex-1 flex flex-col gap-4">
-                {/* Title & Description */}
-                {!isEditMode && (
-                  <div>
-                    <h3 className="text-2xl font-bold mb-2">{selectedProduct.title}</h3>
-                    <p className="text-gray-700 text-base mb-2 whitespace-pre-line">{selectedProduct.description}</p>
+                <div>
+                  <h3 className="text-2xl font-bold mb-2">{selectedProduct.title}</h3>
+                  <p className="text-gray-700 text-base mb-2 whitespace-pre-line">{selectedProduct.description}</p>
+                </div>
+                <div className="border-t pt-3 grid grid-cols-2 gap-x-8 gap-y-2 text-sm text-gray-700">
+                  <div><span className="font-semibold">Status:</span> <Badge variant={selectedProduct.status === 'ACTIVE' ? 'default' : 'secondary'}>{selectedProduct.status}</Badge></div>
+                  <div><span className="font-semibold">Condition:</span> {selectedProduct.condition}</div>
+                  <div><span className="font-semibold">Size:</span> {selectedProduct.size}</div>
+                  <div><span className="font-semibold">Color:</span> {selectedProduct.color}</div>
+                </div>
+                <div className="border-t pt-3 grid grid-cols-2 gap-x-8 gap-y-2 items-center">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold">Price:</span>
+                    <span className="text-2xl font-bold text-black">${selectedProduct.price}</span>
                   </div>
-                )}
-                {/* Edit form or Detail view (not both) */}
-                {isEditMode ? (
-                  <form onSubmit={handleEditSubmit} className="space-y-4">
-                    <div>
-                      <label className="font-semibold">Title:</label>
-                      <input
-                        name="title"
-                        value={editForm.title}
-                        onChange={handleEditChange}
-                        className="border rounded px-2 py-1 w-full"
-                        required
-                      />
+                  {selectedProduct.hasDiscount && (
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold">Original Price:</span>
+                      <span className="line-through text-gray-400 text-lg">${selectedProduct.originalPrice}</span>
+                      <span className="font-semibold ml-4">Discount:</span>
+                      <span className="font-bold text-red-600">-{selectedProduct.discountPercentage}%</span>
                     </div>
-                    <div>
-                      <label className="font-semibold">Description:</label>
-                      <input
-                        name="description"
-                        value={editForm.description}
-                        onChange={handleEditChange}
-                        className="border rounded px-2 py-1 w-full"
-                        required
-                      />
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="flex-1">
-                        <label className="font-semibold">Price:</label>
-                        <input
-                          name="price"
-                          type="number"
-                          value={editForm.price}
-                          onChange={handleEditChange}
-                          className="border rounded px-2 py-1 w-full"
-                          required
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label className="font-semibold">Original Price:</label>
-                        <input
-                          name="originalPrice"
-                          type="number"
-                          value={editForm.originalPrice}
-                          onChange={handleEditChange}
-                          className="border rounded px-2 py-1 w-full"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="flex-1">
-                        <label className="font-semibold">Size:</label>
-                        <input
-                          name="size"
-                          value={editForm.size}
-                          onChange={handleEditChange}
-                          className="border rounded px-2 py-1 w-full"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label className="font-semibold">Color:</label>
-                        <input
-                          name="color"
-                          value={editForm.color}
-                          onChange={handleEditChange}
-                          className="border rounded px-2 py-1 w-full"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="flex-1">
-                        <label className="font-semibold">Status:</label>
-                        <select
-                          name="status"
-                          value={editForm.status}
-                          onChange={handleEditChange}
-                          className="border rounded px-2 py-1 w-full"
-                        >
-                          <option value="ACTIVE">ACTIVE</option>
-                          <option value="PENDING_PAYMENT">PENDING_PAYMENT</option>
-                          <option value="SOLD">SOLD</option>
-                          <option value="DELETED">DELETED</option>
-                        </select>
-                      </div>
-                      <div className="flex-1">
-                        <label className="font-semibold">Condition:</label>
-                        <select
-                          name="condition"
-                          value={editForm.condition}
-                          onChange={handleEditChange}
-                          className="border rounded px-2 py-1 w-full"
-                        >
-                          <option value="NEW">NEW</option>
-                          <option value="USED">USED</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="flex-1">
-                        <label className="font-semibold">Category ID:</label>
-                        <input
-                          name="categoryId"
-                          type="number"
-                          value={editForm.categoryId}
-                          onChange={handleEditChange}
-                          className="border rounded px-2 py-1 w-full"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label className="font-semibold">Brand ID:</label>
-                        <input
-                          name="brandId"
-                          type="number"
-                          value={editForm.brandId}
-                          onChange={handleEditChange}
-                          className="border rounded px-2 py-1 w-full"
-                        />
-                      </div>
-                    </div>
+                  )}
+                </div>
+                <div className="border-t pt-3 grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                  <div><span className="font-semibold">Brand:</span> {selectedProduct.brandName}</div>
+                  <div><span className="font-semibold">Category:</span> {selectedProduct.categoryName}</div>
+                </div>
+                <div className="border-t pt-3 grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                  <div><span className="font-semibold">Views:</span> {selectedProduct.viewsCount}</div>
+                  <div><span className="font-semibold">Likes:</span> {selectedProduct.likesCount}</div>
+                </div>
+                <div className="border-t pt-3 text-xs text-gray-500">
+                  <span className="font-semibold">Created:</span> {selectedProduct.createdAt}
+                </div>
+                <div className="flex flex-row gap-2 self-end mt-4">
+                  {activeTab === 'pending' && ['PENDING_PAYMENT', 'DRAFT'].includes(selectedProduct.status) && (
                     <div className="flex gap-2">
-                      <Button type="submit" size="sm" variant="default" disabled={updateLoading}>Save</Button>
-                      <Button type="button" size="sm" variant="outline" onClick={handleCloseEditModal}>Cancel</Button>
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        className="border-2 border-red-600 text-red-700 font-bold shadow flex items-center gap-2 transition-colors duration-150 hover:bg-red-100 hover:border-red-700 hover:text-red-800"
+                        onClick={async () => {
+                          await updateProduct(selectedProduct.productId, { status: 'INACTIVE' });
+                          toast.success('Product rejected!');
+                          fetchAllProducts();
+                          setSelectedProduct({ ...selectedProduct, status: 'INACTIVE' });
+                        }}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                        Reject
+                      </Button>
+                      <Button
+                        size="lg"
+                        variant="default"
+                        className="bg-green-600 hover:bg-green-700 text-white font-bold border-2 border-green-700 hover:border-green-800 shadow-lg flex items-center gap-2 transition-colors duration-150"
+                        onClick={async () => {
+                          await updateProduct(selectedProduct.productId, { status: 'ACTIVE' });
+                          toast.success('Product approved!');
+                          fetchAllProducts();
+                          setSelectedProduct({ ...selectedProduct, status: 'ACTIVE' });
+                        }}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                        Approve
+                      </Button>
                     </div>
-                  </form>
-                ) : (
-                  <>
-                    {/* Detail view here (all the detail layout you already have) */}
-                    <div className="border-t pt-3 grid grid-cols-2 gap-x-8 gap-y-2 text-sm text-gray-700">
-                      <div><span className="font-semibold">Status:</span> <Badge variant={selectedProduct.status === 'ACTIVE' ? 'default' : 'secondary'}>{selectedProduct.status}</Badge></div>
-                      <div><span className="font-semibold">Condition:</span> {selectedProduct.condition}</div>
-                      <div><span className="font-semibold">Size:</span> {selectedProduct.size}</div>
-                      <div><span className="font-semibold">Color:</span> {selectedProduct.color}</div>
-                    </div>
-                    <div className="border-t pt-3 grid grid-cols-2 gap-x-8 gap-y-2 items-center">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold">Price:</span>
-                        <span className="text-2xl font-bold text-black">${selectedProduct.price}</span>
-                      </div>
-                      {selectedProduct.hasDiscount && (
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold">Original Price:</span>
-                          <span className="line-through text-gray-400 text-lg">${selectedProduct.originalPrice}</span>
-                          <span className="font-semibold ml-4">Discount:</span>
-                          <span className="font-bold text-red-600">-{selectedProduct.discountPercentage}%</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="border-t pt-3 grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
-                      <div><span className="font-semibold">Brand:</span> {selectedProduct.brandName}</div>
-                      <div><span className="font-semibold">Category:</span> {selectedProduct.categoryName}</div>
-                    </div>
-                    <div className="border-t pt-3 grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
-                      <div><span className="font-semibold">Views:</span> {selectedProduct.viewsCount}</div>
-                      <div><span className="font-semibold">Likes:</span> {selectedProduct.likesCount}</div>
-                    </div>
-                    <div className="border-t pt-3 text-xs text-gray-500">
-                      <span className="font-semibold">Created:</span> {selectedProduct.createdAt}
-                    </div>
-                    <div className="flex flex-row gap-2 self-end mt-4">
-                      <Button size="sm" variant="outline" onClick={handleEditOpen}>Edit</Button>
-                      <Button size="sm" variant="outline" onClick={handleImageEditOpen}>Update Image</Button>
-                    </div>
-                  </>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           )}
         </DialogContent>
       </Dialog>
-      {/* Image Update Modal */}
-      <UIDialog open={isImageEditMode} onOpenChange={setIsImageEditMode}>
-        <UIDialogContent className="max-w-md">
-          <UIDialogHeader>
-            <UIDialogTitle>Update Product Image</UIDialogTitle>
-          </UIDialogHeader>
-          <form onSubmit={handleImageUpdate} className="space-y-2">
-            <div>
-              <label className="font-semibold">Image ID:</label>
-              <input name="imageId" value={imageForm.imageId} onChange={handleImageFormChange} className="border rounded px-2 py-1 w-full" required />
-            </div>
-            <div>
-              <label className="font-semibold">Image URL:</label>
-              <input name="imageUrl" value={imageForm.imageUrl} onChange={handleImageFormChange} className="border rounded px-2 py-1 w-full" required />
-            </div>
-            <div>
-              <label className="font-semibold">Display Order:</label>
-              <input name="displayOrder" type="number" value={imageForm.displayOrder} onChange={handleImageFormChange} className="border rounded px-2 py-1 w-full" required />
-            </div>
-            <div>
-              <label className="font-semibold">Is Primary:</label>
-              <input name="isPrimary" type="checkbox" checked={imageForm.isPrimary} onChange={handleImageFormChange} className="ml-2" />
-            </div>
-            <div>
-              <label className="font-semibold">Active:</label>
-              <input name="active" type="checkbox" checked={imageForm.active} onChange={handleImageFormChange} className="ml-2" />
-            </div>
-            <div className="flex gap-2">
-              <Button type="submit" size="sm" variant="default" disabled={imagesLoading}>Save Image</Button>
-              <Button type="button" size="sm" variant="outline" onClick={() => setIsImageEditMode(false)}>Cancel</Button>
-            </div>
-          </form>
-        </UIDialogContent>
-      </UIDialog>
-      {/* Edit Product Modal */}
-      <UIDialog open={isEditMode} onOpenChange={setIsEditMode}>
-        <UIDialogContent style={{ width: '90vw', maxWidth: 900, height: 'auto', maxHeight: '70vh', overflowY: 'auto' }} className="h-auto">
-          <UIDialogHeader>
-            <UIDialogTitle>Edit Product</UIDialogTitle>
-          </UIDialogHeader>
-          <form onSubmit={handleEditSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <div className="flex flex-col gap-2">
-              <label htmlFor="title">Title:</label>
-              <input id="title" name="title" value={editForm.title} onChange={handleEditChange} className="border rounded px-2 py-1" required />
-            </div>
-            <div className="flex flex-col gap-2 md:col-span-2">
-              <label htmlFor="description">Description:</label>
-              <input id="description" name="description" value={editForm.description} onChange={handleEditChange} className="border rounded px-2 py-1" required />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="price">Price:</label>
-              <input id="price" name="price" value={editForm.price} onChange={handleEditChange} className="border rounded px-2 py-1" required />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="originalPrice">Original Price:</label>
-              <input id="originalPrice" name="originalPrice" value={editForm.originalPrice} onChange={handleEditChange} className="border rounded px-2 py-1" required />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="size">Size:</label>
-              <input id="size" name="size" value={editForm.size} onChange={handleEditChange} className="border rounded px-2 py-1" required />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="color">Color:</label>
-              <input id="color" name="color" value={editForm.color} onChange={handleEditChange} className="border rounded px-2 py-1" required />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="status">Status:</label>
-              <select id="status" name="status" value={editForm.status} onChange={handleEditChange} className="border rounded px-2 py-1" required>
-                <option value="ACTIVE">ACTIVE</option>
-                <option value="INACTIVE">INACTIVE</option>
-                <option value="SOLD">SOLD</option>
-              </select>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="condition">Condition:</label>
-              <select id="condition" name="condition" value={editForm.condition} onChange={handleEditChange} className="border rounded px-2 py-1" required>
-                <option value="NEW">NEW</option>
-                <option value="USED">USED</option>
-              </select>
-            </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="categoryId">Category ID:</label>
-              <input id="categoryId" name="categoryId" value={editForm.categoryId} onChange={handleEditChange} className="border rounded px-2 py-1" required />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="brandId">Brand ID:</label>
-              <input id="brandId" name="brandId" value={editForm.brandId} onChange={handleEditChange} className="border rounded px-2 py-1" required />
-            </div>
-            <div className="md:col-span-2 flex justify-end gap-2 mt-2">
-              <button type="submit" className="px-4 py-2 bg-black text-white rounded">Save</button>
-              <button type="button" className="px-4 py-2 border rounded" onClick={handleCloseEditModal}>Cancel</button>
-            </div>
-          </form>
-        </UIDialogContent>
-      </UIDialog>
     </div>
   );
 } 
