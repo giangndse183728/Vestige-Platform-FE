@@ -1,6 +1,6 @@
 import api from '@/libs/axios';
 import { ApiResponse } from '@/libs/axios';
-import { ProductsResponse, CreateProductRequest, UpdateProductRequest, ProductDetail, ProductFilters } from './schema';
+import { ProductsResponse, CreateProductRequest, UpdateProductRequest, ProductDetail, ProductFilters, Product } from './schema';
 
 
 export const getProducts = async (filters?: ProductFilters): Promise<ProductsResponse> => {
@@ -106,3 +106,13 @@ export const updateProductImagesByAdmin = async (id: number, images: any) => {
   const response = await api.patch(`/products/admin/${id}/images`, images);
   return response.data;
 };
+
+export async function fetchTopViewedProducts(): Promise<ProductsResponse> {
+  const response = await api.get<ApiResponse<ProductsResponse>>(`/products?&size=12&sortBy=viewCount&sortDir=desc`);
+  return response.data.data;
+}
+
+export async function fetchNewArrivals(): Promise<ProductsResponse> {
+  const response = await api.get<ApiResponse<ProductsResponse>>(`/products?size=12&sortBy=createdAt&sortDir=desc`);
+  return response.data.data;
+}

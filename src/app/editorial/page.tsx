@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { format } from 'date-fns';
-import Image from 'next/image';
+import ImageWithFallback from '@/components/ui/image-fallback';
 import { Input } from "@/components/ui/input";
 
 interface EditorialItem {
@@ -169,7 +169,7 @@ export default function EditorialPage() {
                   </div>
                   {mainFeatured.image && (
                     <div className="relative h-80 border-b-4 border-black">
-                      <Image
+                      <ImageWithFallback
                         src={mainFeatured.image}
                         alt={mainFeatured.title}
                         fill
@@ -214,7 +214,7 @@ export default function EditorialPage() {
                   <div className="flex gap-3">
                     {item.image && (
                       <div className="relative w-20 h-20 border border-black flex-shrink-0">
-                        <Image
+                        <ImageWithFallback
                           src={item.image}
                           alt={item.title}
                           fill
@@ -273,7 +273,7 @@ export default function EditorialPage() {
                   </div>
                   {centerSpotlight[0].image && (
                     <div className="relative h-48 mb-4 border-2 border-black">
-                      <Image
+                      <ImageWithFallback
                         src={centerSpotlight[0].image}
                         alt={centerSpotlight[0].title}
                         fill
@@ -301,7 +301,7 @@ export default function EditorialPage() {
                     <div className="flex gap-3 h-full">
                       {item.image && (
                         <div className="relative w-24 h-24 border border-black flex-shrink-0">
-                          <Image
+                          <ImageWithFallback
                             src={item.image}
                             alt={item.title}
                             fill
@@ -343,7 +343,7 @@ export default function EditorialPage() {
                 </div>
                 {bottomGrid[0].image && (
                   <div className="relative h-48 border-b-2 border-black">
-                    <Image
+                    <ImageWithFallback
                       src={bottomGrid[0].image}
                       alt={bottomGrid[0].title}
                       fill
@@ -370,7 +370,7 @@ export default function EditorialPage() {
                 <article key={index} className="col-span-4 border border-black p-3 bg-gray-50">
                   {item.image && (
                     <div className="relative h-32 mb-3 border border-black">
-                      <Image
+                      <ImageWithFallback
                         src={item.image}
                         alt={item.title}
                         fill
@@ -403,7 +403,7 @@ export default function EditorialPage() {
                 <article key={index} className="col-span-4 border border-gray-300 p-3 bg-white">
                   {item.image && (
                     <div className="relative h-24 mb-2 border border-black">
-                      <Image
+                      <ImageWithFallback
                         src={item.image}
                         alt={item.title}
                         fill
@@ -444,7 +444,7 @@ export default function EditorialPage() {
                   <article key={index} className="border border-black p-3 bg-white">
                     {item.image && (
                       <div className="relative h-20 mb-2 border border-black">
-                        <Image
+                        <ImageWithFallback
                           src={item.image}
                           alt={item.title}
                           fill
@@ -479,7 +479,7 @@ export default function EditorialPage() {
                     <div className="grid grid-cols-2 gap-4 h-full">
                       {finalRow[2].image && (
                         <div className="relative border border-black">
-                          <Image
+                          <ImageWithFallback
                             src={finalRow[2].image}
                             alt={finalRow[2].title}
                             fill
@@ -517,7 +517,7 @@ export default function EditorialPage() {
                   <article key={index} className="border-2 border-red-900 p-3 bg-red-50">
                     {item.image && (
                       <div className="relative h-20 mb-2 border border-black">
-                        <Image
+                        <ImageWithFallback
                           src={item.image}
                           alt={item.title}
                           fill

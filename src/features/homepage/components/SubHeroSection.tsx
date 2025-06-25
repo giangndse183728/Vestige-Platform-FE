@@ -175,7 +175,7 @@ const SubHeroSection = () => {
                     asChild
                     size={'lg'}
                   >
-                    <a href="/shop/limited-edition">Shop Now</a>
+                    <a href="/marketplace">Shop Now</a>
                   </Button>
               </div>
             </FadeUp>

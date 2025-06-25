@@ -23,8 +23,8 @@ const heroSEOContent = {
   heading: "DIGITAL FASHION",
   description: "Where virtual expression meets innovative design. Explore our platform for digital fashion, virtual runway shows, and meta fashion concepts.",
   links: [
-    { text: "Explore", url: "/explore" },
-    { text: "Join", url: "/creators" }
+    { text: "Explore", url: "/editorial" },
+    { text: "Join", url: "/subscription" }
   ]
 };
 
