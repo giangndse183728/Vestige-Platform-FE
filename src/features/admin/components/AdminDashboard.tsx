@@ -146,21 +146,11 @@ export default function AdminDashboard() {
               <h1 className="text-xl font-semibold text-gray-900">Admin Dashboard</h1>
             </div>
             <div className="absolute left-1/2 transform -translate-x-1/2">
-              <Link href="/" className="group">
                 <h1 className="font-metal text-3xl tracking-wider uppercase inline-block relative">
                   <span className="text-black">VES</span>
                   <span className="text-red-900">TIGE</span>
                   <span className="absolute -top-1 -right-1 text-red-900 text-[8px]">®</span>
                 </h1>
-              </Link>
-            </div>
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon">
-                <Bell className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <User className="h-5 w-5" />
-              </Button>
             </div>
           </div>
         </div>
