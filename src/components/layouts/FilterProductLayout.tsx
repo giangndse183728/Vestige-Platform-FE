@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Search, X, Heart, DollarSign, Tag, Package, Filter, ChevronDown, ChevronUp } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -12,10 +12,12 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { CategorySelect } from '@/features/category/components/CategorySelect';
 import { useBrands } from '@/features/brand/hooks';
+import { useCategories } from '@/features/category/hooks';
 import { ProductFilters } from '@/features/products/schema';
 import { Brand } from '@/features/brand/schema';
 import { useFiltersStore } from '@/features/products/hooks/useFilters';
-import { formatVNDPrice } from '@/utils/format';
+import { formatVNDInput, unformatVND } from '@/utils/format';
+import { useDebounce } from '@/hooks/useDebounce';
 
 interface FilterProductLayoutProps {
   children: React.ReactNode;
@@ -31,6 +33,7 @@ const conditions = [
 
 export function FilterProductLayout({ children }: FilterProductLayoutProps) {
   const { data: brands, isLoading: isLoadingBrands } = useBrands();
+  const { data: categories, isLoading: isLoadingCategories } = useCategories();
   
   const {
     filters,
@@ -53,12 +56,36 @@ export function FilterProductLayout({ children }: FilterProductLayoutProps) {
   const selectedBrands = filters.brand ? filters.brand.split(',').filter(Boolean) : [];
   const selectedConditions = filters.condition ? filters.condition.split(',').filter(Boolean) : [];
 
+  const debouncedMinPrice = useDebounce(priceRange[0], 400);
+  const debouncedMaxPrice = useDebounce(priceRange[1], 400);
+  const [searchInput, setSearchInput] = useState(filters.search || '');
+  const debouncedSearch = useDebounce(searchInput, 400);
+
   useEffect(() => {
     setPriceRange([
       filters.minPrice ? parseInt(filters.minPrice) : 0,
       filters.maxPrice ? parseInt(filters.maxPrice) : 100000000,
     ]);
   }, [filters.minPrice, filters.maxPrice]);
+
+  // Debounced price filter effect
+  useEffect(() => {
+    if (debouncedMinPrice !== (filters.minPrice ? parseInt(filters.minPrice) : 0)) {
+      updateFilter('minPrice', debouncedMinPrice.toString());
+    }
+    if (debouncedMaxPrice !== (filters.maxPrice ? parseInt(filters.maxPrice) : 100000000)) {
+      updateFilter('maxPrice', debouncedMaxPrice.toString());
+    }
+    // eslint-disable-next-line
+  }, [debouncedMinPrice, debouncedMaxPrice]);
+
+  // Debounced search filter effect
+  useEffect(() => {
+    if (debouncedSearch !== filters.search) {
+      updateFilter('search', debouncedSearch);
+    }
+    // eslint-disable-next-line
+  }, [debouncedSearch]);
 
   const handleFilterChange = (key: keyof ProductFilters, value: string) => {
     updateFilter(key, value);
@@ -165,14 +192,40 @@ export function FilterProductLayout({ children }: FilterProductLayoutProps) {
                             onValueChange={setPriceRange}
                             onValueCommit={handlePriceRangeCommit}
                             max={100000000}
-                            min={0}
-                            step={100000}
-                            thumbClassName="border-black bg-white"
-                            className="w-full"
+                            min={0}                         
+                            thumbClassName="border-black bg-white border-2"
+                            className="w-full bg-red-900"
                           />
-                          <div className="flex justify-between mt-2 text-sm font-mono">
-                            <span className="bg-gray-100 px-2 py-1 border">{formatVNDPrice(priceRange[0])}</span>
-                            <span className="bg-gray-100 px-2 py-1 border">{formatVNDPrice(priceRange[1])}</span>
+                          <div className="flex items-center justify-between gap-2 mt-4 text-sm font-mono">
+                            <span className="text-gray-500 mr-2">₫</span>
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              pattern="[0-9]*"
+                              min={0}
+                              max={priceRange[1]}
+                              value={formatVNDInput(priceRange[0])}
+                              onChange={e => {
+                                const val = Math.max(0, Math.min(Number(unformatVND(e.target.value)), priceRange[1]));
+                                setPriceRange([val, priceRange[1]]);
+                              }}
+                              className="w-full max-w-[110px] px-2 py-1 border-2 border-black bg-gray-50 focus:bg-white focus:outline-none focus:border-red-900 rounded-none text-right transition-colors duration-150 shadow-inner text-ellipsis overflow-x-auto"
+                            />
+                            <span className="mx-2 text-gray-400">—</span>
+                            <span className="text-gray-500 mr-2">₫</span>
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              pattern="[0-9]*"
+                              min={priceRange[0]}
+                              max={100000000}
+                              value={formatVNDInput(priceRange[1])}
+                              onChange={e => {
+                                const val = Math.max(Number(unformatVND(e.target.value)), priceRange[0]);
+                                setPriceRange([priceRange[0], val]);
+                              }}
+                              className="w-full max-w-[110px] px-2 py-1 border-2 border-black bg-gray-50 focus:bg-white focus:outline-none focus:border-red-900 rounded-none text-right transition-colors duration-150 shadow-inner text-ellipsis overflow-x-auto"
+                            />
                           </div>
                         </div>
                       )}
@@ -378,8 +431,8 @@ export function FilterProductLayout({ children }: FilterProductLayoutProps) {
                     <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600 w-5 h-5" />
                     <Input
                       placeholder="Search the marketplace..."
-                      value={filters.search || ''}
-                      onChange={(e) => handleFilterChange('search', e.target.value)}
+                      value={searchInput}
+                      onChange={(e) => setSearchInput(e.target.value)}
                       className="pl-12 pr-4 py-3 border-3 border-black rounded-none bg-white text-lg font-serif shadow-inner"
                     />
                   </div>
@@ -408,6 +461,11 @@ export function FilterProductLayout({ children }: FilterProductLayoutProps) {
                         Search: "{filters.search}"
                       </Badge>
                     )}
+                    {filters.category && filters.category !== 'all' && (
+                      <Badge variant="outline" className="border-2 border-red-600 text-red-600 font-serif">
+                        Category: {categories?.find(cat => cat.categoryId.toString() === filters.category)?.name || filters.category}
+                      </Badge>
+                    )}
                     {selectedBrands.map(brandId => {
                       const brand = brands?.find(b => b.brandId.toString() === brandId);
                       return (
@@ -423,7 +481,7 @@ export function FilterProductLayout({ children }: FilterProductLayoutProps) {
                     ))}
                     {(priceRange[0] > 0 || priceRange[1] < 100000000) && (
                       <Badge variant="outline" className="border-2 border-purple-600 text-purple-600 font-serif">
-                        {formatVNDPrice(priceRange[0])} - {formatVNDPrice(priceRange[1])}
+                        {formatVNDInput(priceRange[0])} - {formatVNDInput(priceRange[1])}
                       </Badge>
                     )}
                     <Button

@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { useSellerOrders } from '@/features/order/hooks/useSellerOrders';
 import { ActualOrder, OrderStatus, EscrowStatus } from '@/features/order/schema';
 import { format } from 'date-fns';
-import { Eye, Package, Truck, CheckCircle, XCircle, Clock, DollarSign } from 'lucide-react';
+import { Eye, Package, Truck, CheckCircle, XCircle, Clock, DollarSign, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -129,13 +129,13 @@ export function CustomerOrdersTab() {
         </Button>
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-4 ">
         {orders.map((order) => (
-          <Card key={order.orderId} className="border-2 border-black">
-            <CardHeader className="border-b-2 border-black bg-gray-50">
+          <Card key={order.orderId} className="border-2 rounded-none">
+            <CardHeader className="border-b-2 border-black bg-black/90 text-white ">
               <div className="flex justify-between items-start">
                 <div>
-                  <CardTitle className="font-metal text-lg">
+                  <CardTitle className="font-metal text-lg font-normal">
                     Order #{order.orderId}
                   </CardTitle>
                   <p className="text-sm text-gray-600 mt-1">
@@ -157,7 +157,7 @@ export function CustomerOrdersTab() {
               </div>
             </CardHeader>
 
-            <CardContent className="p-6">
+            <CardContent className="p-6 bg-white/80">
               <div className="grid md:grid-cols-2 gap-6">
                 {/* Order Summary */}
                 <div className="space-y-4">
@@ -230,26 +230,40 @@ export function CustomerOrdersTab() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-3 mt-6 pt-4 border-t-2 border-black">
+              <div className="flex gap-2 pt-6 mt-4 border-t border-gray-200">
+                <Button variant="outline" size="sm" className="flex-1 border-2 border-black font-gothic">
+                  <Package className="w-4 h-4 mr-2" />
+                  Track Order
+                </Button>
+                <Button variant="outline" size="sm" className="flex-1 border-2 border-black font-gothic">
+                  <DollarSign className="w-4 h-4 mr-2" />
+                  View Receipt
+                </Button>
                 <Link href={`/my-orders/${order.orderId}`}>
-                  <Button variant="outline" size="sm" className="border-2 border-black">
-                    <Eye className="w-4 h-4 mr-2" />
+                  <Button size="sm" className="flex-1 border-2 border-black bg-red-900 hover:bg-red-800 text-white font-gothic">
                     View Details
+                    <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </Link>
-                {order.status === 'PENDING' && (
-                  <Button size="sm" className="bg-black text-white hover:bg-gray-800 border-2 border-black">
-                    <CheckCircle className="w-4 h-4 mr-2" />
-                    Confirm Order
-                  </Button>
-                )}
-                {order.status === 'CONFIRMED' && (
-                  <Button size="sm" className="bg-black text-white hover:bg-gray-800 border-2 border-black">
-                    <Truck className="w-4 h-4 mr-2" />
-                    Mark as Shipped
-                  </Button>
-                )}
               </div>
+
+              {/* Status Action Buttons */}
+              {(order.status === 'PENDING' || order.status === 'CONFIRMED') && (
+                <div className="flex gap-3 mt-4 pt-4 border-t-2 border-black">
+                  {order.status === 'PENDING' && (
+                    <Button size="sm" className="bg-black text-white hover:bg-gray-800 border-2 border-black">
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Confirm Order
+                    </Button>
+                  )}
+                  {order.status === 'CONFIRMED' && (
+                    <Button size="sm" className="bg-black text-white hover:bg-gray-800 border-2 border-black">
+                      <Truck className="w-4 h-4 mr-2" />
+                      Mark as Shipped
+                    </Button>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
         ))}
