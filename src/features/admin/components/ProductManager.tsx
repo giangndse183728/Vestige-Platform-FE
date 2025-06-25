@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { getAllProductStatuses, deleteProductByAdmin, updateProductByAdmin } from '@/features/products/services';
+import { useAdminProductActions } from '@/features/products/hooks/useAdminProductActions';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   Dialog,
   DialogContent,
@@ -11,15 +12,25 @@ import {
   DialogDescription,
   DialogClose,
 } from '@/components/ui/dialog';
-import { Trash2, Pencil } from 'lucide-react';
+import { Trash2, Pencil, Search } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function ProductManager() {
-  const [products, setProducts] = useState<any[] | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    allProducts,
+    allProductsLoading,
+    allProductsError,
+    fetchAllProducts,
+    deleteProduct,
+    deleteLoading,
+    updateProduct,
+    updateLoading,
+  } = useAdminProductActions();
+
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [editForm, setEditForm] = useState({
     title: '',
     description: '',
@@ -32,21 +43,44 @@ export default function ProductManager() {
     categoryId: '',
     brandId: '',
   });
+  const [activeTab, setActiveTab] = useState<'pending' | 'inactive' | 'active' | 'sold' | 'all'>('all');
+
+  // Filter products based on search query
+  const filteredProducts = allProducts?.filter((product) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      product.productId.toString().includes(query) ||
+      product.title.toLowerCase().includes(query)
+    );
+  });
+
+  // Các status cho từng tab (thêm Inactive)
+  const statusTabs = [
+    { key: 'pending', label: 'Pending Approval', statuses: ['PENDING_PAYMENT', 'DRAFT'] },
+    { key: 'inactive', label: 'Inactive', statuses: ['INACTIVE'] },
+    { key: 'active', label: 'Active', statuses: ['ACTIVE'] },
+    { key: 'sold', label: 'Sold', statuses: ['SOLD'] },
+    { key: 'all', label: 'All Products', statuses: [] },
+  ];
+
+  // Lọc sản phẩm theo tab
+  const displayedProducts = activeTab === 'all'
+    ? filteredProducts
+    : filteredProducts?.filter((product) => {
+        const tab = statusTabs.find(t => t.key === activeTab);
+        return tab && tab.statuses.includes(product.status);
+      });
+
+  // Tính số lượng sản phẩm cho từng tab
+  const getTabCount = (tabKey: string) => {
+    if (tabKey === 'all') return filteredProducts?.length || 0;
+    const tab = statusTabs.find(t => t.key === tabKey);
+    return filteredProducts?.filter(product => tab && tab.statuses.includes(product.status)).length || 0;
+  };
 
   useEffect(() => {
-    async function fetchProducts() {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await getAllProductStatuses();
-        setProducts(data.content || []);
-      } catch (err: any) {
-        setError(err.message || 'Unknown error');
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchProducts();
+    fetchAllProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleViewDetail = (product: any) => {
@@ -59,11 +93,15 @@ export default function ProductManager() {
     setSelectedProduct(null);
   };
 
+  const handleCloseEditModal = () => {
+    setIsEditMode(false);
+  };
+
   const handleDelete = async (productId: number) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
-        await deleteProductByAdmin(productId);
-        setProducts((prev) => prev ? prev.filter(p => p.productId !== productId) : prev);
+        await deleteProduct(productId);
+        fetchAllProducts();
       } catch (err: any) {
         alert('Failed to delete product: ' + (err.message || 'Unknown error'));
       }
@@ -84,7 +122,7 @@ export default function ProductManager() {
         categoryId: selectedProduct.categoryId ? String(selectedProduct.categoryId) : '',
         brandId: selectedProduct.brandId ? String(selectedProduct.brandId) : '',
       });
-      setIsEditMode(true);
+      setTimeout(() => setIsEditMode(true), 0);
     }
   };
 
@@ -96,19 +134,29 @@ export default function ProductManager() {
     e.preventDefault();
     if (!selectedProduct) return;
     try {
-      await updateProductByAdmin(selectedProduct.productId, {
-        ...selectedProduct,
-        ...editForm,
+      const payload = {
+        title: editForm.title,
+        description: editForm.description,
         price: Number(editForm.price),
         originalPrice: Number(editForm.originalPrice),
+        condition: editForm.condition,
+        size: editForm.size,
+        color: editForm.color,
+        status: editForm.status,
         categoryId: Number(editForm.categoryId),
         brandId: Number(editForm.brandId),
-      });
+        imageUrls: selectedProduct.imageUrls || [],
+        adminNotes: selectedProduct.adminNotes || '',
+        sellerId: selectedProduct.sellerId ? Number(selectedProduct.sellerId) : undefined,
+        forceSoldStatus: selectedProduct.forceSoldStatus || false,
+      };
+      await updateProduct(selectedProduct.productId, payload);
+      toast.success('Product updated successfully!');
       setIsEditMode(false);
-      setIsModalOpen(false);
-      // Refresh products
-      const data = await getAllProductStatuses();
-      setProducts(data.content || []);
+      // Fetch all products and update selectedProduct with the latest info
+      const data = await fetchAllProducts();
+      const updated = data?.content?.find((p: any) => p.productId === selectedProduct.productId);
+      if (updated) setSelectedProduct(updated);
     } catch (err: any) {
       alert('Failed to update product: ' + (err.message || 'Unknown error'));
     }
@@ -121,15 +169,42 @@ export default function ProductManager() {
           <h2 className="text-lg font-semibold text-gray-900">Products</h2>
           <p className="text-sm text-gray-500">Manage all products and their statuses</p>
         </div>
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          <div className="relative flex-1 sm:flex-none">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              type="search"
+              placeholder="Search by product ID or name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 w-64"
+            />
+          </div>
+        </div>
+      </div>
+      {/* Tabs filter */}
+      <div className="flex gap-2 mb-2">
+        {statusTabs.map(tab => (
+          <button
+            key={tab.key}
+            className={`px-4 py-2 rounded-t font-semibold border-b-2 ${activeTab === tab.key ? 'border-black text-black bg-white' : 'border-transparent text-gray-500 bg-gray-50'}`}
+            onClick={() => setActiveTab(tab.key as typeof activeTab)}
+          >
+            {tab.label}
+            <span className="ml-2 inline-block min-w-[1.5em] px-2 py-0.5 text-xs font-bold rounded-full bg-gray-200 text-gray-700 align-middle">
+              {getTabCount(tab.key)}
+            </span>
+          </button>
+        ))}
       </div>
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
-          {loading ? (
+          {allProductsLoading ? (
             <div className="flex items-center justify-center h-64">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
             </div>
-          ) : error ? (
-            <div className="text-red-600 py-8 text-center">{error}</div>
+          ) : allProductsError ? (
+            <div className="text-red-600 py-8 text-center">{allProductsError}</div>
           ) : (
             <table className="w-full">
               <thead>
@@ -144,8 +219,8 @@ export default function ProductManager() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {products && products.length > 0 ? (
-                  products.map((product) => (
+                {displayedProducts && displayedProducts.length > 0 ? (
+                  displayedProducts.map((product) => (
                     <tr key={product.productId} className="hover:bg-gray-50">
                       <td className="py-4 px-6 text-sm text-gray-900">{product.productId}</td>
                       <td className="py-4 px-6 text-sm text-gray-900">{product.title}</td>
@@ -158,14 +233,6 @@ export default function ProductManager() {
                       <td className="py-4 px-6 text-right">
                         <Button size="sm" variant="outline" onClick={() => handleViewDetail(product)}>
                           View Detail
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(product.productId)}
-                          className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 ml-2"
-                        >
-                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </td>
                     </tr>
@@ -197,171 +264,75 @@ export default function ProductManager() {
               </div>
               {/* Details */}
               <div className="flex-1 flex flex-col gap-4">
-                {/* Title & Description */}
-                {!isEditMode && (
-                  <div>
-                    <h3 className="text-2xl font-bold mb-2">{selectedProduct.title}</h3>
-                    <p className="text-gray-700 text-base mb-2 whitespace-pre-line">{selectedProduct.description}</p>
+                <div>
+                  <h3 className="text-2xl font-bold mb-2">{selectedProduct.title}</h3>
+                  <p className="text-gray-700 text-base mb-2 whitespace-pre-line">{selectedProduct.description}</p>
+                </div>
+                <div className="border-t pt-3 grid grid-cols-2 gap-x-8 gap-y-2 text-sm text-gray-700">
+                  <div><span className="font-semibold">Status:</span> <Badge variant={selectedProduct.status === 'ACTIVE' ? 'default' : 'secondary'}>{selectedProduct.status}</Badge></div>
+                  <div><span className="font-semibold">Condition:</span> {selectedProduct.condition}</div>
+                  <div><span className="font-semibold">Size:</span> {selectedProduct.size}</div>
+                  <div><span className="font-semibold">Color:</span> {selectedProduct.color}</div>
+                </div>
+                <div className="border-t pt-3 grid grid-cols-2 gap-x-8 gap-y-2 items-center">
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold">Price:</span>
+                    <span className="text-2xl font-bold text-black">${selectedProduct.price}</span>
                   </div>
-                )}
-                {/* Edit form or Detail view (not both) */}
-                {isEditMode ? (
-                  <form onSubmit={handleEditSubmit} className="space-y-4">
-                    <div>
-                      <label className="font-semibold">Title:</label>
-                      <input
-                        name="title"
-                        value={editForm.title}
-                        onChange={handleEditChange}
-                        className="border rounded px-2 py-1 w-full"
-                        required
-                      />
+                  {selectedProduct.hasDiscount && (
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold">Original Price:</span>
+                      <span className="line-through text-gray-400 text-lg">${selectedProduct.originalPrice}</span>
+                      <span className="font-semibold ml-4">Discount:</span>
+                      <span className="font-bold text-red-600">-{selectedProduct.discountPercentage}%</span>
                     </div>
-                    <div>
-                      <label className="font-semibold">Description:</label>
-                      <input
-                        name="description"
-                        value={editForm.description}
-                        onChange={handleEditChange}
-                        className="border rounded px-2 py-1 w-full"
-                        required
-                      />
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="flex-1">
-                        <label className="font-semibold">Price:</label>
-                        <input
-                          name="price"
-                          type="number"
-                          value={editForm.price}
-                          onChange={handleEditChange}
-                          className="border rounded px-2 py-1 w-full"
-                          required
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label className="font-semibold">Original Price:</label>
-                        <input
-                          name="originalPrice"
-                          type="number"
-                          value={editForm.originalPrice}
-                          onChange={handleEditChange}
-                          className="border rounded px-2 py-1 w-full"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="flex-1">
-                        <label className="font-semibold">Size:</label>
-                        <input
-                          name="size"
-                          value={editForm.size}
-                          onChange={handleEditChange}
-                          className="border rounded px-2 py-1 w-full"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label className="font-semibold">Color:</label>
-                        <input
-                          name="color"
-                          value={editForm.color}
-                          onChange={handleEditChange}
-                          className="border rounded px-2 py-1 w-full"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="flex-1">
-                        <label className="font-semibold">Status:</label>
-                        <select
-                          name="status"
-                          value={editForm.status}
-                          onChange={handleEditChange}
-                          className="border rounded px-2 py-1 w-full"
-                        >
-                          <option value="ACTIVE">ACTIVE</option>
-                          <option value="PENDING_PAYMENT">PENDING_PAYMENT</option>
-                          <option value="SOLD">SOLD</option>
-                          <option value="DELETED">DELETED</option>
-                        </select>
-                      </div>
-                      <div className="flex-1">
-                        <label className="font-semibold">Condition:</label>
-                        <select
-                          name="condition"
-                          value={editForm.condition}
-                          onChange={handleEditChange}
-                          className="border rounded px-2 py-1 w-full"
-                        >
-                          <option value="NEW">NEW</option>
-                          <option value="USED">USED</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="flex-1">
-                        <label className="font-semibold">Category ID:</label>
-                        <input
-                          name="categoryId"
-                          type="number"
-                          value={editForm.categoryId}
-                          onChange={handleEditChange}
-                          className="border rounded px-2 py-1 w-full"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label className="font-semibold">Brand ID:</label>
-                        <input
-                          name="brandId"
-                          type="number"
-                          value={editForm.brandId}
-                          onChange={handleEditChange}
-                          className="border rounded px-2 py-1 w-full"
-                        />
-                      </div>
-                    </div>
+                  )}
+                </div>
+                <div className="border-t pt-3 grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                  <div><span className="font-semibold">Brand:</span> {selectedProduct.brandName}</div>
+                  <div><span className="font-semibold">Category:</span> {selectedProduct.categoryName}</div>
+                </div>
+                <div className="border-t pt-3 grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                  <div><span className="font-semibold">Views:</span> {selectedProduct.viewsCount}</div>
+                  <div><span className="font-semibold">Likes:</span> {selectedProduct.likesCount}</div>
+                </div>
+                <div className="border-t pt-3 text-xs text-gray-500">
+                  <span className="font-semibold">Created:</span> {selectedProduct.createdAt}
+                </div>
+                <div className="flex flex-row gap-2 self-end mt-4">
+                  {activeTab === 'pending' && ['PENDING_PAYMENT', 'DRAFT'].includes(selectedProduct.status) && (
                     <div className="flex gap-2">
-                      <Button type="submit" size="sm" variant="default">Save</Button>
-                      <Button type="button" size="sm" variant="outline" onClick={() => setIsEditMode(false)}>Cancel</Button>
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        className="border-2 border-red-600 text-red-700 font-bold shadow flex items-center gap-2 transition-colors duration-150 hover:bg-red-100 hover:border-red-700 hover:text-red-800"
+                        onClick={async () => {
+                          await updateProduct(selectedProduct.productId, { status: 'INACTIVE' });
+                          toast.success('Product rejected!');
+                          fetchAllProducts();
+                          setSelectedProduct({ ...selectedProduct, status: 'INACTIVE' });
+                        }}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                        Reject
+                      </Button>
+                      <Button
+                        size="lg"
+                        variant="default"
+                        className="bg-green-600 hover:bg-green-700 text-white font-bold border-2 border-green-700 hover:border-green-800 shadow-lg flex items-center gap-2 transition-colors duration-150"
+                        onClick={async () => {
+                          await updateProduct(selectedProduct.productId, { status: 'ACTIVE' });
+                          toast.success('Product approved!');
+                          fetchAllProducts();
+                          setSelectedProduct({ ...selectedProduct, status: 'ACTIVE' });
+                        }}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                        Approve
+                      </Button>
                     </div>
-                  </form>
-                ) : (
-                  <>
-                    {/* Detail view here (all the detail layout you already have) */}
-                    <div className="border-t pt-3 grid grid-cols-2 gap-x-8 gap-y-2 text-sm text-gray-700">
-                      <div><span className="font-semibold">Status:</span> <Badge variant={selectedProduct.status === 'ACTIVE' ? 'default' : 'secondary'}>{selectedProduct.status}</Badge></div>
-                      <div><span className="font-semibold">Condition:</span> {selectedProduct.condition}</div>
-                      <div><span className="font-semibold">Size:</span> {selectedProduct.size}</div>
-                      <div><span className="font-semibold">Color:</span> {selectedProduct.color}</div>
-                    </div>
-                    <div className="border-t pt-3 grid grid-cols-2 gap-x-8 gap-y-2 items-center">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold">Price:</span>
-                        <span className="text-2xl font-bold text-black">${selectedProduct.price}</span>
-                      </div>
-                      {selectedProduct.hasDiscount && (
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold">Original Price:</span>
-                          <span className="line-through text-gray-400 text-lg">${selectedProduct.originalPrice}</span>
-                          <span className="font-semibold ml-4">Discount:</span>
-                          <span className="font-bold text-red-600">-{selectedProduct.discountPercentage}%</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="border-t pt-3 grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
-                      <div><span className="font-semibold">Brand:</span> {selectedProduct.brandName}</div>
-                      <div><span className="font-semibold">Category:</span> {selectedProduct.categoryName}</div>
-                    </div>
-                    <div className="border-t pt-3 grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
-                      <div><span className="font-semibold">Views:</span> {selectedProduct.viewsCount}</div>
-                      <div><span className="font-semibold">Likes:</span> {selectedProduct.likesCount}</div>
-                    </div>
-                    <div className="border-t pt-3 text-xs text-gray-500">
-                      <span className="font-semibold">Created:</span> {selectedProduct.createdAt}
-                    </div>
-                    <Button size="sm" variant="outline" className="self-end mt-4" onClick={handleEditOpen}>Edit</Button>
-                  </>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           )}

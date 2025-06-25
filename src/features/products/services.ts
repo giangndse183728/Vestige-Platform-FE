@@ -87,8 +87,34 @@ export const updateProduct = async (id: number, data: UpdateProductRequest) => {
   return response.data.data;
 };
 
-export const getAllProductStatuses = async (): Promise<any> => {
-  const response = await api.get('/products/admin/all-statuses');
+export const getAllProductStatuses = async (filters?: ProductFilters): Promise<any> => {
+  const params = new URLSearchParams();
+  if (filters?.search) params.append('search', filters.search);
+  if (filters?.minPrice) params.append('minPrice', filters.minPrice);
+  if (filters?.maxPrice) params.append('maxPrice', filters.maxPrice);
+  if (filters?.category) params.append('categoryId', filters.category);
+  if (filters?.brand) {
+    const brandIds = filters.brand.split(',').filter(Boolean);
+    brandIds.forEach(brandId => {
+      params.append('brandId', brandId.trim());
+    });
+  }
+  if (filters?.condition) {
+    const conditions = filters.condition.split(',').filter(Boolean);
+    conditions.forEach(condition => {
+      params.append('condition', condition.trim());
+    });
+  }
+  if (filters?.sortDir) params.append('sortDir', filters.sortDir);
+  if (filters?.sortBy) params.append('sortBy', filters.sortBy);
+  if (filters?.status) params.append('status', filters.status);
+  if (filters?.sellerId) params.append('sellerId', filters.sellerId);
+  if (filters?.page !== undefined) params.append('page', filters.page);
+  if (filters?.size !== undefined) params.append('size', filters.size);
+
+  const queryString = params.toString();
+  const url = queryString ? `/products/admin/all-statuses?${queryString}` : '/products/admin/all-statuses';
+  const response = await api.get(url);
   return response.data.data;
 };
 
