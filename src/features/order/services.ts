@@ -30,3 +30,54 @@ export const getOrderById = async (orderId: number): Promise<Order> => {
   const response = await api.get<ApiResponse<Order>>(`/orders/${orderId}`);
   return response.data.data;
 };
+
+// ADMIN ORDER SERVICES
+export const getAdminTransactions = async () => {
+  const response = await api.get('/orders/admin/transactions');
+  return response.data;
+};
+
+export const getAdminProblemTransactions = async () => {
+  const response = await api.get('/orders/admin/transactions/problems');
+  return response.data;
+};
+
+export const getAdminTransactionAnalytics = async () => {
+  const response = await api.get('/orders/admin/transactions/analytics');
+  return response.data;
+};
+
+export const getAdminOrderStatistics = async () => {
+  const response = await api.get('/orders/admin/statistics');
+  return response.data;
+};
+
+export const getAdminOrderTimeline = async (orderId: string | number) => {
+  const response = await api.get(`/orders/admin/orders/${orderId}/timeline`);
+  return response.data;
+};
+
+export const getAdminExportOrders = async () => {
+  const response = await api.get('/orders/admin/orders/export');
+  return response.data;
+};
+
+export const getAdminSellerAnalytics = async () => {
+  const response = await api.get('/orders/admin/analytics/sellers');
+  return response.data;
+};
+
+export const getAdminRevenueAnalytics = async () => {
+  const response = await api.get('/orders/admin/analytics/revenue');
+  return response.data;
+};
+
+export const getAdminBuyerAnalytics = async () => {
+  const response = await api.get('/orders/admin/analytics/buyers');
+  return response.data;
+};
+
+export const getAdminAllOrders = async () => {
+  const response = await api.get('/orders/admin/all');
+  return response.data;
+};

@@ -20,6 +20,13 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import OrderManager from './OrderManager';
+import {
+  getAdminTransactionAnalytics,
+  getAdminOrderStatistics,
+  getAdminRevenueAnalytics
+} from '@/features/order/services';
+import { Tabs as UITabs, TabsList as UITabsList, TabsTrigger as UITabsTrigger, TabsContent as UITabsContent } from "@/components/ui/tabs";
 
 // Mock data for the dashboard
 const mockStats = [
@@ -41,10 +48,31 @@ const tabs = [
   { id: "categories", label: "Categories", icon: Tag },
   { id: "brands", label: "Brands", icon: Briefcase },
   { id: "all-products", label: "All Product", icon: FileText },
+  { id: "order-management", label: "Order Management", icon: ShoppingBag },
 ];
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (activeTab !== 'overview') return;
+    setLoading(true);
+    setError(null);
+    Promise.all([
+      getAdminTransactionAnalytics(),
+      getAdminOrderStatistics(),
+      getAdminRevenueAnalytics()
+    ]).then(([transactionAnalytics, orderStatistics, revenueAnalytics]) => {
+      setStats({ transactionAnalytics, orderStatistics, revenueAnalytics });
+    }).catch((err) => {
+      setError(err?.response?.data?.message || err.message || 'Error fetching analytics');
+    }).finally(() => {
+      setLoading(false);
+    });
+  }, [activeTab]);
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -54,83 +82,146 @@ export default function AdminDashboard() {
         return <BrandManager />;
       case "all-products":
         return <ProductManager />;
+      case "order-management":
+        return <OrderManager />;
       default:
         return (
           <>
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              {mockStats.map((stat, index) => (
+              {loading ? (
+                Array.from({ length: 8 }).map((_, idx) => (
+                  <Card key={idx} className="p-6 animate-pulse h-32" />
+                ))
+              ) : error ? (
+                <div className="col-span-4 text-red-500">{error}</div>
+              ) : stats ? ([
+                {
+                  title: "Total Transactions",
+                  value: stats.transactionAnalytics?.data?.totalTransactions ?? 0,
+                  icon: ShoppingBag,
+                },
+                {
+                  title: "Total Volume",
+                  value: stats.transactionAnalytics?.data?.totalVolume?.toLocaleString('vi-VN') ?? 0,
+                  icon: BarChart3,
+                },
+                {
+                  title: "Total Revenue",
+                  value: stats.revenueAnalytics?.data?.totalRevenue?.toLocaleString('vi-VN') ?? 0,
+                  icon: BarChart3,
+                },
+                {
+                  title: "Today Orders",
+                  value: stats.orderStatistics?.data?.todayOrders ?? 0,
+                  icon: ShoppingBag,
+                },
+                {
+                  title: "Total Orders",
+                  value: stats.orderStatistics?.data?.totalOrders ?? 0,
+                  icon: ShoppingBag,
+                },
+                {
+                  title: "Avg Transaction Value",
+                  value: stats.transactionAnalytics?.data?.avgTransactionValue?.toLocaleString('vi-VN') ?? 0,
+                  icon: BarChart3,
+                },
+                {
+                  title: "Dispute Rate",
+                  value: (stats.transactionAnalytics?.data?.disputeRate * 100 || 0).toFixed(2) + '%',
+                  icon: Bell,
+                },
+                {
+                  title: "Paid Orders",
+                  value: stats.orderStatistics?.data?.statusBreakdown?.PAID ?? 0,
+                  icon: BarChart3,
+                },
+              ].map((stat, index) => (
                 <motion.div
                   key={stat.title}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
+                  transition={{ delay: index * 0.05 }}
                 >
                   <Card className="p-6">
                     <div className="flex items-center justify-between mb-4">
                       <div className="p-2 bg-gray-50 rounded-lg">
                         <stat.icon className="h-5 w-5 text-gray-600" />
                       </div>
-                      <Badge variant={stat.change.startsWith('+') ? "default" : "destructive"}>
-                        {stat.change}
-                      </Badge>
                     </div>
                     <h3 className="text-2xl font-semibold text-gray-900 mb-1">{stat.value}</h3>
                     <p className="text-sm text-gray-500">{stat.title}</p>
                   </Card>
                 </motion.div>
-              ))}
+              ))) : null}
             </div>
-
-            {/* Main Content */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Recent Orders */}
-              <Card className="lg:col-span-3">
-                <div className="p-6 border-b">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-semibold text-gray-900">Recent Orders</h2>
-                    <Button variant="link" className="text-blue-600 hover:text-blue-700">
-                      View All
-                    </Button>
-                  </div>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="bg-gray-50">
-                        <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
-                        <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                        <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                        <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                        <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {mockRecentOrders.map((order) => (
-                        <tr key={order.id} className="hover:bg-gray-50">
-                          <td className="py-4 px-6 text-sm text-gray-900">{order.id}</td>
-                          <td className="py-4 px-6 text-sm text-gray-900">{order.customer}</td>
-                          <td className="py-4 px-6 text-sm text-gray-900">{order.product}</td>
-                          <td className="py-4 px-6 text-sm text-gray-900">{order.amount}</td>
-                          <td className="py-4 px-6">
-                            <Badge
-                              variant={
-                                order.status === "Completed" ? "default" :
-                                order.status === "Processing" ? "default" :
-                                order.status === "Shipped" ? "secondary" :
-                                "destructive"
-                              }
-                            >
-                              {order.status}
-                            </Badge>
-                          </td>
+            {/* Card tổng hợp breakdown dạng tab */}
+            {stats && (
+              <Card className="p-6 mt-6">
+                <h3 className="text-lg font-semibold mb-4">Platform Status</h3>
+                <UITabs defaultValue="order" className="w-full">
+                  <UITabsList className="mb-4">
+                    <UITabsTrigger value="order">Order Status</UITabsTrigger>
+                    <UITabsTrigger value="transaction">Transaction Status</UITabsTrigger>
+                    <UITabsTrigger value="escrow">Escrow Status</UITabsTrigger>
+                  </UITabsList>
+                  <UITabsContent value="order">
+                    <table className="min-w-full border rounded-xl shadow-sm overflow-hidden">
+                      <thead className="bg-gray-100">
+                        <tr>
+                          <th className="py-3 px-4 text-xs font-bold text-gray-700 text-center uppercase tracking-wider">Status</th>
+                          <th className="py-3 px-4 text-xs font-bold text-gray-700 text-center uppercase tracking-wider">Count</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {stats.orderStatistics?.data?.statusBreakdown && Object.entries(stats.orderStatistics.data.statusBreakdown).map(([key, value]) => (
+                          <tr key={key} className="border-b last:border-b-0 hover:bg-gray-50 transition">
+                            <td className="py-3 px-4 text-center capitalize">{key.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}</td>
+                            <td className="py-3 px-4 text-center font-bold">{value as any}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </UITabsContent>
+                  <UITabsContent value="transaction">
+                    <table className="min-w-full border rounded-xl shadow-sm overflow-hidden">
+                      <thead className="bg-gray-100">
+                        <tr>
+                          <th className="py-3 px-4 text-xs font-bold text-gray-700 text-center uppercase tracking-wider">Status</th>
+                          <th className="py-3 px-4 text-xs font-bold text-gray-700 text-center uppercase tracking-wider">Count</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {stats.transactionAnalytics?.data?.transactionStatusBreakdown && Object.entries(stats.transactionAnalytics.data.transactionStatusBreakdown).map(([key, value]) => (
+                          <tr key={key} className="border-b last:border-b-0 hover:bg-gray-50 transition">
+                            <td className="py-3 px-4 text-center capitalize">{key.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}</td>
+                            <td className="py-3 px-4 text-center font-bold">{value as any}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </UITabsContent>
+                  <UITabsContent value="escrow">
+                    <table className="min-w-full border rounded-xl shadow-sm overflow-hidden">
+                      <thead className="bg-gray-100">
+                        <tr>
+                          <th className="py-3 px-4 text-xs font-bold text-gray-700 text-center uppercase tracking-wider">Status</th>
+                          <th className="py-3 px-4 text-xs font-bold text-gray-700 text-center uppercase tracking-wider">Count</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {stats.transactionAnalytics?.data?.escrowStatusBreakdown && Object.entries(stats.transactionAnalytics.data.escrowStatusBreakdown).map(([key, value]) => (
+                          <tr key={key} className="border-b last:border-b-0 hover:bg-gray-50 transition">
+                            <td className="py-3 px-4 text-center capitalize">{key.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}</td>
+                            <td className="py-3 px-4 text-center font-bold">{value as any}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </UITabsContent>
+                </UITabs>
               </Card>
-            </div>
+            )}
           </>
         );
     }
