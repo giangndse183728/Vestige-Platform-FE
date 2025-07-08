@@ -1,12 +1,12 @@
 'use client';
 
 import { ProductDetail } from '@/features/products/components/ProductDetail';
-import { useProductDetail } from '@/features/products/hooks/useProductDetail';
+import { useProductDetailBySlug } from '@/features/products/hooks/useProductDetail';
 import { use } from 'react';
 
-export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
+export default function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = use(params);
-  const { data: product, isLoading, error } = useProductDetail(resolvedParams.id);
+  const { data: product, isLoading, error } = useProductDetailBySlug(resolvedParams.slug);
 
   if (isLoading) {
     return (

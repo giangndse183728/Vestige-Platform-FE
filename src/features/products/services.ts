@@ -77,6 +77,11 @@ export const getMyProductDetail = async (id: string): Promise<ProductDetail> => 
   return response.data.data;
 };
 
+export const getProductBySlug = async (slug: string): Promise<ProductDetail> => {
+  const response = await api.get<ApiResponse<ProductDetail>>(`/products/slug/${slug}`);
+  return response.data.data;
+};
+
 export const createProduct = async (data: CreateProductRequest) => {
   const response = await api.post<ApiResponse<any>>('/products', data);
   return response.data.data;

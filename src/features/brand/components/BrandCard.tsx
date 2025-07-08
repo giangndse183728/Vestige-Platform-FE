@@ -42,7 +42,7 @@ export function BrandCard({ brand }: BrandCardProps) {
         </div>
         
         <CardContent className="p-4">
-          <h3 className="font-metal text-lg font-bold mb-2 leading-tight truncate" title={brand.name}>
+          <h3 className="font-metal text-lg mb-2 leading-tight truncate" title={brand.name}>
             {brand.name}
           </h3>
           

@@ -20,6 +20,7 @@ import { formatVNDInput, unformatVND } from '@/utils/format';
 import { useDebounce } from '@/hooks/useDebounce';
 import { Card } from '../ui/card';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 
 interface FilterProductLayoutProps {
   children: React.ReactNode;
@@ -36,6 +37,7 @@ const conditions = [
 export function FilterProductLayout({ children }: FilterProductLayoutProps) {
   const { data: brands, isLoading: isLoadingBrands } = useBrands();
   const { data: categories, isLoading: isLoadingCategories } = useCategories();
+  const searchParams = useSearchParams();
   
   const {
     filters,
@@ -43,6 +45,9 @@ export function FilterProductLayout({ children }: FilterProductLayoutProps) {
     updateFilter,
     clearFilters: clearStoreFilters
   } = useFiltersStore();
+  
+  // Get category name from URL params
+  const categoryName = searchParams.get('name');
   
   const [priceRange, setPriceRange] = useState([
     filters.minPrice ? parseInt(filters.minPrice) : 0,
@@ -480,7 +485,7 @@ export function FilterProductLayout({ children }: FilterProductLayoutProps) {
                     )}
                     {filters.category && filters.category !== 'all' && (
                       <Badge variant="outline" className="border-2 border-red-600 text-red-600 font-serif">
-                        Category: {categories?.find(cat => cat.categoryId.toString() === filters.category)?.name || filters.category}
+                        {categoryName || filters.category}
                       </Badge>
                     )}
                     {selectedBrands.map(brandId => {
