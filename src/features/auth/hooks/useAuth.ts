@@ -11,7 +11,6 @@ import {
 } from '@/features/auth/schema';
 import { toast } from 'sonner';
 import { useProfile } from '@/features/profile/hooks/useProfile';
-import { jwtDecode } from 'jwt-decode';
 
 export const useLogin = () => {
   const router = useRouter();
@@ -21,16 +20,18 @@ export const useLogin = () => {
     mutationFn: (credentials: LoginFormData) => login(credentials),
     onSuccess: (data: LoginResponse) => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
-      toast.success('Login successful!');
-      try {
-        const decoded: any = jwtDecode(data.accessToken);
-        if (decoded.role === 'ADMIN') {
-          router.push('/admin');
+      toast.success('Login successful!');   
+      if (data.role === 'ADMIN') {
+        router.push('/admin');
+      } else {
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectTo = urlParams.get('redirect');
+        
+        if (redirectTo) {
+          router.push(redirectTo);
         } else {
           router.push('/');
         }
-      } catch (e) {
-        router.push('/');
       }
     },
     onError: (error: Error) => {
@@ -48,10 +49,15 @@ export const useSignup = () => {
       const { confirmPassword, ...payload } = formData;
       return signup(payload);
     },
-    onSuccess: () => {
+    onSuccess: (data: SignupResponse) => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
       toast.success('Account created successfully!');
-      router.push('/');
+      
+      if (data.role === 'ADMIN') {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Registration failed');
@@ -66,8 +72,6 @@ export const useLogout = () => {
   return useMutation({
     mutationFn: () => logout(),
     onSuccess: () => {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
       queryClient.clear();
       toast.success('Logged out successfully');
       router.push('/login');

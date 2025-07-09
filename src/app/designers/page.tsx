@@ -5,7 +5,7 @@ import { BrandCard } from '@/features/brand/components/BrandCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, Filter } from 'lucide-react';
+import { Search, Filter, Star, Award, TrendingUp, Zap, Crown, Flame } from 'lucide-react';
 import { useState } from 'react';
 import { format } from 'date-fns';
 
@@ -17,134 +17,193 @@ export default function DesignersPage() {
     brand.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Layout distribution similar to editorial
-  const featuredBrands = filteredBrands?.slice(0, 6) || [];
-  const remainingBrands = filteredBrands?.slice(8) || [];
+  // Different layout distribution
+  const featuredBrand = filteredBrands?.[0];
+  const topBrands = filteredBrands?.slice(1, 4) || [];
+  const mainBrands = filteredBrands?.slice(4, 10) || [];
+  const remainingBrands = filteredBrands?.slice(10) || [];
 
   return (
-    <div className="container mx-auto px-2 py-8 mt-8 bg-black/10">
-      <div className="max-w-8xl mx-auto">
-        {/* Editorial Style Header */}
-        <div className="mb-12 relative border-b-6 border-black pb-8">
-          <div className="text-center mb-2 p-4">
-            <div className="relative inline-block">
-              <h1 className="text-7xl font-metal tracking-widest">THE DESIGNERS HERALD</h1>
-            </div>
-            <div className="flex justify-center mt-4 space-x-8">
-              <span className="text-sm font-metal">VOLUME I</span>
-              <span className="text-sm font-metal">•</span>
-              <span className="text-sm font-metal">{format(new Date(), 'EEEE, MMMM d, yyyy').toUpperCase()}</span>
-              <span className="text-sm font-metal">•</span>
-              <span className="text-sm font-metal">FASHION EDITION</span>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-red-50 to-amber-50">
+      {/* Modern Header */}
+      <div className="bg-white shadow-2xl border-b-4 border-black">
+        <div className="container mx-auto px-4 py-8 mt-10">
+          {/* Magazine Masthead */}
+          <div className="text-center mb-6">
+            <h1 className="font-metal text-7xl text-gray-900 mb-2 tracking-tight">
+              THE DESIGNERS   <span className=" text-5xl text-red-900 mt-2">HERALD</span>
+            </h1>
+            
+            <div className="flex items-center justify-center space-x-8 mt-6 text-sm font-gothic text-gray-700">
+              <span>{format(new Date(), 'MMMM d, yyyy').toUpperCase()}</span>
+              <div className="w-2 h-2 bg-red-900 rounded-full"></div>
+              <span>FASHION & STYLE</span>
+              <div className="w-2 h-2 bg-red-900 rounded-full"></div>
+              <span>WORLDWIDE CIRCULATION</span>
             </div>
           </div>
-          
-          <div className="flex items-center justify-between">
-            <div className="relative w-[350px]">
+
+          {/* Search Bar */}
+          <div className="max-w-2xl mx-auto">
+            <div className="relative">
               <Input 
                 type="text" 
-                placeholder="Search designers..." 
+                placeholder="Discover fashion designers..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 text-lg border-2 border-black focus:border-red-900 focus:ring-red-900"
+                className="w-full pl-14 pr-6 py-4 text-lg border-3 border-red-900 focus:border-black focus:ring-black bg-white font-gothic rounded-none shadow-lg"
               />
-              <Search 
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" 
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" className="font-metal border-2 border-black hover:bg-red-900 hover:text-white text-xs px-3 py-2">ALL</Button>
-              <Button variant="outline" className="font-metal border-2 border-black hover:bg-red-900 hover:text-white text-xs px-3 py-2">LUXURY</Button>
-              <Button variant="outline" className="font-metal border-2 border-black hover:bg-red-900 hover:text-white text-xs px-3 py-2">STREETWEAR</Button>
-              <Button variant="outline" className="font-metal border-2 border-black hover:bg-red-900 hover:text-white text-xs px-3 py-2">VINTAGE</Button>
-              <Button variant="outline" className="font-metal border-2 border-black hover:bg-red-900 hover:text-white text-xs px-3 py-2">CONTEMPORARY</Button>
+              <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 w-6 h-6 text-red-900" />
+              <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                <Button size="sm" className="bg-red-900 hover:bg-red-800 text-white font-metal">
+                  SEARCH
+                </Button>
+              </div>
             </div>
           </div>
         </div>
+      </div>
 
+      <div className="container mx-auto px-4 py-6">
         {/* Loading State */}
         {isLoading && (
-          <div className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-px gap-y-px bg-black border-2 border-black">
-              {Array.from({ length: 8 }).map((_, index) => (
-                <div key={index} className="bg-white p-6">
-                  <Skeleton className="h-40 w-full mb-4" />
-                  <Skeleton className="h-6 w-3/4 mx-auto" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <div key={index} className="bg-white border-4 border-red-900 shadow-lg">
+                <Skeleton className="h-48 w-full" />
+                <div className="p-4">
+                  <Skeleton className="h-6 w-3/4 mb-2" />
+                  <Skeleton className="h-4 w-1/2" />
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         )}
 
-        {/* Brands Content */}
+        {/* Main Content */}
         {!isLoading && (
-          <div className="space-y-8">
-            {/* Featured Brands Section */}
-            {featuredBrands.length > 0 && (
-              <section className="grid grid-cols-12 gap-6">
-                {/* Main Featured Brand */}
-                {featuredBrands[0] && (
-                  <div className="col-span-12 lg:col-span-8">
-                    <div className="relative border-4 border-black bg-gradient-to-br from-[#fafafa] to-[#f0f0f0] shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] hover:shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] transition-all duration-300">
-                      <div className="absolute top-4 left-4 bg-red-900 text-white px-3 py-1 font-metal text-xs z-10">
-                        FEATURED
+          <div className="space-y-16">
+            {/* Hero Section */}
+            {featuredBrand && (
+              <section className="relative">
+                                 <div className="absolute top-0 left-0 bg-red-900 text-white px-6 py-2 font-metal text-lg tracking-wider z-10 transform -rotate-2">
+                   <Flame className="w-5 h-5 inline mr-2" />
+                   SPOTLIGHT
+                 </div>
+                <div className="bg-white border-6 border-black shadow-2xl p-8 mt-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <div className="order-2 lg:order-1">
+                      <div className="space-y-6">
+                        <div className="flex items-center space-x-3">          
+                        </div>
+                        <h2 className="font-metal text-6xl text-gray-900 leading-tight">
+                          {featuredBrand.name}
+                        </h2>
+                        <p className="font-gothic text-xl text-gray-700 leading-relaxed">
+                          Pioneering the future of fashion with revolutionary designs that challenge conventional 
+                          boundaries and redefine modern elegance.
+                        </p>
+                        <div className="flex items-center space-x-6">
+                          <Button className="bg-red-900 hover:bg-red-800 text-white font-metal text-lg px-8 py-4">
+                            EXPLORE COLLECTION
+                          </Button>
+                          <div className="text-center">
+                            <p className="font-gothic text-sm text-gray-600">ESTABLISHED</p>
+                            <p className="font-metal text-2xl text-red-900">
+                              {featuredBrand.createdAt ? new Date(featuredBrand.createdAt).getFullYear() : '2025'}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                      <div className="relative h-80 border-b-4 border-black bg-gray-100 flex items-center justify-center">
-                        {featuredBrands[0].logoUrl ? (
+                    </div>
+                    <div className="order-1 lg:order-2">
+                      <div className="relative h-80 bg-gradient-to-br from-gray-100 to-gray-200 border-4 border-red-900">
+                        {featuredBrand.logoUrl ? (
                           <img
-                            src={featuredBrands[0].logoUrl}
-                            alt={featuredBrands[0].name}
-                            className="max-w-full max-h-full object-contain p-8"
+                            src={featuredBrand.logoUrl}
+                            alt={featuredBrand.name}
+                            className="w-full h-full object-contain p-12"
                           />
                         ) : (
-                          <div className="text-gray-400 text-center">
-                            <div className="text-6xl mb-4">🏷️</div>
-                            <p className="font-gothic">No Logo Available</p>
+                          <div className="w-full h-full flex items-center justify-center text-gray-400">
+                            <div className="text-center">
+                              <div className="text-8xl mb-4">🎨</div>
+                              <p className="font-gothic text-2xl">SIGNATURE BRAND</p>
+                            </div>
                           </div>
                         )}
                       </div>
-                      <div className="p-8">
-                        <div className="mb-4 flex items-center justify-between">
-                          <span className="text-lg font-metal text-red-800 uppercase tracking-wider">FEATURED DESIGNER</span>
-                          <span className="text-sm text-gray-500">
-                            Est. {featuredBrands[0].createdAt ? new Date(featuredBrands[0].createdAt).getFullYear() : '2025'}
-                          </span>
-                        </div>
-                        <h2 className="font-gothic text-5xl mb-6 leading-tight">
-                          {featuredBrands[0].name}
-                        </h2>
-                        <p className="text-gray-700 text-xl leading-relaxed mb-6">
-                          Discover the latest collections and timeless pieces from this iconic fashion house.
-                        </p>
-                        <Button className="text-red-800 hover:text-red-900 font-metal text-lg border-2 border-red-800 hover:bg-red-800 hover:text-white px-6 py-2">
-                          Explore Collection →
-                        </Button>
-                      </div>
                     </div>
-                  </div>
-                )}
-
-                {/* Sidebar Brands */}
-                <div className="col-span-12 lg:col-span-4 space-y-4">
-                  <div className="bg-black text-white p-2 text-center">
-                    <h3 className="font-metal text-sm tracking-wider">TRENDING DESIGNERS</h3>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    {featuredBrands.slice(1, 5).map((brand) => (
-                      <BrandCard key={brand.brandId} brand={brand} />
-                    ))}
                   </div>
                 </div>
               </section>
             )}
 
-            {/* Remaining Brands Grid */}
+            {/* Top Designers Row */}
+            {topBrands.length > 0 && (
+              <section>
+                <div className="text-center mb-8">
+                  <h3 className="font-metal text-4xl text-gray-900 mb-2">TOP DESIGNERS</h3>
+                  <div className="w-24 h-1 bg-red-900 mx-auto"></div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {topBrands.map((brand, index) => (
+                    <div key={brand.brandId} className="relative group">
+                     
+                      <div className="bg-white border-4 border-red-900 shadow-lg transform group-hover:scale-105 transition-transform duration-300">
+                        <BrandCard brand={brand} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Magazine Grid Layout */}
+            {mainBrands.length > 0 && (
+              <section>
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h3 className="font-metal text-4xl text-gray-900 mb-2">TRENDING NOW</h3>
+                    <div className="w-16 h-1 bg-red-900"></div>
+                  </div>
+                  <div className="flex items-center space-x-2 text-red-900">
+                    <Zap className="w-6 h-6" />
+                    <span className="font-metal text-lg">HOT PICKS</span>
+                  </div>
+                </div>
+                
+                                 {/* Uniform grid */}
+                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                   {mainBrands.map((brand, index) => (
+                     <div key={brand.brandId} className="relative group">
+                      {index % 3 === 0 && (
+                        <div className="absolute -top-2 -left-2 bg-red-900 text-white px-3 py-1 font-metal text-xs transform -rotate-6 z-10">
+                          TRENDING
+                        </div>
+                      )}
+                      <div className="bg-white border-4 border-red-900 shadow-lg transform group-hover:-translate-y-2 transition-transform duration-300">
+                        <BrandCard brand={brand} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Remaining Brands */}
             {remainingBrands.length > 0 && (
-              <section className="border-t-4 border-black mt-8 pt-8">
-                <h2 className="text-3xl font-metal text-center mb-8">More Designers</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-px gap-y-px  border-2 border-black">
+              <section>
+                <div className="text-center mb-8">
+                  <h3 className="font-metal text-4xl text-gray-900 mb-2">ALL DESIGNERS</h3>
+                  <p className="font-gothic text-lg text-gray-600">Complete Fashion Directory</p>
+                  <div className="w-32 h-1 bg-red-900 mx-auto mt-4"></div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {remainingBrands.map((brand) => (
-                    <BrandCard key={brand.brandId} brand={brand} />
+                    <div key={brand.brandId} className="bg-white border-4 border-red-900 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                      <BrandCard brand={brand} />
+                    </div>
                   ))}
                 </div>
               </section>
@@ -152,19 +211,49 @@ export default function DesignersPage() {
 
             {/* Empty State */}
             {!isLoading && filteredBrands?.length === 0 && (
-              <div className="text-center py-20 bg-gray-50 border-2 border-dashed border-gray-300">
-                <p className="text-xl font-serif text-gray-600">No designers found.</p>
-                <p className="mt-2 text-gray-500">Try adjusting your search criteria.</p>
+              <div className="text-center py-24">
+                <div className="bg-white border-8 border-red-900 shadow-2xl p-16 max-w-2xl mx-auto">
+                  <div className="text-8xl mb-8 text-red-900">🔍</div>
+                  <h3 className="font-metal text-4xl text-gray-900 mb-4">NO DESIGNERS FOUND</h3>
+                  <p className="font-gothic text-xl text-gray-600 mb-8">
+                    Your search didn't match any designers in our directory.
+                  </p>
+                  <Button 
+                    onClick={() => setSearchQuery('')}
+                    className="bg-red-900 hover:bg-red-800 text-white font-metal text-lg px-8 py-4"
+                  >
+                    VIEW ALL DESIGNERS
+                  </Button>
+                </div>
               </div>
             )}
           </div>
         )}
 
         {/* Footer */}
-        <div className="mt-12 border-t-4 border-black pt-6 text-center bg-white/90 p-6 rounded-lg">
-          <p className="font-gothic text-sm text-gray-500">
-            THE DESIGNERS HERALD • Published by Fashion Editorial Board • All Rights Reserved
-          </p>
+        <div className="mt-24 bg-white border-8 border-red-900 shadow-2xl">
+          <div className="bg-gradient-to-r from-red-900 to-red-700 text-white p-8 text-center">
+            <h4 className="font-metal text-3xl mb-4">THE DESIGNERS HERALD</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+              <div>
+                <h5 className="font-metal text-lg mb-2">EDITORIAL TEAM</h5>
+                <p className="font-gothic text-red-100">Fashion Industry Experts</p>
+              </div>
+              <div>
+                <h5 className="font-metal text-lg mb-2">CIRCULATION</h5>
+                <p className="font-gothic text-red-100">Global Fashion Community</p>
+              </div>
+              <div>
+                <h5 className="font-metal text-lg mb-2">ESTABLISHED</h5>
+                <p className="font-gothic text-red-100">2025 • Fashion Forward</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-6 text-center bg-gray-50">
+            <p className="font-gothic text-sm text-gray-600">
+              © 2025 The Designers Herald • All Rights Reserved • Premium Fashion Directory
+            </p>
+          </div>
         </div>
       </div>
     </div>

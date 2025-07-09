@@ -6,31 +6,21 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true,
 });
 
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
 interface FailedQueueItem {
-  resolve: (token: string) => void;
+  resolve: (value: any) => void;
   reject: (err: unknown) => void;
 }
 
 let isRefreshing = false;
 let failedQueue: FailedQueueItem[] = [];
 
-const processQueue = (error: unknown, token: string | null = null) => {
+const processQueue = (error: unknown, success: boolean = false) => {
   failedQueue.forEach((prom) => {
-    if (token) {
-      prom.resolve(token);
+    if (success) {
+      prom.resolve(true);
     } else {
       prom.reject(error);
     }
@@ -50,10 +40,7 @@ api.interceptors.response.use(
       if (isRefreshing) {
         return new Promise(function (resolve, reject) {
           failedQueue.push({
-            resolve: (token: string) => {
-              originalRequest.headers.Authorization = "Bearer " + token;
-              resolve(api(originalRequest));
-            },
+            resolve: () => resolve(api(originalRequest)),
             reject: (err: unknown) => reject(err),
           });
         });
@@ -62,41 +49,42 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const refreshToken = localStorage.getItem("refreshToken");
-        
-        if (!refreshToken) {
-          throw new Error("No refresh token available");
-        }
-
         const res = await axios.post(
           `${process.env.NEXT_PUBLIC_APP_API_URL || "http://localhost:3001/api"}/auth/refresh`,
-          { refreshToken },
+          {},
           {
             headers: {
               "Content-Type": "application/json",
             },
-          
+            withCredentials: true,
           }
         );
 
-        if (res.data?.accessToken) {
-          localStorage.setItem("accessToken", res.data.accessToken);
-          if (res.data.refreshToken) {
-            localStorage.setItem("refreshToken", res.data.refreshToken);
-          }
-          
-          processQueue(null, res.data.accessToken);
-          originalRequest.headers.Authorization = `Bearer ${res.data.accessToken}`;
-
+        if (res.status === 200) {
+          processQueue(null, true);
           return api(originalRequest);
         } else {
-          throw new Error("Invalid refresh token response");
+          throw new Error("Token refresh failed");
         }
       } catch (err) {
-        processQueue(err, null);
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-    
+        processQueue(err, false);
+        
+        try {
+          await axios.post(
+            `${process.env.NEXT_PUBLIC_APP_API_URL || "http://localhost:3001/api"}/auth/logout`,
+            {},
+            {
+              withCredentials: true,
+            }
+          );
+        } catch (logoutError) {
+          // Ignore logout errors
+        }
+        
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
+        
         return Promise.reject(err);
       } finally {
         isRefreshing = false;

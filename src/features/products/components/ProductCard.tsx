@@ -36,7 +36,7 @@ export function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <Link href={`/products/${product.productId}`}>
+    <Link href={`/products/${product.slug}`}>
       <div className="group relative bg-white/90 backdrop-blur-sm overflow-hidden border-2 border-black -mr-[2px] -mb-[2px]">
         <div className="absolute top-0 right-0 z-10 px-3 py-1 bg-black text-white text-xs font-metal uppercase shadow-sm">
           {product.condition}

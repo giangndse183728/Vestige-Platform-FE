@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, X, Heart, DollarSign, Tag, Package, Filter, ChevronDown, ChevronUp } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,9 @@ import { Brand } from '@/features/brand/schema';
 import { useFiltersStore } from '@/features/products/hooks/useFilters';
 import { formatVNDInput, unformatVND } from '@/utils/format';
 import { useDebounce } from '@/hooks/useDebounce';
+import { Card } from '../ui/card';
+import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 
 interface FilterProductLayoutProps {
   children: React.ReactNode;
@@ -34,6 +37,7 @@ const conditions = [
 export function FilterProductLayout({ children }: FilterProductLayoutProps) {
   const { data: brands, isLoading: isLoadingBrands } = useBrands();
   const { data: categories, isLoading: isLoadingCategories } = useCategories();
+  const searchParams = useSearchParams();
   
   const {
     filters,
@@ -41,6 +45,9 @@ export function FilterProductLayout({ children }: FilterProductLayoutProps) {
     updateFilter,
     clearFilters: clearStoreFilters
   } = useFiltersStore();
+  
+  // Get category name from URL params
+  const categoryName = searchParams.get('name');
   
   const [priceRange, setPriceRange] = useState([
     filters.minPrice ? parseInt(filters.minPrice) : 0,
@@ -143,13 +150,13 @@ export function FilterProductLayout({ children }: FilterProductLayoutProps) {
       <div className="container mx-auto py-6">
         <div className="flex flex-col lg:flex-row">
           <aside className="lg:w-80 w-full">
-            <div className="lg:sticky lg:top-16">
+            <div className="lg:sticky lg:top-16 ">
               <div className="bg-white border-b-4 border-black shadow-lg">
                 <div className="bg-black text-white p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Filter className="w-5 h-5" />
-                      <span className="font-serif text-lg font-bold">FILTERS</span>
+                      <span className="font-gothic text-md ">FILTERS</span>
                       {activeFilterCount > 0 && (
                         <Badge variant="secondary" className="bg-red-600 text-white text-xs">
                           {activeFilterCount}
@@ -168,7 +175,7 @@ export function FilterProductLayout({ children }: FilterProductLayoutProps) {
                 </div>
 
                 {isFilterExpanded && (
-                  <div className="p-6 space-y-8 max-h-[calc(100vh-120px)] overflow-y-auto">
+                  <div className="p-6 space-y-8 max-h-[calc(100vh-120px)] pt-10 overflow-y-auto">
                     <div className="space-y-4">
                       <Button
                         variant="ghost"
@@ -348,7 +355,7 @@ export function FilterProductLayout({ children }: FilterProductLayoutProps) {
                       <Button
                         variant="ghost"
                         onClick={() => setIsConditionsExpanded(!isConditionsExpanded)}
-                        className="flex items-center justify-between w-full gap-2 border-b-2 border-dotted border-gray-300 pb-2 hover:bg-gray-50 transition-colors p-0 h-auto font-serif font-bold text-sm uppercase tracking-wider"
+                        className="flex items-center justify-between w-full gap-2 border-b-2 border-dotted border-gray-300 pb-2 hover:bg-gray-50 transition-colors p-0 h-auto font-serif font-bold text-sm uppercase tracking-wider "
                       >
                         <div className="flex items-center gap-2">
                           <Heart className="w-4 h-4" />
@@ -403,6 +410,21 @@ export function FilterProductLayout({ children }: FilterProductLayoutProps) {
                     </div>
                   </div>
                 )}
+              </div>
+              
+              <div className="text-center font-serif bg-white border-b-2 border-black">
+                <Image
+                   src="/team.jpg"
+                   alt="Vestige Team"
+                   width={350}
+                   height={180}
+                   className=" shadow-lg object-cover border-b-2 border-black"
+                />
+                <p className="text-sm text-gray-300 bg-black py-4">
+                    © {new Date().getFullYear()} Vestige Marketplace.
+                    <br />
+                    A curated space for timeless pieces.
+                  </p>
               </div>
             </div>
           </aside>
@@ -463,7 +485,7 @@ export function FilterProductLayout({ children }: FilterProductLayoutProps) {
                     )}
                     {filters.category && filters.category !== 'all' && (
                       <Badge variant="outline" className="border-2 border-red-600 text-red-600 font-serif">
-                        Category: {categories?.find(cat => cat.categoryId.toString() === filters.category)?.name || filters.category}
+                        {categoryName || filters.category}
                       </Badge>
                     )}
                     {selectedBrands.map(brandId => {

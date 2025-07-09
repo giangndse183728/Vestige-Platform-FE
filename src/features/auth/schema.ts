@@ -58,11 +58,15 @@ export interface AuthUser {
 }
 
 export interface LoginResponse {
-  accessToken: string;
-  refreshToken: string;
+  userId: number;
+  username: string;
+  email: string;
+  role: string;
 }
 
 export interface SignupResponse {
-  accessToken: string;
-  refreshToken: string;
+  userId: number;
+  username: string;
+  email: string;
+  role: string;
 }

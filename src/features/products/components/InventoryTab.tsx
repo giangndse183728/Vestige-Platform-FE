@@ -164,7 +164,7 @@ export function InventoryTab({ onSwitchToAddProduct }: InventoryTabProps) {
                   </div>
                   
                   {/* Product Image - Clickable */}
-                  <Link href={`/products/${product.productId}`}>
+                  <Link href={`/products/${product.slug}`}>
                     <div className="relative aspect-[1/1] overflow-hidden bg-gray-100 cursor-pointer">
                       <Image
                         src={product.primaryImageUrl}
@@ -186,7 +186,7 @@ export function InventoryTab({ onSwitchToAddProduct }: InventoryTabProps) {
                       </span>
                     </div>
                     
-                    <Link href={`/products/${product.productId}`}>
+                    <Link href={`/products/${product.slug}`}>
                       <h3 className="font-serif text-xl font-bold mb-3 leading-tight truncate cursor-pointer hover:text-[var(--dark-red)] transition-colors" title={product.title}>
                         {product.title}
                       </h3>

@@ -109,11 +109,10 @@ export default function EditorialPage() {
       <div className="max-w-8xl mx-auto">
         <div className="mb-12 relative border-b-6 border-black pb-8">
           <div className="text-center mb-2 p-4 ">
-            <div className="relative inline-block ">
+            <div className="relative inline-block mt-2">
    
       
-              <h1 className="text-7xl font-metal tracking-widest">THE DAILY EDITORIAL</h1>
-            
+              <h1 className="text-7xl font-metal tracking-widest mb-6">THE DAILY <span className="bg-red-900 text-white px-4 ">EDITORIAL</span></h1>
            
             <div className="flex justify-center mt-4 space-x-8">
               <span className="text-sm font-metal">VOLUME XCIV</span>
@@ -127,30 +126,37 @@ export default function EditorialPage() {
             </div>
           </div>
           
+          {/* Search Bar and Filter Tags */}
           <div className="flex items-center justify-between">
-            <div className="relative w-[350px]">
+            <div className="relative w-[400px]">
               <Input 
                 type="text" 
-                placeholder="Search archives..." 
-                className="w-full pl-12 pr-4 py-3 text-lg border-2 border-black focus:border-red-900 focus:ring-red-900"
+                placeholder="Search editorial..." 
+                className="w-full pl-14 pr-6 py-4 text-lg border-3 border-red-900 focus:border-black focus:ring-black bg-white font-gothic rounded-none shadow-lg"
               />
               <svg 
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" 
+                className="absolute left-5 top-1/2 transform -translate-y-1/2 w-6 h-6 text-red-900" 
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
+              <div className="absolute right-2 top-0 ">
+                <Button className="bg-red-900 hover:bg-red-800 text-white font-metal h-full px-6 rounded-none border-l-2 border-red-900">
+                  SEARCH
+                </Button>
+              </div>
             </div>
+
             <div className="flex gap-2">
-              <Button variant="outline" className="font-metal border-2 border-black hover:bg-red-900 hover:text-white text-xs px-3 py-2">ALL</Button>
-              <Button variant="outline" className="font-metal border-2 border-black hover:bg-red-900 hover:text-white text-xs px-3 py-2">FASHION</Button>
-              <Button variant="outline" className="font-metal border-2 border-black hover:bg-red-900 hover:text-white text-xs px-3 py-2">LIFESTYLE</Button>
-              <Button variant="outline" className="font-metal border-2 border-black hover:bg-red-900 hover:text-white text-xs px-3 py-2">CULTURE</Button>
-              <Button variant="outline" className="font-metal border-2 border-black hover:bg-red-900 hover:text-white text-xs px-3 py-2">ART</Button>
-              <Button variant="outline" className="font-metal border-2 border-black hover:bg-red-900 hover:text-white text-xs px-3 py-2">OPINION</Button>
-              <Button variant="outline" className="font-metal border-2 border-black hover:bg-red-900 hover:text-white text-xs px-3 py-2">WORLD</Button>
+              <Button variant="outline" className="font-metal bg-white border-2 border-black hover:bg-red-900 hover:text-white text-xs px-3 py-2">ALL</Button>
+              <Button variant="outline" className="font-metal bg-white border-2 border-black hover:bg-red-900 hover:text-white text-xs px-3 py-2">FASHION</Button>
+              <Button variant="outline" className="font-metal bg-white border-2 border-black hover:bg-red-900 hover:text-white text-xs px-3 py-2">LIFESTYLE</Button>
+              <Button variant="outline" className="font-metal bg-white border-2 border-black hover:bg-red-900 hover:text-white text-xs px-3 py-2">CULTURE</Button>
+              <Button variant="outline" className="font-metal bg-white border-2 border-black hover:bg-red-900 hover:text-white text-xs px-3 py-2">ART</Button>
+              <Button variant="outline" className="font-metal bg-white border-2 border-black hover:bg-red-900 hover:text-white text-xs px-3 py-2">OPINION</Button>
+              <Button variant="outline" className="font-metal bg-white border-2 border-black hover:bg-red-900 hover:text-white text-xs px-3 py-2">WORLD</Button>
             </div>
           </div>
         </div>
