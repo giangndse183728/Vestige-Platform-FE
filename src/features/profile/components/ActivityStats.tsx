@@ -21,7 +21,7 @@ const ActivityCharts = ({ user }: { user: ActivityStatsProps['user'] }) => {
   const performanceData = [
     { name: 'Success Rate', value: ((user.soldProductsCount / user.totalProductsListed) * 100) || 0 },
     { name: 'Active Rate', value: ((user.activeProductsCount / user.totalProductsListed) * 100) || 0 },
-    { name: 'Trust Score', value: (user.trustScore / 5) * 100 },
+    { name: 'Trust Score', value: user.trustScore },
     { name: 'Seller Rating', value: (user.sellerRating / 5) * 100 },
   ];
 
@@ -137,7 +137,7 @@ export const ActivityStats = ({ user }: ActivityStatsProps) => {
             <Shield className="w-6 h-6 text-green-600" />
           </div>
           <div className="text-center">
-            <div className="font-metal text-3xl font-bold text-black">{user.trustScore}/5.0</div>
+            <div className="font-metal text-3xl font-bold text-black">{user.trustScore}/100</div>
             <div className="font-gothic text-sm text-gray-600">Community Trust Level</div>
           </div>
         </div>

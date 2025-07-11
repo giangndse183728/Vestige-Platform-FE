@@ -1,8 +1,23 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card} from "@/components/ui/card";
 import { SubscriptionPlans } from "@/components/subscription/SubscriptionPlans";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Instagram, Facebook, ShoppingBag, UserPlus } from "lucide-react";
 
 function About() {
+  const router = useRouter();
+
+  const handleJoinRevolution = () => {
+    router.push('/login');
+  };
+
+  const handleExploreMarketplace = () => {
+    router.push('/marketplace');
+  };
+
   return (
     <div className="mx-auto my-8 max-w-8xl px-6 bg-white/80">
       {/* Newspaper Header */}
@@ -54,16 +69,82 @@ function About() {
             </div>
           </div>
 
-          {/* Simplified Article */}
-          <div className="font-gothic text-sm leading-relaxed">
+          {/* Article Content */}
+          <div className="font-gothic text-sm leading-relaxed mb-8">
             <p className="mb-4">
               The platform specializes in authenticated luxury brands and rare pieces, sourced directly from fashion enthusiasts. Beyond transactions, Vestige serves as a cultural hub for style inspiration and trend forecasting.
             </p>
           </div>
+
+          {/* Key Features Section - Redesigned */}
+          <div className="border-2 border-black bg-gradient-to-br from-red-50 via-white to-red-50 p-8 mb-6">
+            <div className="text-center mb-6">
+              <h3 className="text-3xl font-metal text-red-800 mb-2">PLATFORM HIGHLIGHTS</h3>
+              <div className="w-24 h-1 bg-red-800 mx-auto"></div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="group">
+                <div className="border-2 border-black bg-white p-6 h-full hover:shadow-[6px_6px_0px_0px_rgba(220,38,38,0.2)] transition-all duration-300">
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 bg-red-800 border-2 border-black flex items-center justify-center mr-4">
+                      <span className="text-white font-metal text-xl">✓</span>
+                    </div>
+                    <h4 className="font-metal text-lg text-black">AUTHENTICATED LUXURY</h4>
+                  </div>
+                  <p className="font-gothic text-sm text-gray-700 leading-relaxed">
+                    Every piece is verified by our expert team. From Balenciaga to Rick Owens, we guarantee authenticity.
+                  </p>
+                </div>
+              </div>
+
+              <div className="group">
+                <div className="border-2 border-black bg-white p-6 h-full hover:shadow-[6px_6px_0px_0px_rgba(220,38,38,0.2)] transition-all duration-300">
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 bg-red-800 border-2 border-black flex items-center justify-center mr-4">
+                      <span className="text-white font-metal text-xl">🔒</span>
+                    </div>
+                    <h4 className="font-metal text-lg text-black">SECURE TRANSACTIONS</h4>
+                  </div>
+                  <p className="font-gothic text-sm text-gray-700 leading-relaxed">
+                    Advanced payment protection and escrow services ensure safe buying and selling for all users.
+                  </p>
+                </div>
+              </div>
+
+              <div className="group">
+                <div className="border-2 border-black bg-white p-6 h-full hover:shadow-[6px_6px_0px_0px_rgba(220,38,38,0.2)] transition-all duration-300">
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 bg-red-800 border-2 border-black flex items-center justify-center mr-4">
+                      <span className="text-white font-metal text-xl">👥</span>
+                    </div>
+                    <h4 className="font-metal text-lg text-black">COMMUNITY DRIVEN</h4>
+                  </div>
+                  <p className="font-gothic text-sm text-gray-700 leading-relaxed">
+                    Connect with fashion enthusiasts, share style inspiration, and discover emerging trends.
+                  </p>
+                </div>
+              </div>
+
+              <div className="group">
+                <div className="border-2 border-black bg-white p-6 h-full hover:shadow-[6px_6px_0px_0px_rgba(220,38,38,0.2)] transition-all duration-300">
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 bg-red-800 border-2 border-black flex items-center justify-center mr-4">
+                      <span className="text-white font-metal text-xl">💎</span>
+                    </div>
+                    <h4 className="font-metal text-lg text-black">CURATED COLLECTIONS</h4>
+                  </div>
+                  <p className="font-gothic text-sm text-gray-700 leading-relaxed">
+                    Discover rare pieces and limited editions curated by fashion experts and style influencers.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-8">
+        <div className="sticky top-20 self-start space-y-8">
           {/* Quick Stats Box */}
           <Card variant="decorated">
           <div className=" p-10">
@@ -87,40 +168,74 @@ function About() {
           </div>
           </Card>
 
-          {/* Features Box */}
-          <div className="border border-black bg-gray-50 p-4">
-            <h3 className="text-lg font-metal text-red-800 mb-3">KEY FEATURES</h3>
-            <ul className="space-y-2 font-gothic text-xs">
-              <li className="flex items-start gap-2">
-                <span className="text-red-800">•</span>
-                <span>Authenticated luxury brands</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-red-800">•</span>
-                <span>Secure transactions</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-red-800">•</span>
-                <span>Community marketplace</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-red-800">•</span>
-                <span>Style inspiration feed</span>
-              </li>
-            </ul>
-          </div>
+          {/* Call to Action Section */}
+          <div className="border-2 border-black bg-gradient-to-b from-red-50 to-white p-6">
+            <h3 className="text-xl font-metal text-red-800 mb-4 text-center">
+              JOIN THE MOVEMENT
+            </h3>
+            
+            {/* Primary Actions */}
+            <div className="space-y-3 mb-6">
+              <Button 
+                onClick={handleJoinRevolution}
+                className="w-full bg-red-800 hover:bg-red-900 font-gothic border-2 border-red-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all" 
+                size="lg"
+              >
+                <UserPlus className="w-5 h-5 mr-2" />
+                JOIN THE REVOLUTION
+              </Button>
+              
+              <Button 
+                onClick={handleExploreMarketplace}
+                variant="outline" 
+                className="w-full border-2 border-red-800 text-red-800 hover:bg-red-800 hover:text-white font-gothic shadow-[4px_4px_0px_0px_rgba(220,38,38,0.3)] hover:shadow-[2px_2px_0px_0px_rgba(220,38,38,0.3)] transition-all" 
+                size="lg"
+              >
+                <ShoppingBag className="w-5 h-5 mr-2" />
+                EXPLORE MARKETPLACE
+              </Button>
+            </div>
 
-          {/* Action Buttons */}
-          <div className="space-y-3">
-            <Button className="w-full bg-red-800 hover:bg-red-900 font-gothic" size="lg">
-              JOIN THE REVOLUTION
-            </Button>
-            <Button variant="outline" className="w-full border-red-800 text-red-800 hover:bg-red-800 hover:text-white font-gothic" size="lg">
-              EXPLORE MARKETPLACE
-            </Button>
-            <Button variant="ghost" className="w-full text-red-800 hover:bg-red-50 font-gothic" size="lg">
-              FOLLOW ON INSTAGRAM
-            </Button>
+            {/* Social Media Section */}
+            <div className="border-t border-black pt-4">
+              <p className="text-sm font-gothic text-center text-gray-600 mb-3">
+                FOLLOW US FOR DAILY DROPS
+              </p>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <Link 
+                  href="https://www.instagram.com/vestige.house/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="group"
+                >
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-2 border-pink-500 text-pink-600 hover:bg-pink-500 hover:text-white font-gothic transition-all group-hover:shadow-[3px_3px_0px_0px_rgba(236,72,153,0.3)]" 
+                    size="sm"
+                  >
+                    <Instagram className="w-4 h-4 mr-2" />
+                    INSTAGRAM
+                  </Button>
+                </Link>
+                
+                <Link 
+                  href="https://www.facebook.com/profile.php?id=61577693459247" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="group"
+                >
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-gothic transition-all group-hover:shadow-[3px_3px_0px_0px_rgba(37,99,235,0.3)]" 
+                    size="sm"
+                  >
+                    <Facebook className="w-4 h-4 mr-2" />
+                    FACEBOOK
+                  </Button>
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </div>

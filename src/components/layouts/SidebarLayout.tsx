@@ -16,6 +16,7 @@ import {
   Star
 } from 'lucide-react';
 import { useProfile } from '@/features/profile/hooks/useProfile';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
 
@@ -98,6 +99,7 @@ const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, currentPage = "
   const router = useRouter();
   const [activeItem, setActiveItem] = useState(currentPage);
   const { user: userData, isLoading, error } = useProfile();
+  const { logout, isLoggingOut } = useAuth();
 
   const navigationItems = [
     {
@@ -156,8 +158,12 @@ const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, currentPage = "
     router.push(item.href);
   };
 
-  const handleLogout = () => {
-    router.push('/auth/login');
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   if (isLoading) {
@@ -254,10 +260,11 @@ const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, currentPage = "
           <Button
             onClick={handleLogout}
             variant="outline"
-            className="w-full border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white font-gothic"
+            disabled={isLoggingOut}
+            className="w-full border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white font-gothic disabled:opacity-50"
           >
             <LogOut className="w-4 h-4 mr-2" />
-            Logout
+            {isLoggingOut ? 'Logging out...' : 'Logout'}
           </Button>
         </div>
 

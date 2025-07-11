@@ -1,5 +1,7 @@
+"use client";
 
 import ContinueExploring  from '@/components/ui/footer-section';
+import { useRouter } from 'next/navigation';
 
 interface Brand {
   id: number;
@@ -100,10 +102,16 @@ const brandLayoutData: Brand[] = [
 ];
 
 const NewspaperBentoGrid = () => {
+  const router = useRouter();
+
+  const handleBrandClick = () => {
+    router.push('/designers');
+  };
 
   const renderBrandItem = (brand: Brand) => (
     <div
       key={brand.id}
+      onClick={handleBrandClick}
       className={`
         ${brand.colSpan} ${brand.rowSpan}
         group relative overflow-hidden  border-2 border-black

@@ -17,9 +17,9 @@ import {
   MapPin,
   User,
   Shield,
-} from 'lucide-react';
-import Link from 'next/link';
+} from 'lucide-react'
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 const statusConfig = {
   PENDING: {
@@ -98,6 +98,7 @@ interface OrderDetailProps {
 
 export function OrderDetail({ orderId }: OrderDetailProps) {
   const { data: order, isLoading, error } = useOrderDetail(orderId);
+  const router = useRouter();
 
   if (isLoading) {
     return (
@@ -148,34 +149,19 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
 
   return (
     <div className="min-h-screen bg-[#f8f7f3]/80">
-      {/* Enhanced Herald Header */}
-      <div className="border-t-4 border-b-4 border-black py-6 mb-8 mt-8 bg-white/90">
-        <div className="text-center">
-          <h1 className="font-metal text-5xl font-bold text-black tracking-widest mb-2">
-            ORDER DETAILS HERALD
-          </h1>
-          <p className="font-gothic text-sm text-gray-600 tracking-widest">
-            ESTABLISHED 2025 • ORDER #{order.orderId} EDITION
-          </p>
-          <div className="flex justify-center items-center gap-6 mt-3 text-xs text-gray-500">
-            <span className="bg-black text-white px-3 py-1 font-metal">VOL. 1, NO. {order.orderId}</span>
-            <span>•</span>
-            <span>{formatDate(order.createdAt)}</span>
-            <span>•</span>
-            <span className="bg-red-900 text-white px-3 py-1 font-metal">{order.totalItems} ITEMS</span>
-          </div>
-        </div>
-      </div>
+  
 
       <div className="max-w-7xl mx-auto p-6">
         {/* Back Button */}
         <div className="mb-8">
-          <Link href="/my-orders">
-            <Button variant="outline" className="border-2 border-black font-gothic hover:bg-black hover:text-white transition-colors">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Orders
-            </Button>
-          </Link>
+          <Button 
+            variant="outline" 
+            onClick={() => router.back()}
+            className="border-2 border-black font-gothic hover:bg-black hover:text-white transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
         </div>
 
         {/* Enhanced Order Summary Card */}
@@ -259,7 +245,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                       <h4 className="font-metal text-xl text-black">Product Details</h4>
                     </div>
                     {items.map((item) => (
-                      <div key={item.orderItemId} className="border-2 border-gray-200 p-6 rounded-lg hover:border-black transition-colors">
+                      <div key={item.orderItemId} className="border-2 border-gray-200 p-6  hover:border-black transition-colors">
                         <div className="flex gap-6">
                           <div className="relative w-24 h-24 bg-gray-200 rounded-lg overflow-hidden border-2 border-gray-300 flex-shrink-0">
                             {item.product.primaryImageUrl ? (
@@ -400,8 +386,8 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
             </CardHeader>
             <CardContent className="p-8 bg-white">
               <div className="bg-gray-50 p-6 rounded-lg border-2 border-gray-200">
-                <div className="space-y-2 font-gothic">
-                  <div className="text-lg font-metal">{order.shippingAddress.addressLine1}</div>
+                <div className="space-y-2 ">
+                  <div className="text-lg">{order.shippingAddress.addressLine1}</div>
                   {order.shippingAddress.addressLine2 && (
                     <div className="text-gray-600">{order.shippingAddress.addressLine2}</div>
                   )}
@@ -430,7 +416,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
               <div className="flex items-center gap-6">
                 <div className="w-4 h-4 bg-green-500 rounded-full border-4 border-white shadow-lg"></div>
                 <div className="flex-1">
-                  <div className="font-bold font-metal text-lg text-black">Order Placed</div>
+                  <div className=" font-metal text-lg text-black">Order Placed</div>
                   <div className="text-sm text-gray-600 font-gothic">{formatDate(order.createdAt)}</div>
                 </div>
               </div>
@@ -438,7 +424,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                 <div className="flex items-center gap-6">
                   <div className="w-4 h-4 bg-blue-500 rounded-full border-4 border-white shadow-lg"></div>
                   <div className="flex-1">
-                    <div className="font-bold font-metal text-lg text-black">Payment Processed</div>
+                    <div className="font-metal text-lg text-black">Payment Processed</div>
                     <div className="text-sm text-gray-600 font-gothic">Stripe Payment Intent: {order.stripePaymentIntentId}</div>
                   </div>
                 </div>

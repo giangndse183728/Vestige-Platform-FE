@@ -124,6 +124,65 @@ export const Profile = () => {
     setEditingAddress(null);
   };
 
+  const getProfilePictureBorder = (tier: string) => {
+    switch (tier) {
+      case 'NEW_SELLER':
+        return 'border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,0.3)] bg-gradient-to-br from-gray-200 to-white p-2';
+      case 'RISING_SELLER':
+        return 'border-6 border-black shadow-[12px_12px_0px_0px_rgba(220,38,38,0.4)] bg-gradient-to-br from-red-100 to-yellow-100 p-2';
+      case 'PRO_SELLER':
+        return 'border-8 border-black shadow-[12px_12px_0px_0px_rgba(126,34,206,0.5)] bg-gradient-to-br from-purple-100 to-gray-100 p-3';
+      case 'ELITE_SELLER':
+        return 'border-8 border-black shadow-[12px_12px_0px_0px_rgba(220,38,38,0.6)] bg-gradient-to-br from-yellow-200 via-red-100 to-black p-3';
+      default:
+        return 'border-3 border-gray-600 shadow-lg';
+    }
+  };
+
+  const getProfilePictureAccents = (tier: string) => {
+    switch (tier) {
+      case 'NEW_SELLER':
+        return (
+          <>
+            <div className="absolute top-0 left-4 right-4 h-1 bg-gradient-to-r from-transparent via-red-600 to-transparent"></div>
+            <div className="absolute bottom-0 left-4 right-4 h-1 bg-gradient-to-r from-transparent via-red-600 to-transparent"></div>
+          </>
+        );
+      case 'RISING_SELLER':
+        return (
+          <>
+            <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-red-600 via-yellow-500 to-red-600"></div>
+            <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-red-600 via-yellow-500 to-red-600"></div>
+            <div className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-red-600 via-yellow-500 to-red-600"></div>
+            <div className="absolute right-0 top-0 bottom-0 w-2 bg-gradient-to-b from-red-600 via-yellow-500 to-red-600"></div>
+          </>
+        );
+      case 'PRO_SELLER':
+        return (
+          <>
+            <div className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-purple-600 via-black to-purple-600"></div>
+            <div className="absolute bottom-0 left-0 right-0 h-3 bg-gradient-to-r from-purple-600 via-black to-purple-600"></div>
+            <div className="absolute left-0 top-0 bottom-0 w-3 bg-gradient-to-b from-purple-600 via-black to-purple-600"></div>
+            <div className="absolute right-0 top-0 bottom-0 w-3 bg-gradient-to-b from-purple-600 via-black to-purple-600"></div>
+
+            <div className="absolute top-4 left-4 right-4 bottom-4 border-2 border-dashed border-purple-400/50"></div>
+          </>
+        );
+      case 'ELITE_SELLER':
+        return (
+          <>
+            <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-r from-yellow-400 via-red-600 via-black to-yellow-400"></div>
+            <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-r from-yellow-400 via-red-600 via-black to-yellow-400"></div>
+            <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-b from-yellow-400 via-red-600 via-black to-yellow-400"></div>
+            <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-b from-yellow-400 via-red-600 via-black to-yellow-400"></div>
+            <div className="absolute top-6 left-6 right-6 bottom-6 border-2 border-dashed border-yellow-500/60"></div>
+          </>
+        );
+      default:
+        return null;
+    }
+  };
+
   if (isLoading) {
     return <ProfileSkeleton />;
   }
@@ -157,12 +216,18 @@ export const Profile = () => {
 
      
       <div className="max-w-6xl mx-auto">
-        <Card variant='stamp'>
+        <Card variant={
+          user?.trustTier === 'ELITE_SELLER' ? 'elite-seller' :
+          user?.trustTier === 'PRO_SELLER' ? 'pro-seller' :
+          user?.trustTier === 'RISING_SELLER' ? 'rising-seller' :
+          user?.trustTier === 'NEW_SELLER' ? 'stamp' :
+          'stamp'
+        }>
       <CardContent>
           <div className="flex flex-col lg:flex-row gap-8">
             <div className="flex-shrink-0">
               <div className="relative">
-                <div className="w-100 h-80 bg-gray-200 border-3 border-darkred flex items-center justify-center">
+                <div className={`w-100 h-80 bg-gray-200 ${getProfilePictureBorder(user?.trustTier || 'NEW_SELLER')} flex items-center justify-center relative overflow-hidden`}>
                   {isEditing ? (
                     editData.profilePictureUrl ? (
                       <Image 
@@ -190,9 +255,12 @@ export const Profile = () => {
                       <User className="w-24 h-24 text-gray-500" />
                     )
                   )}
+
+                  {/* Trust tier punk accents */}
+                  {getProfilePictureAccents(user?.trustTier || 'NEW_SELLER')}
                 </div>
                 {isEditing && (
-                  <button className="absolute bottom-2 right-2 bg-white border-2 border-black p-2 rounded-full hover:bg-gray-100">
+                  <button className="absolute bottom-2 right-2 bg-red-900 border-2 border-red-600 p-2 rounded-full hover:bg-red-800 text-white shadow-lg">
                     <Camera className="w-4 h-4" />
                   </button>
                 )}
@@ -202,14 +270,32 @@ export const Profile = () => {
                 <p className="font-gothic text-lg text-gray-600">@{user.username}</p>
                 <div className="flex items-center justify-center gap-2 mt-2">
                   <Badge variant={user.isVerified ? "default" : "secondary"} 
-                         className={user.isVerified ? "bg-green-600" : "bg-gray-500"}>
+                         className={user.isVerified ? "bg-green-600 font-metal tracking-wider" : "bg-gray-500 font-metal tracking-wider"}>
                     {user.isVerified ? "VERIFIED" : "PENDING"}
                   </Badge>
-                  <Badge className="bg-green-600 text-white">
+                  <Badge className="bg-green-600 text-white font-metal tracking-wider">
                     {user.accountStatus}
                   </Badge>
                 </div>
               </div>
+              <div className={`
+                    relative font-metal text-sm tracking-wider font-bold px-6 py-3 overflow-hidden mt-5
+                    ${user.trustTier === 'ELITE_SELLER' ? 
+                      'bg-gradient-to-r from-black via-red-900 to-black text-white border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]' :
+                      user.trustTier === 'PRO_SELLER' ? 
+                      'bg-gradient-to-r from-black to-purple-900 text-white border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]' :
+                      user.trustTier === 'RISING_SELLER' ? 
+                      'bg-gradient-to-r from-red-800 to-red-900 text-white border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]' :
+                      'bg-gradient-to-r from-gray-800 to-gray-900 text-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'}
+                  `}>
+                    
+                    <div className="relative z-10">
+                      {user.trustTier === 'ELITE_SELLER' ? '★★★ ELITE' :
+                       user.trustTier === 'PRO_SELLER' ? '★★ PRO' :
+                       user.trustTier === 'RISING_SELLER' ? '★ RISING' :
+                       'ROOKIE'}
+                    </div>
+                  </div>
             </div>
 
             <div className="flex-1">
@@ -269,6 +355,15 @@ export const Profile = () => {
                     <div className="border-b border-black pb-2">
                       <Label className="font-gothic text-sm text-gray-600">Joined Date</Label>
                       <p className="font-metal text-lg text-black">{formatDate(user.joinedDate)}</p>
+                    </div>
+                    <div className="border-b border-black pb-2">
+                      <Label className="font-gothic text-sm text-gray-600">Trust Tier</Label>
+                      <p className="font-metal text-lg text-black">
+                        {user.trustTier === 'ELITE_SELLER' ? 'Elite Seller' :
+                         user.trustTier === 'PRO_SELLER' ? 'Pro Seller' :
+                         user.trustTier === 'RISING_SELLER' ? 'Rising Seller' :
+                         'New Seller'} 
+                      </p>
                     </div>
                   </div>
                   <div className="md:col-span-2">
@@ -372,10 +467,10 @@ export const Profile = () => {
                       onChange={(e) => handleInputChange('bio', e.target.value || null)}
                       className="border-black focus:border-black focus:ring-0 min-h-24"
                       placeholder="Tell us about yourself..."
-                      maxLength={200}
+                      maxLength={250}
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      {(editData.bio?.length || 0)}/200 characters
+                      {(editData.bio?.length || 0)}/250 characters
                     </p>
                   </div>
                 </div>
@@ -385,7 +480,7 @@ export const Profile = () => {
           </CardContent>
         </Card>
 
-        <div className="border-2 border-black p-6 mt-6 my-8 bg-black/10">
+        <div className="border-2 border-black p-6 mt-10 my-8 bg-black/10">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <h4 className="font-metal text-2xl font-bold text-black tracking-wider">
