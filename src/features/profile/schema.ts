@@ -15,7 +15,7 @@ export const profileFormSchema = z.object({
     .optional()
     .nullable(),
   bio: z.string()
-    .max(200, { message: "Bio must be less than 200 characters" })
+    .max(250, { message: "Bio must be less than 250 characters" })
     .optional()
     .nullable(),
   profilePictureUrl: z.string()
@@ -27,6 +27,7 @@ export const profileFormSchema = z.object({
 export const profileStatsSchema = z.object({
   sellerRating: z.number().min(0).max(5),
   trustScore: z.number().min(0).max(5),
+  trustTier: z.enum(["NEW_SELLER", "RISING_SELLER", "PRO_SELLER", "ELITE_SELLER"]),
   successfulTransactions: z.number().min(0),
   totalProductsListed: z.number().min(0),
   activeProductsCount: z.number().min(0),

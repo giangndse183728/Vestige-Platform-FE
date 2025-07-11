@@ -224,96 +224,92 @@ export function BuyerOrdersTab() {
                       </div>
                     </CardHeader>
 
-                    <CardContent className="p-12 space-y-4">
-                      {/* Order Items */}
-                      <div className="space-y-3">
-                        {order.itemSummaries.map((item) => (
-                          <div key={item.productId} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                            <div className="relative w-16 h-16 bg-gray-200 rounded overflow-hidden border border-gray-300">
-                              {item.productImage ? (
-                                <Image
-                                  src={item.productImage}
-                                  alt={item.productTitle}
-                                  fill
-                                  className="object-cover"
-                                />
-                              ) : (
-                                <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                                  <span className="text-xs">No Image</span>
+                    <CardContent className="p-6 bg-white/80">
+                      <div className="grid md:grid-cols-2 gap-6">
+                        {/* Order Items */}
+                        <div className="space-y-4">
+                          <h3 className="font-metal text-lg border-b-2 border-black pb-2">Items</h3>
+                          <div className="space-y-3 max-h-64 overflow-y-auto">
+                            {order.itemSummaries.map((item) => (
+                              <div key={item.productId} className="flex gap-3 p-3 border border-gray-200 ">
+                                <div className="relative w-16 h-16 bg-gray-100 rounded overflow-hidden flex-shrink-0">
+                                  {item.productImage ? (
+                                    <Image
+                                      src={item.productImage}
+                                      alt={item.productTitle}
+                                      fill
+                                      className="object-cover"
+                                    />
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                      <Package className="w-6 h-6" />
+                                    </div>
+                                  )}
                                 </div>
-                              )}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h4 className="font-medium text-sm truncate font-metal">{item.productTitle}</h4>
-                              <p className="text-xs text-gray-500 font-gothic">
-                                Seller: {item.sellerUsername}
-                                {item.sellerIsLegitProfile && (
-                                  <span className="ml-2 text-green-600">✓ Verified</span>
-                                )}
-                              </p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Badge className={`text-xs ${
-                                  item.itemStatus === 'DELIVERED' ? 'bg-green-100 text-green-800' :
-                                  item.itemStatus === 'SHIPPED' ? 'bg-purple-100 text-purple-800' :
-                                  item.itemStatus === 'PROCESSING' ? 'bg-blue-100 text-blue-800' :
-                                  item.itemStatus === 'CANCELLED' ? 'bg-red-100 text-red-800' :
-                                  'bg-gray-100 text-gray-800'
-                                }`}>
-                                  {item.itemStatus}
-                                </Badge>
-                                {/* <Badge className={`text-xs ${
-                                  item.escrowStatus === 'HOLDING' ? 'bg-yellow-100 text-yellow-800' :
-                                  item.escrowStatus === 'RELEASED' ? 'bg-green-100 text-green-800' :
-                                  item.escrowStatus === 'CANCELLED' ? 'bg-red-100 text-red-800' :
-                                  'bg-gray-100 text-gray-800'
-                                }`}>
-                                  {item.escrowStatus}
-                                </Badge> */}
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="font-medium text-sm truncate">{item.productTitle}</h4>
+                                  <p className="text-sm text-gray-600">
+                                    Seller: {item.sellerUsername}
+                                    {item.sellerIsLegitProfile && (
+                                      <span className="ml-2 text-green-600">✓ Verified</span>
+                                    )}
+                                  </p>
+                                  <div className="flex gap-2 mt-2">
+                                    <Badge className={`text-xs ${
+                                      item.itemStatus === 'DELIVERED' ? 'bg-green-100 text-green-800' :
+                                      item.itemStatus === 'SHIPPED' ? 'bg-purple-100 text-purple-800' :
+                                      item.itemStatus === 'PROCESSING' ? 'bg-blue-100 text-blue-800' :
+                                      item.itemStatus === 'CANCELLED' ? 'bg-red-100 text-red-800' :
+                                      'bg-gray-100 text-gray-800'
+                                    }`}>
+                                      {item.itemStatus}
+                                    </Badge>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <p className="font-medium">{formatVNDPrice(item.price)}</p>
+                                </div>
                               </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Order Summary */}
+                        <div className="space-y-4">
+                          <h3 className="font-metal text-lg border-b-2 border-black pb-2">Order Summary</h3>
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <span className="text-gray-600">Total Items:</span>
+                              <p className="font-medium">{order.totalItems}</p>
                             </div>
-                            <div className="text-right">
-                              <div className="font-medium font-metal">{formatVNDPrice(item.price)}</div>
+    
+                            <div>
+                              <span className="text-gray-600">Shipping Fee:</span>
+                              <p className="font-medium">{formatVNDPrice(order.totalShippingFee)}</p>
+                            </div>
+                            <div>
+                              <span className="text-gray-600">Order Date:</span>
+                              <p className="font-medium">{formatDate(order.createdAt)}</p>
+                            </div>
+                            <div>
+                              <span className="text-gray-600">Paid At:</span>
+                              <p className="font-medium">{order.paidAt ? formatDate(order.paidAt) : 'N/A'}</p>
                             </div>
                           </div>
-                        ))}
-                      </div>
+                          
+                     
 
-                      {/* Order Details */}
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
-                        <div>
-                          <div className="text-xs text-gray-500 mb-1 font-gothic">Items</div>
-                          <div className="font-medium font-metal">{order.totalItems}</div>
-                        </div>
-                        <div>
-                          <div className="text-xs text-gray-500 mb-1 font-gothic">Shipping Fee</div>
-                          <div className="font-medium font-metal">{formatVNDPrice(order.totalShippingFee)}</div>
-                        </div>
-                        <div>
-                          <div className="text-xs text-gray-500 mb-1 font-gothic">Order Date</div>
-                          <div className="font-medium text-sm font-metal">{formatDate(order.createdAt)}</div>
+                          <div className="border-t-2 border-black pt-4">
+                            <div className="flex justify-between items-center">
+                              <span className="text-lg font-metal">Total Amount:</span>
+                              <span className="text-xl font-bold">{formatVNDPrice(order.totalAmount)}</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
-
-                      {/* Payment/Delivery Info */}
-                      {(order.paidAt || order.deliveredAt) && (
-                        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
-                          {order.paidAt && (
-                            <div>
-                              <div className="text-xs text-gray-500 mb-1 font-gothic">Paid At</div>
-                              <div className="font-medium text-sm font-metal">{formatDate(order.paidAt)}</div>
-                            </div>
-                          )}
-                          {order.deliveredAt && (
-                            <div>
-                              <div className="text-xs text-gray-500 mb-1 font-gothic">Delivered At</div>
-                              <div className="font-medium text-sm font-metal">{formatDate(order.deliveredAt)}</div>
-                            </div>
-                          )}
-                        </div>
-                      )}
 
                       {/* Action Buttons */}
-                      <div className="flex gap-2 pt-4 border-t border-gray-200">
+                      <div className="flex gap-2 pt-6 mt-4 border-t border-gray-200">
                         <Button variant="outline" size="sm" className="flex-1 border-2 border-black font-gothic">
                           <Package className="w-4 h-4 mr-2" />
                           Track Order
@@ -322,7 +318,7 @@ export function BuyerOrdersTab() {
                           <DollarSign className="w-4 h-4 mr-2" />
                           View Receipt
                         </Button>
-                        <Link href={`/my-orders/${order.orderId}`}>
+                        <Link href={`/order-details/${order.orderId}`}>
                           <Button size="sm" className="flex-1 border-2 border-black bg-red-900 hover:bg-red-800 text-white font-gothic">
                             View Details
                             <ArrowRight className="w-4 h-4 ml-2" />

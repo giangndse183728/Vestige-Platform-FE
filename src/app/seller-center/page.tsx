@@ -5,7 +5,6 @@ import { CreateProduct } from '@/features/products/components/CreateProduct';
 import { InventoryTab } from '@/features/products/components/InventoryTab';
 import { CustomerOrdersTab } from '@/features/order/components/CustomerOrdersTab';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Package, ShoppingCart, Plus } from 'lucide-react';
 
 export default function SellerCenterPage() {

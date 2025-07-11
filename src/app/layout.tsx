@@ -54,7 +54,7 @@ export default function RootLayout({
 }) {
   const [queryClient] = useState(() => new QueryClient());
   const pathname = usePathname();
-  const noLayout = ROUTES_NO_LAYOUT.includes(pathname) || pathname.startsWith("/admin");
+  const noLayout = ROUTES_NO_LAYOUT.includes(pathname) || pathname.startsWith("/admin") || pathname.startsWith("/order-details/");
 
   return (
     <html lang="en">
