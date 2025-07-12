@@ -17,6 +17,8 @@ import {
   MapPin,
   User,
   Shield,
+  QrCode,
+  Package,
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -66,6 +68,21 @@ const statusConfig = {
     label: 'Processing',
     color: 'bg-blue-100 text-blue-800',
     icon: Clock,
+  },
+  AWAITING_PICKUP: {
+    label: 'Awaiting Pickup',
+    color: 'bg-orange-100 text-orange-800',
+    icon: QrCode,
+  },
+  IN_WAREHOUSE: {
+    label: 'In Warehouse',
+    color: 'bg-indigo-100 text-indigo-800',
+    icon: Package,
+  },
+  OUT_FOR_DELIVERY: {
+    label: 'Out for Delivery',
+    color: 'bg-purple-100 text-purple-800',
+    icon: Truck,
   },
 };
 

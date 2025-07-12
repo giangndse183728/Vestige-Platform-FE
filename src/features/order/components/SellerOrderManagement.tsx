@@ -4,10 +4,25 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { QRCode } from '@/components/ui/qr-code';
 import { useSellerOrders } from '@/features/order/hooks/useSellerOrders';
+import { requestPickup } from '@/features/order/services';
 import { ActualOrder, OrderStatus, EscrowStatus } from '@/features/order/schema';
 import { format } from 'date-fns';
-import { Eye, Package, Truck, CheckCircle, XCircle, Clock, DollarSign, ArrowRight } from 'lucide-react';
+import { 
+  Eye, 
+  Package, 
+  Truck, 
+  CheckCircle, 
+  XCircle, 
+  Clock, 
+  DollarSign, 
+  ArrowRight,
+  QrCode,
+  Camera,
+  AlertCircle
+} from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -18,6 +33,12 @@ const getStatusIcon = (status: OrderStatus) => {
     case 'CONFIRMED':
     case 'PROCESSING':
       return <Package className="w-4 h-4" />;
+    case 'AWAITING_PICKUP':
+      return <QrCode className="w-4 h-4" />;
+    case 'IN_WAREHOUSE':
+      return <Package className="w-4 h-4" />;
+    case 'OUT_FOR_DELIVERY':
+      return <Truck className="w-4 h-4" />;
     case 'SHIPPED':
       return <Truck className="w-4 h-4" />;
     case 'DELIVERED':
@@ -78,12 +99,37 @@ const formatVND = (amount: number) => {
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
     currency: 'VND',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   }).format(amount);
 };
 
-export function CustomerOrdersTab() {
+export function SellerOrderManagement() {
   const { data: orders, isLoading, error, refetch } = useSellerOrders();
   const [selectedOrder, setSelectedOrder] = useState<ActualOrder | null>(null);
+  const [processingPickup, setProcessingPickup] = useState<number | null>(null);
+  const [pickupError, setPickupError] = useState<string | null>(null);
+
+  const handleRequestPickup = async (orderId: number, itemId: number) => {
+    try {
+      setProcessingPickup(itemId);
+      setPickupError(null);
+      await requestPickup(orderId, itemId);
+      // Refresh the orders list
+      await refetch();
+    } catch (err) {
+      setPickupError('Failed to request pickup. Please try again.');
+      console.error('Error requesting pickup:', err);
+    } finally {
+      setProcessingPickup(null);
+    }
+  };
+
+  const generateQRCode = (itemId: number) => {
+    // In a real implementation, this would generate a QR code
+    // For now, we'll just show the item ID
+    return `https://vestige.com/pickup/${itemId}`;
+  };
 
   if (isLoading) {
     return (
@@ -129,16 +175,28 @@ export function CustomerOrdersTab() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-metal font-bold">Customer Orders</h2>
+        <h2 className="text-2xl font-metal font-bold">My Sales</h2>
         <Button onClick={() => refetch()} variant="outline" size="sm">
           Refresh
         </Button>
       </div>
 
-      <div className="grid gap-4 ">
+      {/* Error Display */}
+      {pickupError && (
+        <Card className="border-2 border-red-200 bg-red-50">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 text-red-800">
+              <AlertCircle className="w-4 h-4" />
+              <p className="font-gothic text-sm">{pickupError}</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      <div className="grid gap-4">
         {orders.map((order) => (
           <Card key={order.orderId} className="border-2 rounded-none">
-            <CardHeader className="border-b-2 border-black bg-black/90 text-white ">
+            <CardHeader className="border-b-2 border-black bg-black/90 text-white">
               <div className="flex justify-between items-start">
                 <div>
                   <CardTitle className="font-metal text-lg font-normal">
@@ -253,21 +311,99 @@ export function CustomerOrdersTab() {
                 </Link>
               </div>
 
-              {/* Status Action Buttons */}
-              {(order.status === 'PENDING' || order.status === 'CONFIRMED') && (
+              {/* Pickup Actions */}
+              {order.itemSummaries.some(item => item.itemStatus === 'PROCESSING') && (
                 <div className="flex gap-3 mt-4 pt-4 border-t-2 border-black">
-                  {order.status === 'PENDING' && (
-                    <Button size="sm" className="bg-black text-white hover:bg-gray-800 border-2 border-black">
-                      <CheckCircle className="w-4 h-4 mr-2" />
-                      Confirm Order
-                    </Button>
-                  )}
-                  {order.status === 'CONFIRMED' && (
-                    <Button size="sm" className="bg-black text-white hover:bg-gray-800 border-2 border-black">
-                      <Truck className="w-4 h-4 mr-2" />
-                      Mark as Shipped
-                    </Button>
-                  )}
+                  {order.itemSummaries.map((item, index) => (
+                    item.itemStatus === 'PROCESSING' && (
+                      <div key={index} className="flex items-center gap-2">
+                        <span className="font-gothic text-sm">{item.productTitle}:</span>
+                        <Button
+                          onClick={() => handleRequestPickup(order.orderId, item.productId)}
+                          disabled={processingPickup === item.productId}
+                          size="sm"
+                          className="bg-orange-600 text-white hover:bg-orange-700 border-2 border-orange-600"
+                        >
+                          {processingPickup === item.productId ? (
+                            <>
+                              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-2"></div>
+                              Requesting...
+                            </>
+                          ) : (
+                            <>
+                              <Truck className="w-3 h-3 mr-2" />
+                              Request Pickup
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    )
+                  ))}
+                </div>
+              )}
+
+              {/* QR Code Display for AWAITING_PICKUP items */}
+              {order.itemSummaries.some(item => item.itemStatus === 'AWAITING_PICKUP') && (
+                <div className="flex gap-3 mt-4 pt-4 border-t-2 border-black">
+                  {order.itemSummaries.map((item, index) => (
+                    item.itemStatus === 'AWAITING_PICKUP' && (
+                      <div key={index} className="flex items-center gap-2">
+                        <span className="font-gothic text-sm">{item.productTitle}:</span>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              size="sm"
+                              className="bg-green-600 text-white hover:bg-green-700 border-2 border-green-600"
+                            >
+                              <QrCode className="w-3 h-3 mr-2" />
+                              Show Pickup QR Code
+                            </Button>
+                          </DialogTrigger>
+                                                     <DialogContent>
+                             <DialogHeader>
+                               <DialogTitle className="font-metal">Pickup QR Code</DialogTitle>
+                             </DialogHeader>
+                             <div className="text-center p-6">
+                               <QRCode 
+                                 value={item.productId.toString()} 
+                                 size={200} 
+                                 className="mx-auto mb-4"
+                               />
+                               <p className="font-gothic text-sm text-gray-600 mb-2">
+                                 Show this QR code to the Vestige shipper
+                               </p>
+                               <p className="font-gothic text-xs text-gray-500">
+                                 Item ID: {item.productId}
+                               </p>
+                             </div>
+                           </DialogContent>
+                        </Dialog>
+                      </div>
+                    )
+                  ))}
+                </div>
+              )}
+
+              {/* Status Timeline for other statuses */}
+              {order.itemSummaries.some(item => 
+                ['IN_WAREHOUSE', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(item.itemStatus)
+              ) && (
+                <div className="mt-4 pt-4 border-t-2 border-black">
+                  <h4 className="font-metal text-sm mb-2">Shipping Status:</h4>
+                  <div className="space-y-2">
+                    {order.itemSummaries.map((item, index) => (
+                      ['IN_WAREHOUSE', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(item.itemStatus) && (
+                        <div key={index} className="flex items-center gap-2 text-sm">
+                          <span className="font-gothic">{item.productTitle}:</span>
+                          <Badge className={`text-xs ${getStatusColor(item.itemStatus)}`}>
+                            {item.itemStatus === 'IN_WAREHOUSE' && 'In Warehouse'}
+                            {item.itemStatus === 'OUT_FOR_DELIVERY' && 'Out for Delivery'}
+                            {item.itemStatus === 'DELIVERED' && 'Delivered'}
+                          </Badge>
+                        </div>
+                      )
+                    ))}
+                  </div>
                 </div>
               )}
             </CardContent>
@@ -276,4 +412,4 @@ export function CustomerOrdersTab() {
       </div>
     </div>
   );
-}
+} 
