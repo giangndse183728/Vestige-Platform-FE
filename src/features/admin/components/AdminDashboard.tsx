@@ -27,6 +27,7 @@ import {
   getAdminRevenueAnalytics
 } from '@/features/order/services';
 import { Tabs as UITabs, TabsList as UITabsList, TabsTrigger as UITabsTrigger, TabsContent as UITabsContent } from "@/components/ui/tabs";
+import UserManager from './UserManager';
 
 // Mock data for the dashboard
 const mockStats = [
@@ -49,6 +50,7 @@ const tabs = [
   { id: "brands", label: "Brands", icon: Briefcase },
   { id: "all-products", label: "All Product", icon: FileText },
   { id: "order-management", label: "Order Management", icon: ShoppingBag },
+  { id: "user-management", label: "User Management", icon: Users },
 ];
 
 export default function AdminDashboard() {
@@ -84,6 +86,8 @@ export default function AdminDashboard() {
         return <ProductManager />;
       case "order-management":
         return <OrderManager />;
+      case "user-management":
+        return <UserManager />;
       default:
         return (
           <>
