@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FadeUp, Marquee } from '../../../components/animation/AnimatedWrapper';
 import { useTopViewedProducts } from '@/features/products/hooks/useTopViewedProducts';
 import { useNewArrivals } from '@/features/products/hooks/useNewArrivals';
@@ -13,6 +14,7 @@ import { formatVNDPrice } from '@/utils/format';
 import { ProductCard } from '@/features/products/components/ProductCard';
 
 export default function NewspaperSlider() {
+  const router = useRouter();
   const { data: topViewedData, isLoading: isLoadingTopViewed, isError: isErrorTopViewed } = useTopViewedProducts();
   const [topViewedCurrentPage, setTopViewedCurrentPage] = useState(0);
   const topViewedProducts: Product[] = topViewedData?.content || [];
@@ -57,6 +59,9 @@ export default function NewspaperSlider() {
     setNewArrivalsCurrentPage(newIndex);
   };
 
+  const handleCategoryClick = () => {
+    router.push('/categories');
+  };
 
   const renderTopViewedSlider = () => {
     if (isLoadingTopViewed) {
@@ -205,7 +210,7 @@ export default function NewspaperSlider() {
       <div className="container mx-auto relative z-10"> 
         <FadeUp delay={0.2}>
           <div className="flex flex-col items-center justify-center max-w-full mx-auto bg-white/60 backdrop-blur-3xs border-black p-8 relative overflow-hidden">
-            <div className="absolute inset-0" style={{ backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 0, 0, 0.08) 1px, transparent 1px)`, backgroundSize: '24px 24px' }} />
+            <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 0, 0, 0.08) 1px, transparent 1px)`, backgroundSize: '24px 24px' }} />
             <div className="font-serif italic font-bold text-xs text-black/60 tracking-wider uppercase mb-1">Volume III • Edition No. 21</div>
             <h2 className="font-metal text-5xl md:text-6xl text-black relative mb-4 text-center tracking-tight">
               Product Showcase
@@ -214,14 +219,14 @@ export default function NewspaperSlider() {
               Discover our curated collection of exclusive designs crafted for the modern lifestyle.
               Each piece tells a unique story of craftsmanship and innovation.
             </p>
-            <div className="flex justify-center gap-4 mt-4">
-              <button className="px-4 py-2 border border-black text-black text-sm font-metal uppercase hover:bg-black hover:text-white transition-colors">Top</button>
-              <button className="px-4 py-2 border border-black text-black text-sm font-metal uppercase hover:bg-black hover:text-white transition-colors">Bottom</button>
-              <button className="px-4 py-2 border border-black text-black text-sm font-metal uppercase hover:bg-black hover:text-white transition-colors">Outerwear</button>
-              <button className="px-4 py-2 border border-black text-black text-sm font-metal uppercase hover:bg-black hover:text-white transition-colors">Footwear</button>
-              <button className="px-4 py-2 border border-black text-black text-sm font-metal uppercase hover:bg-black hover:text-white transition-colors">Tailoring</button>
-              <button className="px-4 py-2 border border-black text-black text-sm font-metal uppercase hover:bg-black hover:text-white transition-colors">Accessories</button>
-            </div>
+                          <div className="flex justify-center gap-4 mt-4">
+                <button className="px-4 py-2 border border-black text-black text-sm font-metal uppercase hover:bg-black hover:text-white transition-colors" onClick={handleCategoryClick}>Top</button>
+                <button className="px-4 py-2 border border-black text-black text-sm font-metal uppercase hover:bg-black hover:text-white transition-colors" onClick={handleCategoryClick}>Bottom</button>
+                <button className="px-4 py-2 border border-black text-black text-sm font-metal uppercase hover:bg-black hover:text-white transition-colors" onClick={handleCategoryClick}>Outerwear</button>
+                <button className="px-4 py-2 border border-black text-black text-sm font-metal uppercase hover:bg-black hover:text-white transition-colors" onClick={handleCategoryClick}>Footwear</button>
+                <button className="px-4 py-2 border border-black text-black text-sm font-metal uppercase hover:bg-black hover:text-white transition-colors" onClick={handleCategoryClick}>Tailoring</button>
+                <button className="px-4 py-2 border border-black text-black text-sm font-metal uppercase hover:bg-black hover:text-white transition-colors" onClick={handleCategoryClick}>Accessories</button>
+              </div>
             <FadeUp delay={0.5}>
               <div className="mt-6 py-1 bg-black/10 backdrop-blur-sm">
                 <Marquee text="/ Trending / Viral / On Fire / Buzzing / In vouge / Hot / Stylish / Trending / Viral / On Fire / Buzzing / In vouge / Hot / Stylish /" />

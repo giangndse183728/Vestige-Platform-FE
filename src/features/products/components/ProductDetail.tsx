@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Star, Heart, Eye, Shield, UserCircle } from 'lucide-react';
+import { Star, Heart, Eye, Shield, UserCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useCartStore } from '@/features/cart/hooks';
@@ -72,6 +72,18 @@ export function ProductDetail({ product }: ProductDetailProps) {
   const addToCart = useCartStore((state) => state.addItem);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const router = useRouter();
+
+  const handlePrevImage = () => {
+    setSelectedImageIndex((prevIndex) =>
+      prevIndex === 0 ? product.images.length - 1 : prevIndex - 1
+    );
+  };
+
+  const handleNextImage = () => {
+    setSelectedImageIndex((prevIndex) =>
+      prevIndex === product.images.length - 1 ? 0 : prevIndex + 1
+    );
+  };
 
   const isValidUrl = (url: string) => {
     try {
@@ -159,6 +171,26 @@ export function ProductDetail({ product }: ProductDetailProps) {
               <div className="absolute top-0 right-0 z-10 px-3 py-1 bg-black text-white text-xs font-metal uppercase shadow-sm">
                 {product.discountPercentage}% OFF
               </div>
+            )}
+            {product.images.length > 1 && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute top-1/2 left-2 -translate-y-1/2 z-10 text-red-900 hover:bg-black/20"
+                  onClick={handlePrevImage}
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute top-1/2 right-2 -translate-y-1/2 z-10 text-red-900 hover:bg-black/20"
+                  onClick={handleNextImage}
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </Button>
+              </>
             )}
           </div>
           <div className="grid grid-cols-4">

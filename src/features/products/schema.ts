@@ -35,6 +35,7 @@ export const productImageSchema = z.object({
 
 export const productSchema = z.object({
   productId: z.number(),
+  slug: z.string(),
   title: z.string(),
   price: z.number(),
   condition: z.string(),
@@ -49,6 +50,7 @@ export const productSchema = z.object({
 
 export const productDetailSchema = z.object({
   productId: z.number(),
+  slug: z.string(),
   title: z.string(),
   description: z.string(),
   price: z.number(),

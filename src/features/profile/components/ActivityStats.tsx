@@ -1,7 +1,8 @@
 import React from 'react';
 import { Star, Shield, Calendar, TrendingUp, Award } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import {  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+import {  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, Legend } from 'recharts';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface ActivityStatsProps {
   user: {
@@ -20,7 +21,7 @@ const ActivityCharts = ({ user }: { user: ActivityStatsProps['user'] }) => {
   const performanceData = [
     { name: 'Success Rate', value: ((user.soldProductsCount / user.totalProductsListed) * 100) || 0 },
     { name: 'Active Rate', value: ((user.activeProductsCount / user.totalProductsListed) * 100) || 0 },
-    { name: 'Trust Score', value: (user.trustScore / 5) * 100 },
+    { name: 'Trust Score', value: user.trustScore },
     { name: 'Seller Rating', value: (user.sellerRating / 5) * 100 },
   ];
 
@@ -30,11 +31,17 @@ const ActivityCharts = ({ user }: { user: ActivityStatsProps['user'] }) => {
     { name: 'Remaining', value: user.totalProductsListed - user.soldProductsCount },
   ];
 
-  const COLORS = ['#2c3e50', '#8e44ad', '#2980b9'];
+  const COLORS = [
+    '#7f1d1d',     // red-900
+    '#1f2937',     // black-800 
+    '#6b7280'      // white-800 
+  ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-      <div className="border border-black p-4 md:col-span-2">
+      <Card variant='double' className="border border-black p-4 md:col-span-2">
+     <CardContent className='p-6'>
+        
         <h5 className="font-metal text-lg text-black mb-4">PERFORMANCE METRICS</h5>
         <div className="h-[250px]">
           <ResponsiveContainer width="100%" height="100%">
@@ -43,36 +50,43 @@ const ActivityCharts = ({ user }: { user: ActivityStatsProps['user'] }) => {
               <XAxis dataKey="name" />
               <YAxis unit="%" />
               <Tooltip formatter={(value: number) => [`${value.toFixed(1)}%`, '']} />
-              <Bar dataKey="value" fill="#2c3e50" />
+              <Bar dataKey="value">
+                {performanceData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
-      </div>
+        </CardContent>
+      </Card>
 
-      <div className="border border-black p-4">
-        <h5 className="font-metal text-lg text-black mb-4">LISTING DISTRIBUTION</h5>
-        <div className="h-[250px]">
+      <Card variant='decorated'>
+      <CardContent className='p-8'>
+        <h5 className="font-metal text-lg text-black ">LISTING DISTRIBUTION</h5>
+        <div className="h-[280px]">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={listingData}
                 cx="50%"
-                cy="50%"
+                cy="45%"
                 labelLine={false}
                 outerRadius={80}
                 fill="#2c3e50"
                 dataKey="value"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
               >
                 {listingData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip formatter={(value, name) => [`${value} listings`, name]} />
+              <Legend />
             </PieChart>
           </ResponsiveContainer>
         </div>
-      </div>
+        </CardContent>
+        </Card>
     </div>
   );
 };
@@ -123,7 +137,7 @@ export const ActivityStats = ({ user }: ActivityStatsProps) => {
             <Shield className="w-6 h-6 text-green-600" />
           </div>
           <div className="text-center">
-            <div className="font-metal text-3xl font-bold text-black">{user.trustScore}/5.0</div>
+            <div className="font-metal text-3xl font-bold text-black">{user.trustScore}/100</div>
             <div className="font-gothic text-sm text-gray-600">Community Trust Level</div>
           </div>
         </div>

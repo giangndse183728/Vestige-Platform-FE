@@ -129,10 +129,7 @@ export function CustomerOrdersTab() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-metal font-bold">Customer Orders</h2>
-        <Button onClick={() => refetch()} variant="outline" size="sm">
-          Refresh
-        </Button>
+        <h2 className="text-2xl font-metal">Customer Orders</h2>
       </div>
 
       <div className="grid gap-4 ">
@@ -154,46 +151,12 @@ export function CustomerOrdersTab() {
                     {getStatusIcon(order.status)}
                     <span className="ml-1">{order.status}</span>
                   </Badge>
-                  {order.overallEscrowStatus && (
-                    <Badge className={`border ${getEscrowStatusColor(order.overallEscrowStatus)}`}>
-                      {order.overallEscrowStatus}
-                    </Badge>
-                  )}
                 </div>
               </div>
             </CardHeader>
 
             <CardContent className="p-6 bg-white/80">
               <div className="grid md:grid-cols-2 gap-6">
-                {/* Order Summary */}
-                <div className="space-y-4">
-                  <h3 className="font-metal text-lg border-b-2 border-black pb-2">Order Summary</h3>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-gray-600">Total Items:</span>
-                      <p className="font-medium">{order.totalItems}</p>
-                    </div>
-                    <div>
-                      <span className="text-gray-600">Unique Sellers:</span>
-                      <p className="font-medium">{order.uniqueSellers}</p>
-                    </div>
-                    <div>
-                      <span className="text-gray-600">Shipping Fee:</span>
-                      <p className="font-medium">{formatVND(order.totalShippingFee)}</p>
-                    </div>
-                    <div>
-                      <span className="text-gray-600">Platform Fee:</span>
-                      <p className="font-medium">{formatVND(order.totalPlatformFee)}</p>
-                    </div>
-                  </div>
-                  <div className="border-t-2 border-black pt-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-lg font-metal">Total Amount:</span>
-                      <span className="text-xl font-bold">{formatVND(order.totalAmount)}</span>
-                    </div>
-                  </div>
-                </div>
-
                 {/* Order Items */}
                 <div className="space-y-4">
                   <h3 className="font-metal text-lg border-b-2 border-black pb-2">Items</h3>
@@ -233,6 +196,35 @@ export function CustomerOrdersTab() {
                     ))}
                   </div>
                 </div>
+
+                {/* Order Summary */}
+                <div className="space-y-4">
+                  <h3 className="font-metal text-lg border-b-2 border-black pb-2">Order Summary</h3>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-600">Total Items:</span>
+                      <p className="font-medium">{order.totalItems}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Unique Sellers:</span>
+                      <p className="font-medium">{order.uniqueSellers}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Shipping Fee:</span>
+                      <p className="font-medium">{formatVND(order.totalShippingFee)}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Platform Fee:</span>
+                      <p className="font-medium">{formatVND(order.totalPlatformFee)}</p>
+                    </div>
+                  </div>
+                  <div className="border-t-2 border-black pt-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-lg font-metal">Total Amount:</span>
+                      <span className="text-xl font-bold">{formatVND(order.totalAmount)}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Action Buttons */}
@@ -245,7 +237,7 @@ export function CustomerOrdersTab() {
                   <DollarSign className="w-4 h-4 mr-2" />
                   View Receipt
                 </Button>
-                <Link href={`/my-orders/${order.orderId}`}>
+                <Link href={`/order-details/${order.orderId}`}>
                   <Button size="sm" className="flex-1 border-2 border-black bg-red-900 hover:bg-red-800 text-white font-gothic">
                     View Details
                     <ArrowRight className="w-4 h-4 ml-2" />
