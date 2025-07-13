@@ -24,6 +24,26 @@ import { format } from 'date-fns';
 import { cn } from '@/utils/cn';
 import { StripeAccountSection } from '@/features/payment/components/StripeAccountSection';
 import Image from 'next/image';
+import { TrustTier, Gender, TRUST_TIER_LABELS, TRUST_TIER_DESCRIPTIONS } from '@/constants/enum';
+import { TierProgress } from './TierProgress';
+
+// Helper function to format gender display
+const formatGenderDisplay = (gender: string | null | undefined): string => {
+  if (!gender) return 'Not provided';
+  
+  switch (gender) {
+    case Gender.MALE:
+      return 'Male';
+    case Gender.FEMALE:
+      return 'Female';
+    case Gender.OTHER:
+      return 'Other';
+    case Gender.PREFER_NOT_TO_SAY:
+      return 'Prefer not to say';
+    default:
+      return gender;
+  }
+};
 
 export const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -38,6 +58,7 @@ export const Profile = () => {
   });
   const [isAddingAddress, setIsAddingAddress] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
+  const [previewTier, setPreviewTier] = useState<TrustTier | null>(null);
 
   const { user, isLoading, error, updateProfile, isUpdating } = useProfile();
   const {
@@ -62,12 +83,30 @@ export const Profile = () => {
 
   const handleEdit = () => {
     if (!user) return;
+    
+    const convertGender = (gender: string | null | undefined): Gender | null => {
+      if (!gender) return null;
+      
+      switch (gender.toLowerCase()) {
+        case 'male':
+          return Gender.MALE;
+        case 'female':
+          return Gender.FEMALE;
+        case 'other':
+          return Gender.OTHER;
+        case 'prefer-not-to-say':
+          return Gender.PREFER_NOT_TO_SAY;
+        default:
+          return gender as Gender;
+      }
+    };
+    
     setEditData({
       firstName: user.firstName,
       lastName: user.lastName,
       phoneNumber: user.phoneNumber,
       dateOfBirth: user.dateOfBirth,
-      gender: user.gender as "male" | "female" | "other" | "prefer-not-to-say" | null,
+      gender: convertGender(user.gender),
       bio: user.bio,
       profilePictureUrl: user.profilePictureUrl
     });
@@ -124,31 +163,35 @@ export const Profile = () => {
     setEditingAddress(null);
   };
 
-  const getProfilePictureBorder = (tier: string) => {
+  const handleTierPreview = (tier: TrustTier) => {
+    setPreviewTier(tier);
+  };
+
+  const getProfilePictureBorder = (tier: TrustTier | string) => {
     switch (tier) {
-      case 'NEW_SELLER':
+      case TrustTier.NEW_SELLER:
         return 'border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,0.3)] bg-gradient-to-br from-gray-200 to-white p-2';
-      case 'RISING_SELLER':
+      case TrustTier.RISING_SELLER:
         return 'border-6 border-black shadow-[12px_12px_0px_0px_rgba(220,38,38,0.4)] bg-gradient-to-br from-red-100 to-yellow-100 p-2';
-      case 'PRO_SELLER':
+      case TrustTier.PRO_SELLER:
         return 'border-8 border-black shadow-[12px_12px_0px_0px_rgba(126,34,206,0.5)] bg-gradient-to-br from-purple-100 to-gray-100 p-3';
-      case 'ELITE_SELLER':
+      case TrustTier.ELITE_SELLER:
         return 'border-8 border-black shadow-[12px_12px_0px_0px_rgba(220,38,38,0.6)] bg-gradient-to-br from-yellow-200 via-red-100 to-black p-3';
       default:
         return 'border-3 border-gray-600 shadow-lg';
     }
   };
 
-  const getProfilePictureAccents = (tier: string) => {
+  const getProfilePictureAccents = (tier: TrustTier | string) => {
     switch (tier) {
-      case 'NEW_SELLER':
+      case TrustTier.NEW_SELLER:
         return (
           <>
             <div className="absolute top-0 left-4 right-4 h-1 bg-gradient-to-r from-transparent via-red-600 to-transparent"></div>
             <div className="absolute bottom-0 left-4 right-4 h-1 bg-gradient-to-r from-transparent via-red-600 to-transparent"></div>
           </>
         );
-      case 'RISING_SELLER':
+      case TrustTier.RISING_SELLER:
         return (
           <>
             <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-red-600 via-yellow-500 to-red-600"></div>
@@ -157,7 +200,7 @@ export const Profile = () => {
             <div className="absolute right-0 top-0 bottom-0 w-2 bg-gradient-to-b from-red-600 via-yellow-500 to-red-600"></div>
           </>
         );
-      case 'PRO_SELLER':
+      case TrustTier.PRO_SELLER:
         return (
           <>
             <div className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-purple-600 via-black to-purple-600"></div>
@@ -168,7 +211,7 @@ export const Profile = () => {
             <div className="absolute top-4 left-4 right-4 bottom-4 border-2 border-dashed border-purple-400/50"></div>
           </>
         );
-      case 'ELITE_SELLER':
+      case TrustTier.ELITE_SELLER:
         return (
           <>
             <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-r from-yellow-400 via-red-600 via-black to-yellow-400"></div>
@@ -217,17 +260,17 @@ export const Profile = () => {
      
       <div className="max-w-6xl mx-auto">
         <Card variant={
-          user?.trustTier === 'ELITE_SELLER' ? 'elite-seller' :
-          user?.trustTier === 'PRO_SELLER' ? 'pro-seller' :
-          user?.trustTier === 'RISING_SELLER' ? 'rising-seller' :
-          user?.trustTier === 'NEW_SELLER' ? 'stamp' :
+          (previewTier || user?.trustTier) === TrustTier.ELITE_SELLER ? 'elite-seller' :
+          (previewTier || user?.trustTier) === TrustTier.PRO_SELLER ? 'pro-seller' :
+          (previewTier || user?.trustTier) === TrustTier.RISING_SELLER ? 'rising-seller' :
+          (previewTier || user?.trustTier) === TrustTier.NEW_SELLER ? 'stamp' :
           'stamp'
         }>
       <CardContent>
           <div className="flex flex-col lg:flex-row gap-8">
             <div className="flex-shrink-0">
               <div className="relative">
-                <div className={`w-100 h-80 bg-gray-200 ${getProfilePictureBorder(user?.trustTier || 'NEW_SELLER')} flex items-center justify-center relative overflow-hidden`}>
+                <div className={`w-100 h-80 bg-gray-200 ${getProfilePictureBorder(previewTier || user?.trustTier || TrustTier.NEW_SELLER)} flex items-center justify-center relative overflow-hidden`}>
                   {isEditing ? (
                     editData.profilePictureUrl ? (
                       <Image 
@@ -256,8 +299,7 @@ export const Profile = () => {
                     )
                   )}
 
-                  {/* Trust tier punk accents */}
-                  {getProfilePictureAccents(user?.trustTier || 'NEW_SELLER')}
+                  {getProfilePictureAccents(previewTier || user?.trustTier || TrustTier.NEW_SELLER)}
                 </div>
                 {isEditing && (
                   <button className="absolute bottom-2 right-2 bg-red-900 border-2 border-red-600 p-2 rounded-full hover:bg-red-800 text-white shadow-lg">
@@ -280,20 +322,17 @@ export const Profile = () => {
               </div>
               <div className={`
                     relative font-metal text-sm tracking-wider font-bold px-6 py-3 overflow-hidden mt-5
-                    ${user.trustTier === 'ELITE_SELLER' ? 
+                    ${(previewTier || user.trustTier) === TrustTier.ELITE_SELLER ? 
                       'bg-gradient-to-r from-black via-red-900 to-black text-white border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]' :
-                      user.trustTier === 'PRO_SELLER' ? 
+                      (previewTier || user.trustTier) === TrustTier.PRO_SELLER ? 
                       'bg-gradient-to-r from-black to-purple-900 text-white border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]' :
-                      user.trustTier === 'RISING_SELLER' ? 
+                      (previewTier || user.trustTier) === TrustTier.RISING_SELLER ? 
                       'bg-gradient-to-r from-red-800 to-red-900 text-white border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]' :
                       'bg-gradient-to-r from-gray-800 to-gray-900 text-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'}
                   `}>
                     
                     <div className="relative z-10">
-                      {user.trustTier === 'ELITE_SELLER' ? '★★★ ELITE' :
-                       user.trustTier === 'PRO_SELLER' ? '★★ PRO' :
-                       user.trustTier === 'RISING_SELLER' ? '★ RISING' :
-                       'ROOKIE'}
+                      {TRUST_TIER_LABELS[(previewTier || user.trustTier) as TrustTier] || TRUST_TIER_LABELS[TrustTier.NEW_SELLER]}
                     </div>
                   </div>
             </div>
@@ -350,7 +389,7 @@ export const Profile = () => {
                     </div>
                     <div className="border-b border-black pb-2">
                       <Label className="font-gothic text-sm text-gray-600">Gender</Label>
-                      <p className="font-metal text-lg text-black">{user.gender || "Not provided"}</p>
+                      <p className="font-metal text-lg text-black">{formatGenderDisplay(user.gender)}</p>
                     </div>
                     <div className="border-b border-black pb-2">
                       <Label className="font-gothic text-sm text-gray-600">Joined Date</Label>
@@ -359,10 +398,7 @@ export const Profile = () => {
                     <div className="border-b border-black pb-2">
                       <Label className="font-gothic text-sm text-gray-600">Trust Tier</Label>
                       <p className="font-metal text-lg text-black">
-                        {user.trustTier === 'ELITE_SELLER' ? 'Elite Seller' :
-                         user.trustTier === 'PRO_SELLER' ? 'Pro Seller' :
-                         user.trustTier === 'RISING_SELLER' ? 'Rising Seller' :
-                         'New Seller'} 
+                        {TRUST_TIER_DESCRIPTIONS[user.trustTier as TrustTier] || TRUST_TIER_DESCRIPTIONS[TrustTier.NEW_SELLER]}
                       </p>
                     </div>
                   </div>
@@ -452,10 +488,10 @@ export const Profile = () => {
                           <SelectValue placeholder="Select gender" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="male">Male</SelectItem>
-                          <SelectItem value="female">Female</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                          <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+                          <SelectItem value={Gender.MALE}>Male</SelectItem>
+                          <SelectItem value={Gender.FEMALE}>Female</SelectItem>
+                          <SelectItem value={Gender.OTHER}>Other</SelectItem>
+                          <SelectItem value={Gender.PREFER_NOT_TO_SAY}>Prefer not to say</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -477,6 +513,15 @@ export const Profile = () => {
               )}
             </div>
           </div>
+          <div className="mt-10">
+          {user && (
+          <TierProgress
+            currentTier={user.trustTier as TrustTier || TrustTier.NEW_SELLER}
+            previewTier={previewTier || (user.trustTier as TrustTier) || TrustTier.NEW_SELLER}
+            onTierPreview={handleTierPreview}
+          />
+        )}
+        </div>
           </CardContent>
         </Card>
 

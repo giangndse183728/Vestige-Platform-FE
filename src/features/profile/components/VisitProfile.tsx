@@ -22,6 +22,7 @@ import {
 import { usePublicProfile } from '../hooks/usePublicProfile';
 import { PublicProfileSkeleton } from './VisitProfileSkeleton';
 import { ActivityStats } from './ActivityStats';
+import { TrustTier, TRUST_TIER_LABELS } from '@/constants/enum';
 
 interface PublicUserProfileProps {
   userId?: number;
@@ -33,31 +34,31 @@ export const PublicUserProfile: React.FC<PublicUserProfileProps> = ({ userId }) 
   
   const { user, isLoading, error } = usePublicProfile(profileId);
 
-  const getProfilePictureBorder = (tier: string) => {
+  const getProfilePictureBorder = (tier: TrustTier | string) => {
     switch (tier) {
-      case 'NEW_SELLER':
+      case TrustTier.NEW_SELLER:
         return 'border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,0.3)] bg-gradient-to-br from-gray-200 to-white p-2';
-      case 'RISING_SELLER':
+      case TrustTier.RISING_SELLER:
         return 'border-6 border-black shadow-[12px_12px_0px_0px_rgba(220,38,38,0.4)] bg-gradient-to-br from-red-100 to-yellow-100 p-2';
-      case 'PRO_SELLER':
+      case TrustTier.PRO_SELLER:
         return 'border-8 border-black shadow-[12px_12px_0px_0px_rgba(126,34,206,0.5)] bg-gradient-to-br from-purple-100 to-gray-100 p-3';
-      case 'ELITE_SELLER':
+      case TrustTier.ELITE_SELLER:
         return 'border-8 border-black shadow-[12px_12px_0px_0px_rgba(220,38,38,0.6)] bg-gradient-to-br from-yellow-200 via-red-100 to-black p-3';
       default:
         return 'border-4 border-black shadow-lg';
     }
   };
 
-  const getProfilePictureAccents = (tier: string) => {
+  const getProfilePictureAccents = (tier: TrustTier | string) => {
     switch (tier) {
-      case 'NEW_SELLER':
+      case TrustTier.NEW_SELLER:
         return (
           <>
             <div className="absolute top-0 left-4 right-4 h-1 bg-gradient-to-r from-transparent via-red-600 to-transparent"></div>
             <div className="absolute bottom-0 left-4 right-4 h-1 bg-gradient-to-r from-transparent via-red-600 to-transparent"></div>
           </>
         );
-      case 'RISING_SELLER':
+      case TrustTier.RISING_SELLER:
         return (
           <>
             <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-red-600 via-yellow-500 to-red-600"></div>
@@ -66,7 +67,7 @@ export const PublicUserProfile: React.FC<PublicUserProfileProps> = ({ userId }) 
             <div className="absolute right-0 top-0 bottom-0 w-2 bg-gradient-to-b from-red-600 via-yellow-500 to-red-600"></div>
           </>
         );
-      case 'PRO_SELLER':
+      case TrustTier.PRO_SELLER:
         return (
           <>
             <div className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-purple-600 via-black to-purple-600"></div>
@@ -76,7 +77,7 @@ export const PublicUserProfile: React.FC<PublicUserProfileProps> = ({ userId }) 
             <div className="absolute top-4 left-4 right-4 bottom-4 border-2 border-dashed border-purple-400/50"></div>
           </>
         );
-      case 'ELITE_SELLER':
+      case TrustTier.ELITE_SELLER:
         return (
           <>
             <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-r from-yellow-400 via-red-600 via-black to-yellow-400"></div>
@@ -134,10 +135,10 @@ export const PublicUserProfile: React.FC<PublicUserProfileProps> = ({ userId }) 
       <div className="max-w-8xl mx-auto">
         {/* Hero Section */}
         <Card variant={
-          user?.trustTier === 'ELITE_SELLER' ? 'elite-seller' :
-          user?.trustTier === 'PRO_SELLER' ? 'pro-seller' :
-          user?.trustTier === 'RISING_SELLER' ? 'rising-seller' :
-          user?.trustTier === 'NEW_SELLER' ? 'stamp' :
+          user?.trustTier === TrustTier.ELITE_SELLER ? 'elite-seller' :
+          user?.trustTier === TrustTier.PRO_SELLER ? 'pro-seller' :
+          user?.trustTier === TrustTier.RISING_SELLER ? 'rising-seller' :
+          user?.trustTier === TrustTier.NEW_SELLER ? 'stamp' :
           'stamp'
         } className="mb-4 sm:mb-6 lg:mb-8">
           <CardContent className="p-2 sm:p-4 lg:p-6">
@@ -146,7 +147,7 @@ export const PublicUserProfile: React.FC<PublicUserProfileProps> = ({ userId }) 
               <div className="lg:col-span-4">
                 <div className="text-center">
                     <div className="relative">
-                      <div className={`w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-100 lg:h-100 mx-auto bg-gray-200 ${getProfilePictureBorder(user?.trustTier || 'NEW_SELLER')} flex items-center justify-center mb-4 relative overflow-hidden`}>
+                      <div className={`w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-100 lg:h-100 mx-auto bg-gray-200 ${getProfilePictureBorder(user?.trustTier || TrustTier.NEW_SELLER)} flex items-center justify-center mb-4 relative overflow-hidden`}>
 
                         {user.profilePictureUrl ? (
                           <Image 
@@ -162,7 +163,7 @@ export const PublicUserProfile: React.FC<PublicUserProfileProps> = ({ userId }) 
                         )}
 
                         {/* Trust tier accents */}
-                        {getProfilePictureAccents(user?.trustTier || 'NEW_SELLER')}
+                        {getProfilePictureAccents(user?.trustTier || TrustTier.NEW_SELLER)}
                       </div>
                     </div>
                   
@@ -230,20 +231,17 @@ export const PublicUserProfile: React.FC<PublicUserProfileProps> = ({ userId }) 
                 <ActivityStats user={user} />
                 <div className={`
                     relative font-metal text-xs sm:text-sm tracking-wider font-bold px-3 sm:px-6 py-2 sm:py-3 overflow-hidden mt-3 sm:mt-5 text-center
-                    ${user.trustTier === 'ELITE_SELLER' ? 
+                    ${user.trustTier === TrustTier.ELITE_SELLER ? 
                       'bg-gradient-to-r from-black via-red-900 to-black text-white border-2 sm:border-4 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]' :
-                      user.trustTier === 'PRO_SELLER' ? 
+                      user.trustTier === TrustTier.PRO_SELLER ? 
                       'bg-gradient-to-r from-black to-purple-900 text-white border-2 sm:border-4 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]' :
-                      user.trustTier === 'RISING_SELLER' ? 
+                      user.trustTier === TrustTier.RISING_SELLER ? 
                       'bg-gradient-to-r from-red-800 to-red-900 text-white border-2 sm:border-4 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]' :
                       'bg-gradient-to-r from-gray-800 to-gray-900 text-white border-2 sm:border-4 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] sm:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'}
                   `}>
                     
                     <div className="relative z-10">
-                      {user.trustTier === 'ELITE_SELLER' ? '★★★ ELITE' :
-                       user.trustTier === 'PRO_SELLER' ? '★★ PRO' :
-                       user.trustTier === 'RISING_SELLER' ? '★ RISING' :
-                       'ROOKIE'}
+                      {TRUST_TIER_LABELS[user.trustTier as TrustTier] || TRUST_TIER_LABELS[TrustTier.NEW_SELLER]}
                     </div>
                   </div>
               </div>

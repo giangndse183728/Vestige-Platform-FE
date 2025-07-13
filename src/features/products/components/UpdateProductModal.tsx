@@ -18,6 +18,7 @@ import { useImageUpload } from '@/hooks/useImageUpload';
 import * as z from 'zod';
 import { createProductSchema } from '../schema';
 import { formatVNDInput, unformatVND } from '@/utils/format';
+import { ProductStatus, ProductCondition } from '@/constants/enum';
 
 
 interface UpdateProductModalProps {
@@ -282,11 +283,11 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                       <SelectValue placeholder="Select condition" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="NEW">New</SelectItem>
-                      <SelectItem value="LIKE_NEW">Like New</SelectItem>
-                      <SelectItem value="USED_EXCELLENT">Used - Excellent</SelectItem>
-                      <SelectItem value="USED_GOOD">Used - Good</SelectItem>
-                      <SelectItem value="USED_FAIR">Used - Fair</SelectItem>
+                      <SelectItem value={ProductCondition.NEW}>New</SelectItem>
+                      <SelectItem value={ProductCondition.LIKE_NEW}>Like New</SelectItem>
+                      <SelectItem value={ProductCondition.USED_EXCELLENT}>Used - Excellent</SelectItem>
+                      <SelectItem value={ProductCondition.USED_GOOD}>Used - Good</SelectItem>
+                      <SelectItem value={ProductCondition.FAIR}>Used - Fair</SelectItem>
                     </SelectContent>
                   </Select>
                   {errors.condition && <p className="text-red-600 text-xs mt-1">{errors.condition}</p>}
@@ -303,9 +304,9 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="ACTIVE">Active</SelectItem>
-                      <SelectItem value="INACTIVE">Inactive</SelectItem>
-                      <SelectItem value="DRAFT">Draft</SelectItem>
+                      <SelectItem value={ProductStatus.ACTIVE}>Active</SelectItem>
+                      <SelectItem value={ProductStatus.INACTIVE}>Inactive</SelectItem>
+                      <SelectItem value={ProductStatus.DRAFT}>Draft</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

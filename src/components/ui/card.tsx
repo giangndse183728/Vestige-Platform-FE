@@ -119,21 +119,17 @@ const Card = React.forwardRef<
           </div>
         </div>
 
-        {/* Decorative Elements */}
         <div className="absolute top-24 right-6 w-4 h-4 bg-red-900 z-30"></div>
         
-        {/* Side accent stripes */}
  
         <div className="absolute right-0 top-20 bottom-8 w-1 bg-gradient-to-b from-yellow-500 to-yellow-600"></div>
         
-        {/* Content area */}
         <div className="relative z-20 p-6 bg-white">
           <div className="border-l-4 border-red-700 pl-4 bg-gradient-to-br from-red-50 to-yellow-50 p-4 border border-red-200">
             {children}
           </div>
         </div>
         
-        {/* Footer accent */}
         <div className="absolute bottom-0 left-0 w-full h-3 bg-gradient-to-r from-red-600 via-yellow-500 via-black to-red-600"></div>
       </div>
     );
@@ -149,9 +145,7 @@ const Card = React.forwardRef<
         )}
         {...props}
       >
-        {/* Header Section */}
         <div className="bg-gradient-to-r from-black to-gray-900 text-white p-5 border-b-6 border-black relative overflow-hidden">
-          {/* Metal texture background */}
           <div className="absolute inset-0 opacity-40"
                style={{
                  backgroundImage: `
@@ -178,7 +172,6 @@ const Card = React.forwardRef<
         </div>
 
         
-        {/* Corner Accents */}
         <div className="absolute top-26 right-3 w-8 h-8 bg-gradient-to-br from-purple-600 to-purple-800 rotate-45 z-30 shadow-xl"></div>
         <div className="absolute top-35 right-4 w-5 h-5 bg-black rotate-45 z-30 shadow-lg"></div>
        
@@ -204,9 +197,7 @@ const Card = React.forwardRef<
         )}
         {...props}
       >
-        {/* Main Header */}
         <div className="bg-gradient-to-r from-black via-red-900 to-black text-white p-6 border-b-8 border-black relative overflow-hidden">
-          {/* Metal texture background */}
           <div className="absolute inset-0 opacity-40"
                style={{
                  backgroundImage: `
@@ -230,7 +221,6 @@ const Card = React.forwardRef<
           </div>
         </div>
 
-        {/* Elite Marquee Section */}
         <div className="relative bg-black border-t-2 border-b-2 border-yellow-500 overflow-hidden z-20">
           <Marquee 
             text="ELITE SELLER • MAXIMUM TIER • PREMIUM QUALITY • TOP RATED"
@@ -261,7 +251,6 @@ const Card = React.forwardRef<
           </div>
         </div>
         
-        {/* Elite Footer with Text */}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-black via-yellow-600 via-red-700 to-black h-8 z-30 flex items-center justify-between px-4">
           <div className="flex items-center space-x-2">
             <div className="w-3 h-1 bg-yellow-400"></div>
@@ -303,7 +292,6 @@ const Card = React.forwardRef<
         }}
         {...props}
       >
-        {/* Postmark stamp effect */}
         <div className="absolute top-4 right-4 w-16 h-16 opacity-20 pointer-events-none z-20">
           <div className="w-full h-full border-2 border-red-600 rounded-full flex items-center justify-center">
             <div className="text-center">
@@ -313,7 +301,6 @@ const Card = React.forwardRef<
           </div>
         </div>
 
-        {/* Content */}
         <div className="relative z-10 p-8 bg-[#f8f7f3] bg-white">
           <div className="border-1 border-black p-6 border-dashed bg-[#f8f7f3]">
           {children}
@@ -336,7 +323,6 @@ const Card = React.forwardRef<
         <div className="absolute inset-0 bg-white/80 border border-black/10 z-0"></div>
         <div className="absolute inset-0 border-2 border-dashed border-black/10 m-4 z-0"></div>
         
-        {/* Decorative corners */}
         <div className="absolute top-0 left-0 w-10 h-10 z-30">
           <div className="absolute top-0 left-0 w-full h-full border-t-2 border-l-2 border-black/40"></div>
           <div className="absolute top-3 left-3 w-3 h-3 bg-red-800/80 rotate-45"></div>

@@ -12,7 +12,6 @@ function MarketplaceContent() {
   useEffect(() => {
     const brandParam = searchParams.get('brand');
     const categoryParam = searchParams.get('category');
-    const nameParam = searchParams.get('name');
     
     if (brandParam) {
       updateFilter('brand', brandParam);
@@ -22,8 +21,6 @@ function MarketplaceContent() {
       updateFilter('category', categoryParam);
     }
     
-    // Note: nameParam is handled directly in FilterProductLayout via useSearchParams
-    // This ensures the category name is available for display in filter badges
   }, [searchParams, updateFilter]);
 
   return (
