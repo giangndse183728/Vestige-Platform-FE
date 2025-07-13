@@ -79,9 +79,8 @@ api.interceptors.response.use(
           );
         } catch (logoutError) {
           // Ignore logout errors
-        }
-        
-        if (typeof window !== 'undefined') {
+        }          // Only redirect for non-profile API calls to avoid redirecting on public routes
+        if (typeof window !== 'undefined' && !originalRequest.url?.includes('/users/profile')) {
           window.location.href = '/login';
         }
         

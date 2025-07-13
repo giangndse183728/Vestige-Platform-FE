@@ -19,6 +19,7 @@ import * as z from 'zod';
 import { ImageUpload } from '@/components/ui/image-upload';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { formatVNDInput, unformatVND } from '@/utils/format';
+import { ProductStatus, ProductCondition } from '@/constants/enum';
 
 export function CreateProduct() {
   const router = useRouter();
@@ -31,12 +32,11 @@ export function CreateProduct() {
     description: '',
     price: '',
     originalPrice: '',
-    condition: 'NEW',
+    condition: ProductCondition.NEW,
     size: '',
     color: '',
     categoryId: '',
     brandId: '',
-    status: 'ACTIVE',
     imageFiles: [] as File[],
   });
   const [primaryImagePreview, setPrimaryImagePreview] = useState<string | null>(null);
@@ -304,43 +304,24 @@ export function CreateProduct() {
                 <CardTitle className="font-metal  text-xl font-normal">PRODUCT DETAILS</CardTitle>
               </CardHeader>
               <CardContent className="p-10 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="condition" className="font-serif">Condition</Label>
-                    <Select
-                      value={formData.condition}
-                      onValueChange={(value) => handleSelectChange('condition', value)}
-                    >
-                      <SelectTrigger className="border-2 border-black mt-1">
-                        <SelectValue placeholder="Select condition" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="NEW">New</SelectItem>
-                        <SelectItem value="LIKE_NEW">Like New</SelectItem>
-                        <SelectItem value="USED_EXCELLENT">Used - Excellent</SelectItem>
-                        <SelectItem value="USED_GOOD">Used - Good</SelectItem>
-                        <SelectItem value="USED_FAIR">Used - Fair</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    {errors.condition && <p className="text-red-600 text-xs mt-1">{errors.condition}</p>}
-                  </div>
-
-                  <div>
-                    <Label htmlFor="status" className="font-serif">Status</Label>
-                    <Select
-                      value={formData.status}
-                      onValueChange={(value) => handleSelectChange('status', value)}
-                    >
-                      <SelectTrigger className="border-2 border-black mt-1">
-                        <SelectValue placeholder="Select status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="ACTIVE">Active</SelectItem>
-                        <SelectItem value="INACTIVE">Inactive</SelectItem>
-                        <SelectItem value="DRAFT">Draft</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div>
+                  <Label htmlFor="condition" className="font-serif">Condition</Label>
+                  <Select
+                    value={formData.condition}
+                    onValueChange={(value) => handleSelectChange('condition', value)}
+                  >
+                    <SelectTrigger className="border-2 border-black mt-1">
+                      <SelectValue placeholder="Select condition" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={ProductCondition.NEW}>New</SelectItem>
+                      <SelectItem value={ProductCondition.LIKE_NEW}>Like New</SelectItem>
+                      <SelectItem value={ProductCondition.USED_EXCELLENT}>Used - Excellent</SelectItem>
+                      <SelectItem value={ProductCondition.USED_GOOD}>Used - Good</SelectItem>
+                      <SelectItem value={ProductCondition.FAIR}>Used - Fair</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.condition && <p className="text-red-600 text-xs mt-1">{errors.condition}</p>}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
