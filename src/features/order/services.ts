@@ -88,13 +88,10 @@ export const requestPickup = async (orderId: number, itemId: number) => {
   return response.data;
 };
 
-export const getPickupList = async () => {
-  const response = await api.get<ApiResponse<any>>('/logistics/pickups');
-  return response.data;
-};
 
-export const confirmPickup = async (itemId: number, photoUrls: string[]) => {
-  const response = await api.post<ApiResponse<any>>(`/logistics/items/${itemId}/confirm-pickup`, {
+export const confirmPickup = async (orderItemId: number, photoUrls: string[]) => {
+  const response = await api.post<ApiResponse<any>>('/logistics/confirm-pickup', {
+    orderItemId,
     photoUrls,
   });
   return response.data;
@@ -109,5 +106,10 @@ export const confirmDelivery = async (itemId: number, photoUrls: string[]) => {
   const response = await api.post<ApiResponse<any>>(`/logistics/items/${itemId}/confirm-delivery`, {
     photoUrls,
   });
+  return response.data;
+};
+
+export const getLogisticsListByStatus = async (status: string) => {
+  const response = await api.get<ApiResponse<any>>(`/logistics`, { params: { status } });
   return response.data;
 };

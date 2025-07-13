@@ -25,6 +25,7 @@ export const useLogin = () => {
         router.push('/admin');
       } else if (data.role === 'SHIPPER') {
         router.push('/shipper');
+        window.location.href = '/shipper'; // Force reload for session
       } else {
         const urlParams = new URLSearchParams(window.location.search);
         const redirectTo = urlParams.get('redirect');
