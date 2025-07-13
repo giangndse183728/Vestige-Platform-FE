@@ -23,40 +23,6 @@ interface ShipperLayoutProps {
 }
 
 export default function ShipperLayout({ children }: ShipperLayoutProps) {
-  const { user, logout } = useAuth();
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    if (user) {
-      const role = (user as any).roleName || (user as any).role;
-      if (role === 'SHIPPER') {
-        setIsLoading(false);
-      } else {
-        router.replace('/'); // Không đủ quyền, về trang chủ
-      }
-    } else {
-      router.replace('/login');
-    }
-  }, [user, router]);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-[#f8f7f3]/80 flex items-center justify-center">
-        <Card className="w-96 border-2 border-black">
-          <CardContent className="p-6 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black mx-auto mb-4"></div>
-            <p className="font-gothic">Loading shipper dashboard...</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return null;
-  }
-
   return (
     <div className="min-h-screen bg-[#f8f7f3]/80">
       {/* Header */}
@@ -74,24 +40,10 @@ export default function ShipperLayout({ children }: ShipperLayoutProps) {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <Badge className="bg-green-100 text-green-800 border-2 border-green-200 font-metal">
-                {user.firstName} {user.lastName}
-              </Badge>
-              <Button
-                onClick={() => logout()}
-                variant="outline"
-                size="sm"
-                className="border-2 border-black hover:bg-black hover:text-white"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </Button>
-            </div>
+            {/* Removed user info and logout button for consistency */}
           </div>
         </div>
       </div>
-
       {/* Navigation */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-6">
@@ -105,19 +57,27 @@ export default function ShipperLayout({ children }: ShipperLayoutProps) {
                 Pickup List
               </Button>
             </Link>
-            <Link href="/shipper/delivery">
+            <Link href="/shipper/delivery/warehouse">
               <Button
                 variant="ghost"
                 className="font-gothic text-sm border-b-2 border-transparent hover:border-black hover:bg-transparent"
               >
-                <Route className="w-4 h-4 mr-2" />
-                Delivery Route
+                <Package className="w-4 h-4 mr-2" />
+                In Warehouse
+              </Button>
+            </Link>
+            <Link href="/shipper/delivery/out-for-delivery">
+              <Button
+                variant="ghost"
+                className="font-gothic text-sm border-b-2 border-transparent hover:border-black hover:bg-transparent"
+              >
+                <Truck className="w-4 h-4 mr-2" />
+                Out for Delivery
               </Button>
             </Link>
           </nav>
         </div>
       </div>
-
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-6 py-6">
         {children}
