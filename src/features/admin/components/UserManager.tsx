@@ -156,19 +156,11 @@ export default function UserManager() {
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50">
-                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  <input 
-                    type="checkbox" 
-                    checked={bulkSelected.length === filteredUsers.length && filteredUsers.length > 0} 
-                    onChange={e => setBulkSelected(e.target.checked ? filteredUsers.map((u: any) => u.userId) : [])} 
-                  />
-                </th>
                 <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                 <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
                 <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                 <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                 <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Flags</th>
                 <th className="text-right py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
@@ -176,13 +168,6 @@ export default function UserManager() {
             <tbody>
               {Array.isArray(filteredUsers) && filteredUsers.map((user: any) => (
                 <tr key={user.userId} className="hover:bg-gray-50 border-b">
-                  <td className="py-3 px-6">
-                    <input 
-                      type="checkbox" 
-                      checked={bulkSelected.includes(user.userId)} 
-                      onChange={e => setBulkSelected(e.target.checked ? [...bulkSelected, user.userId] : bulkSelected.filter(id => id !== user.userId))} 
-                    />
-                  </td>
                   <td className="py-3 px-6 text-sm text-gray-900">{user.userId}</td>
                   <td className="py-3 px-6 text-sm text-gray-900">{user.username}</td>
                   <td className="py-3 px-6 text-sm text-gray-900">{user.email}</td>
@@ -191,13 +176,6 @@ export default function UserManager() {
                     <Badge variant={user.roleName === 'ADMIN' ? 'default' : 'secondary'}>
                       {user.roleName}
                     </Badge>
-                  </td>
-                  <td className="py-3 px-6">
-                    {user.accountStatus === 'ACTIVE' ? (
-                      <Badge className="bg-green-100 text-green-800">Active</Badge>
-                    ) : (
-                      <Badge className="bg-red-100 text-red-800">Inactive</Badge>
-                    )}
                   </td>
                   <td className="py-3 px-6 flex gap-2 items-center">
                   {user.isLegitProfile ? (

@@ -15,6 +15,11 @@ const routeProtection = {
   
   public: {
     paths: ['/', '/marketplace', '/products', '/categories', '/designers', '/editorial', '/login'],
+  },
+
+  shipper: {
+    paths: ['/shipper'],
+    redirectTo: '/login'
   }
 };
 
@@ -64,6 +69,11 @@ async function isAdmin(request: NextRequest): Promise<boolean> {
   return user?.role === 'ADMIN';
 }
 
+async function isShipper(request: NextRequest): Promise<boolean> {
+  const user = await getUserFromToken(request);
+  return user?.role === 'SHIPPER';
+}
+
 async function checkRouteAccess(pathname: string, request: NextRequest): Promise<{
   isAllowed: boolean;
   redirectTo?: string;
@@ -72,16 +82,24 @@ async function checkRouteAccess(pathname: string, request: NextRequest): Promise
   if (routeProtection.admin.paths.some(path => pathname.startsWith(path))) {
     const authenticated = await isAuthenticated(request);
     const admin = await isAdmin(request);
-    
     if (!authenticated || !admin) {
       return { isAllowed: false, redirectTo: routeProtection.admin.redirectTo };
     }
     return { isAllowed: true };
   }
-  
+
+  // Check shipper routes
+  if (routeProtection.shipper.paths.some(path => pathname.startsWith(path))) {
+    const authenticated = await isAuthenticated(request);
+    const shipper = await isShipper(request);
+    if (!authenticated || !shipper) {
+      return { isAllowed: false, redirectTo: routeProtection.shipper.redirectTo };
+    }
+    return { isAllowed: true };
+  }
+
   if (routeProtection.authenticated.paths.some(path => pathname.startsWith(path))) {
     const authenticated = await isAuthenticated(request);
-    
     if (!authenticated) {
       return { isAllowed: false, redirectTo: routeProtection.authenticated.redirectTo };
     }

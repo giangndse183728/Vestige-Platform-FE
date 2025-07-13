@@ -23,6 +23,8 @@ export const useLogin = () => {
       toast.success('Login successful!');   
       if (data.role === 'ADMIN') {
         router.push('/admin');
+      } else if (data.role === 'SHIPPER') {
+        router.push('/shipper');
       } else {
         const urlParams = new URLSearchParams(window.location.search);
         const redirectTo = urlParams.get('redirect');
