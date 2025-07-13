@@ -10,7 +10,8 @@ import {
   Tag,
   Briefcase,
   Bell,
-  User
+  User,
+  LogOut
 } from "lucide-react";
 import CategoryManager from "./CategoryManager";
 import BrandManager from "./BrandManager";
@@ -27,6 +28,8 @@ import {
   getAdminRevenueAnalytics
 } from '@/features/order/services';
 import { Tabs as UITabs, TabsList as UITabsList, TabsTrigger as UITabsTrigger, TabsContent as UITabsContent } from "@/components/ui/tabs";
+import UserManager from './UserManager';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 
 // Mock data for the dashboard
 const mockStats = [
@@ -49,6 +52,7 @@ const tabs = [
   { id: "brands", label: "Brands", icon: Briefcase },
   { id: "all-products", label: "All Product", icon: FileText },
   { id: "order-management", label: "Order Management", icon: ShoppingBag },
+  { id: "user-management", label: "User Management", icon: Users },
 ];
 
 export default function AdminDashboard() {
@@ -56,6 +60,7 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { logout, isLoggingOut } = useAuth();
 
   useEffect(() => {
     if (activeTab !== 'overview') return;
@@ -84,6 +89,8 @@ export default function AdminDashboard() {
         return <ProductManager />;
       case "order-management":
         return <OrderManager />;
+      case "user-management":
+        return <UserManager />;
       default:
         return (
           <>
@@ -242,6 +249,18 @@ export default function AdminDashboard() {
                   <span className="text-red-900">TIGE</span>
                   <span className="absolute -top-1 -right-1 text-red-900 text-[8px]">®</span>
                 </h1>
+            </div>
+            <div className="flex items-center">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => logout()}
+                disabled={isLoggingOut}
+                className="flex items-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+              >
+                <LogOut className="h-4 w-4" />
+                {isLoggingOut ? 'Logging out...' : 'Logout'}
+              </Button>
             </div>
           </div>
         </div>

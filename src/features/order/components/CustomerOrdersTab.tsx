@@ -38,6 +38,12 @@ const getStatusColor = (status: OrderStatus) => {
     case 'CONFIRMED':
     case 'PROCESSING':
       return 'bg-blue-100 text-blue-800 border-blue-200';
+    case 'AWAITING_PICKUP':
+      return 'bg-orange-100 text-orange-800 border-orange-200';
+    case 'IN_WAREHOUSE':
+      return 'bg-indigo-100 text-indigo-800 border-indigo-200';
+    case 'OUT_FOR_DELIVERY':
+      return 'bg-purple-100 text-purple-800 border-purple-200';
     case 'SHIPPED':
       return 'bg-purple-100 text-purple-800 border-purple-200';
     case 'DELIVERED':

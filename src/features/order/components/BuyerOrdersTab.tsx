@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useBuyerOrders } from '@/features/order/hooks/useBuyerOrders';
 import { ActualOrder, OrderStatus } from '@/features/order/schema';
-import { Package, Clock, CheckCircle, XCircle, Truck, ArrowRight, Calendar, DollarSign, AlertCircle } from 'lucide-react';
+import { Package, Clock, CheckCircle, XCircle, Truck, ArrowRight, Calendar, DollarSign, AlertCircle, QrCode } from 'lucide-react';
 import { format } from 'date-fns';
 
 const statusConfig = {
@@ -57,6 +57,21 @@ const statusConfig = {
     label: 'Processing',
     color: 'bg-blue-100 text-blue-800',
     icon: Clock,
+  },
+  AWAITING_PICKUP: {
+    label: 'Awaiting Pickup',
+    color: 'bg-orange-100 text-orange-800',
+    icon: QrCode,
+  },
+  IN_WAREHOUSE: {
+    label: 'In Warehouse',
+    color: 'bg-indigo-100 text-indigo-800',
+    icon: Package,
+  },
+  OUT_FOR_DELIVERY: {
+    label: 'Out for Delivery',
+    color: 'bg-purple-100 text-purple-800',
+    icon: Truck,
   },
 };
 

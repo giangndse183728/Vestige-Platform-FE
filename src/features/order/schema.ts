@@ -40,7 +40,7 @@ export const transactionSchema = z.object({
 });
 
 export const escrowStatusEnum = z.enum(['HOLDING', 'RELEASED', 'REFUNDED', 'CANCELLED']);
-export const orderStatusEnum = z.enum(['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED', 'EXPIRED', 'PAID', 'PROCESSING']);
+export const orderStatusEnum = z.enum(['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED', 'EXPIRED', 'PAID', 'PROCESSING', 'AWAITING_PICKUP', 'IN_WAREHOUSE', 'OUT_FOR_DELIVERY']);
 
 export const orderItemDetailSchema = z.object({
   orderItemId: z.number(),
@@ -128,3 +128,33 @@ export type OrderItemSummary = z.infer<typeof orderItemSummarySchema>;
 export type ActualOrder = z.infer<typeof actualOrderSchema>;
 export type Pagination = z.infer<typeof paginationSchema>;
 export type OrdersResponse = z.infer<typeof ordersResponseSchema>;
+
+// Logistics schemas for shipper functionality
+export const pickupItemSchema = z.object({
+  orderItemId: z.number(),
+  status: orderStatusEnum,
+  product: orderProductSchema,
+  seller: sellerSchema,
+  order: z.object({
+    shippingAddress: addressSchema.omit({ isDefault: true, createdAt: true }),
+  }),
+});
+
+export const pickupListResponseSchema = z.object({
+  status: z.string(),
+  message: z.string(),
+  data: z.array(pickupItemSchema),
+});
+
+export const confirmPickupRequestSchema = z.object({
+  photoUrls: z.array(z.string().url()),
+});
+
+export const confirmDeliveryRequestSchema = z.object({
+  photoUrls: z.array(z.string().url()),
+});
+
+export type PickupItem = z.infer<typeof pickupItemSchema>;
+export type PickupListResponse = z.infer<typeof pickupListResponseSchema>;
+export type ConfirmPickupRequest = z.infer<typeof confirmPickupRequestSchema>;
+export type ConfirmDeliveryRequest = z.infer<typeof confirmDeliveryRequestSchema>;

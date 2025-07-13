@@ -8,6 +8,7 @@ interface RouteGuardProps {
   children: React.ReactNode;
   requireAuth?: boolean;
   requireAdmin?: boolean;
+  allowedRoles?: string[];
   redirectTo?: string;
 }
 
@@ -15,6 +16,7 @@ export default function RouteGuard({
   children, 
   requireAuth = true, 
   requireAdmin = false,
+  allowedRoles = [],
   redirectTo = '/login'
 }: RouteGuardProps) {
   const [isLoading, setIsLoading] = useState(true);
@@ -54,7 +56,13 @@ export default function RouteGuard({
       router.push('/');
       return;
     }
-  }, [isLoading, requireAuth, requireAdmin, isAuthenticated, userRole, router, redirectTo]);
+
+    // Check allowed roles
+    if (allowedRoles.length > 0 && isAuthenticated && userRole && !allowedRoles.includes(userRole)) {
+      router.push('/');
+      return;
+    }
+  }, [isLoading, requireAuth, requireAdmin, allowedRoles, isAuthenticated, userRole, router, redirectTo]);
 
   // Show loading state
   if (isLoading) {
@@ -71,6 +79,10 @@ export default function RouteGuard({
   }
 
   if (requireAdmin && userRole !== 'ADMIN') {
+    return null;
+  }
+
+  if (allowedRoles.length > 0 && userRole && !allowedRoles.includes(userRole)) {
     return null;
   }
 
