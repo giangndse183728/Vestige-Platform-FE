@@ -29,10 +29,14 @@ export default function ShipperLayout({ children }: ShipperLayoutProps) {
 
   useEffect(() => {
     if (user) {
-      // Any logged in user can access shipper app
-      setIsLoading(false);
+      const role = (user as any).roleName || (user as any).role;
+      if (role === 'SHIPPER') {
+        setIsLoading(false);
+      } else {
+        router.replace('/'); // Không đủ quyền, về trang chủ
+      }
     } else {
-      router.push('/login');
+      router.replace('/login');
     }
   }, [user, router]);
 

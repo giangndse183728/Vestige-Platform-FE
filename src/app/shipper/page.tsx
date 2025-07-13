@@ -17,8 +17,9 @@ import Image from 'next/image';
 import { getPickupList } from '@/features/order/services';
 import { PickupItem } from '@/features/order/schema';
 import { useRouter } from 'next/navigation';
+import RouteGuard from '@/components/auth/RouteGuard';
 
-export default function ShipperDashboard() {
+function ShipperDashboard() {
   const [pickups, setPickups] = useState<PickupItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -206,5 +207,13 @@ export default function ShipperDashboard() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ShipperDashboardPage() {
+  return (
+    <RouteGuard requireAuth={true} allowedRoles={['SHIPPER']}>
+      <ShipperDashboard />
+    </RouteGuard>
   );
 } 
