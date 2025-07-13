@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { TrustTier, AccountStatus, Gender } from "@/constants/enum";
 
 export const profileFormSchema = z.object({
   firstName: z.string().min(1, { message: "First name is required" }),
@@ -11,7 +12,7 @@ export const profileFormSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/, { message: "Invalid date format (YYYY-MM-DD)" })
     .optional()
     .nullable(),
-  gender: z.enum(["male", "female", "other", "prefer-not-to-say"])
+  gender: z.enum([Gender.MALE, Gender.FEMALE, Gender.OTHER, Gender.PREFER_NOT_TO_SAY])
     .optional()
     .nullable(),
   bio: z.string()
@@ -27,7 +28,7 @@ export const profileFormSchema = z.object({
 export const profileStatsSchema = z.object({
   sellerRating: z.number().min(0).max(5),
   trustScore: z.number().min(0).max(5),
-  trustTier: z.enum(["NEW_SELLER", "RISING_SELLER", "PRO_SELLER", "ELITE_SELLER"]),
+  trustTier: z.enum([TrustTier.NEW_SELLER, TrustTier.RISING_SELLER, TrustTier.PRO_SELLER, TrustTier.ELITE_SELLER]),
   successfulTransactions: z.number().min(0),
   totalProductsListed: z.number().min(0),
   activeProductsCount: z.number().min(0),
@@ -41,7 +42,7 @@ export const profileUserSchema = profileFormSchema.extend({
   username: z.string().min(3, { message: "Username must be at least 3 characters" }),
   email: z.string().email({ message: "Invalid email address" }),
   isVerified: z.boolean(),
-  accountStatus: z.enum(["active", "suspended", "pending"]),
+  accountStatus: z.enum([AccountStatus.ACTIVE, AccountStatus.INACTIVE, AccountStatus.SUSPENDED, AccountStatus.PENDING]),
 }).merge(profileStatsSchema);
 
 export type ProfileFormData = z.infer<typeof profileFormSchema>;

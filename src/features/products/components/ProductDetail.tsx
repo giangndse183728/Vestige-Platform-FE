@@ -8,6 +8,7 @@ import { useCartStore } from '@/features/cart/hooks';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { formatVNDPrice } from '@/utils/format';
+import { ProductStatus, BLOCKED_PRODUCT_STATUSES, PRODUCT_STATUS_MESSAGES, ProductCondition } from '@/constants/enum';
 
 interface Seller {
   userId: number;
@@ -135,13 +136,13 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
   const getConditionHearts = (condition: string) => {
     const conditions = {
-      'NEW': 5,
-      'LIKE_NEW': 4,
-      'USED_EXCELLENT': 3,
-      'USED_GOOD': 2,
-      'FAIR': 1
+      [ProductCondition.NEW]: 5,
+      [ProductCondition.LIKE_NEW]: 4,
+      [ProductCondition.USED_EXCELLENT]: 3,
+      [ProductCondition.USED_GOOD]: 2,
+      [ProductCondition.FAIR]: 1
     };
-    return conditions[condition as keyof typeof conditions] || 0;
+    return conditions[condition as ProductCondition] || 0;
   };
 
   return (
@@ -325,12 +326,15 @@ export function ProductDetail({ product }: ProductDetailProps) {
                       <div className="text-xs text-gray-500 mb-1">Status</div>
                       <div className="flex items-center gap-2">
                         <div className={`px-3 py-1 rounded-sm text-xs font-medium ${
-                          product.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                          product.status === 'INACTIVE' ? 'bg-gray-100 text-gray-800' :
-                          product.status === 'DRAFT' ? 'bg-yellow-100 text-yellow-800' :
+                          product.status === ProductStatus.ACTIVE ? 'bg-green-100 text-green-800' :
+                          product.status === ProductStatus.INACTIVE ? 'bg-gray-100 text-gray-800' :
+                          product.status === ProductStatus.DRAFT ? 'bg-yellow-100 text-yellow-800' :
+                          product.status === ProductStatus.SOLD ? 'bg-blue-100 text-blue-800' :
+                          product.status === ProductStatus.REPORTED ? 'bg-orange-100 text-orange-800' :
+                          product.status === ProductStatus.BANNED ? 'bg-red-100 text-red-800' :
                           'bg-gray-100 text-gray-800'
                         }`}>
-                          {product.status || 'INACTIVE'}
+                          {product.status || ProductStatus.INACTIVE}
                         </div>
                       </div>
                     </div>
@@ -388,23 +392,29 @@ export function ProductDetail({ product }: ProductDetailProps) {
               </Link>
             </div>
 
-            <div className="flex flex-col ">
-              <button 
-                className="w-full bg-[var(--dark-red)] text-white py-3 font-medium hover:bg-red-700 transition-colors border-2 border-black -mr-[2px] -mb-[2px]"
-                onClick={() => router.push(`/checkout?productId=${product.productId}`)}
-              >
-                Buy Now
-              </button>
-              <Button 
-                variant="corner-red" 
-                onClick={handleAddToCart}
-              >
-                Add to Cart
-              </Button>
-              
-              
-              
-            </div>
+            {/* Buy/Add to Cart Buttons - Only show if product is available */}
+            {!BLOCKED_PRODUCT_STATUSES.includes(product.status as any) ? (
+              <div className="flex flex-col ">
+                <button 
+                  className="w-full bg-[var(--dark-red)] text-white py-3 font-medium hover:bg-red-700 transition-colors border-2 border-black -mr-[2px] -mb-[2px]"
+                  onClick={() => router.push(`/checkout?productId=${product.productId}`)}
+                >
+                  Buy Now
+                </button>
+                <Button 
+                  variant="corner-red" 
+                  onClick={handleAddToCart}
+                >
+                  Add to Cart
+                </Button>
+              </div>
+            ) : (
+              <div className="p-5 bg-gray-100 border-2 border-black -mr-[2px] -mb-[2px] text-center">
+                                 <p className="text-gray-600 font-medium">
+                   {PRODUCT_STATUS_MESSAGES[product.status as keyof typeof PRODUCT_STATUS_MESSAGES] || 'This item is not available for purchase'}
+                 </p>
+              </div>
+            )}
 
        
           </div>
