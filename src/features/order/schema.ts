@@ -146,3 +146,33 @@ export type OrderItemSummary = z.infer<typeof orderItemSummarySchema>;
 export type ActualOrder = z.infer<typeof actualOrderSchema>;
 export type Pagination = z.infer<typeof paginationSchema>;
 export type OrdersResponse = z.infer<typeof ordersResponseSchema>;
+
+// Logistics schemas for shipper functionality
+export const pickupItemSchema = z.object({
+  orderItemId: z.number(),
+  status: orderStatusEnum,
+  product: orderProductSchema,
+  seller: sellerSchema,
+  order: z.object({
+    shippingAddress: addressSchema.omit({ isDefault: true, createdAt: true }),
+  }),
+});
+
+export const pickupListResponseSchema = z.object({
+  status: z.string(),
+  message: z.string(),
+  data: z.array(pickupItemSchema),
+});
+
+export const confirmPickupRequestSchema = z.object({
+  photoUrls: z.array(z.string().url()),
+});
+
+export const confirmDeliveryRequestSchema = z.object({
+  photoUrls: z.array(z.string().url()),
+});
+
+export type PickupItem = z.infer<typeof pickupItemSchema>;
+export type PickupListResponse = z.infer<typeof pickupListResponseSchema>;
+export type ConfirmPickupRequest = z.infer<typeof confirmPickupRequestSchema>;
+export type ConfirmDeliveryRequest = z.infer<typeof confirmDeliveryRequestSchema>;

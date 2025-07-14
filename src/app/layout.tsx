@@ -54,7 +54,10 @@ export default function RootLayout({
 }) {
   const [queryClient] = useState(() => new QueryClient());
   const pathname = usePathname();
-  const noLayout = ROUTES_NO_LAYOUT.includes(pathname) || pathname.startsWith("/admin") || pathname.startsWith("/order-details/");
+  const noLayout = ROUTES_NO_LAYOUT.includes(pathname)
+    || pathname.startsWith("/admin")
+    || pathname.startsWith("/order-details/")
+    || pathname.startsWith("/shipper");
 
   return (
     <html lang="en">
@@ -66,7 +69,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} ${metalMania.variable} ${cinzel.variable} antialiased text-gray-900 overlay-scroll`}>
       <QueryClientProvider client={queryClient}>
         {noLayout ? (
-       
+ 
        <main className="flex-1 relative z-10">
        <div className="absolute inset-0 bg-[url('/background.jpg')] bg-cover bg-center bg-fixed opacity-95 pointer-events-none"></div>
        <div className="relative z-10 ">

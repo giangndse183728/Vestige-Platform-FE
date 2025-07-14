@@ -215,9 +215,9 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
             onClick={() => router.back()}
             className="border-2 border-black font-gothic hover:bg-black hover:text-white transition-colors"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+              <ArrowLeft className="w-4 h-4 mr-2" />
             Back
-          </Button>
+            </Button>
         </div>
 
         {/* Enhanced Order Summary Card */}

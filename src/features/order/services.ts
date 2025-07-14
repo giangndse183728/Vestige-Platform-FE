@@ -82,6 +82,33 @@ export const getAdminAllOrders = async () => {
   return response.data;
 };
 
+// LOGISTICS SERVICES FOR SHIPPERS
+
+export const confirmPickup = async (orderItemId: number, photoUrls: string[]) => {
+  const response = await api.post<ApiResponse<any>>('/logistics/confirm-pickup', {
+    orderItemId,
+    photoUrls,
+  });
+  return response.data;
+};
+
+export const dispatchItem = async (itemId: number) => {
+  const response = await api.post<ApiResponse<any>>(`/logistics/items/${itemId}/dispatch`);
+  return response.data;
+};
+
+export const confirmDelivery = async (itemId: number, photoUrls: string[]) => {
+  const response = await api.post<ApiResponse<any>>(`/logistics/items/${itemId}/confirm-delivery`, {
+    photoUrls,
+  });
+  return response.data;
+};
+
+export const getLogisticsListByStatus = async (status: string) => {
+  const response = await api.get<ApiResponse<any>>(`/logistics`, { params: { status } });
+  return response.data;
+};
+
 export const requestItemPickup = async (orderId: number, itemId: number) => {
   const response = await api.post(`/orders/${orderId}/items/${itemId}/request-pickup`);
   return response.data;
