@@ -149,3 +149,8 @@ export async function fetchNewArrivals(): Promise<ProductsResponse> {
   const response = await api.get<ApiResponse<ProductsResponse>>(`/products?size=12&sortBy=createdAt&sortDir=desc`);
   return response.data.data;
 }
+
+export async function fetchSellerProducts(sellerId: number): Promise<ProductsResponse> {
+  const response = await api.get<ApiResponse<ProductsResponse>>(`/products?sellerId=${sellerId}`);
+  return response.data.data;
+}

@@ -23,6 +23,8 @@ import { usePublicProfile } from '../hooks/usePublicProfile';
 import { PublicProfileSkeleton } from './VisitProfileSkeleton';
 import { ActivityStats } from './ActivityStats';
 import { TrustTier, TRUST_TIER_LABELS } from '@/constants/enum';
+import { useSellerProduct } from '@/features/products/hooks/useSellerProduct';
+import { ProductCard } from '@/features/products/components/ProductCard';
 
 interface PublicUserProfileProps {
   userId?: number;
@@ -33,6 +35,13 @@ export const PublicUserProfile: React.FC<PublicUserProfileProps> = ({ userId }) 
   const profileId = userId || parseInt(params?.id as string, 10);
   
   const { user, isLoading, error } = usePublicProfile(profileId);
+
+  // Always call the hook, even if user is not available yet
+  const { data: productsData, isLoading: isProductsLoading } = useSellerProduct(user?.userId);
+
+  if (!user) {
+    return <div className="p-6 text-center font-gothic">User data not available.</div>
+  }
 
   const getProfilePictureBorder = (tier: TrustTier | string) => {
     switch (tier) {
@@ -92,6 +101,36 @@ export const PublicUserProfile: React.FC<PublicUserProfileProps> = ({ userId }) 
     }
   };
 
+  const getTrustTierTextColor = (tier: TrustTier | string) => {
+    switch (tier) {
+      case TrustTier.NEW_SELLER:
+        return 'text-gray-800';
+      case TrustTier.RISING_SELLER:
+        return 'text-yellow-700';
+      case TrustTier.PRO_SELLER:
+        return 'text-purple-800';
+      case TrustTier.ELITE_SELLER:
+        return 'text-red-900';
+      default:
+        return 'text-black';
+    }
+  };
+
+  const getTrustTierBg = (tier: TrustTier | string) => {
+    switch (tier) {
+      case TrustTier.NEW_SELLER:
+        return 'bg-gradient-to-r from-gray-200 to-white text-gray-900';
+      case TrustTier.RISING_SELLER:
+        return 'bg-gradient-to-r from-red-100 to-yellow-100 text-yellow-900';
+      case TrustTier.PRO_SELLER:
+        return 'bg-gradient-to-r from-purple-100 to-gray-100 text-purple-900';
+      case TrustTier.ELITE_SELLER:
+        return 'bg-gradient-to-r from-yellow-200 via-red-100 to-black text-yellow-100';
+      default:
+        return 'bg-gray-100 text-black';
+    }
+  };
+
   const handleContactUser = () => {
     // Navigate to messaging or contact form
     console.log('Contact user:', profileId);
@@ -122,10 +161,6 @@ export const PublicUserProfile: React.FC<PublicUserProfileProps> = ({ userId }) 
         </div>
       </div>
     );
-  }
-
-  if (!user) {
-    return <div className="p-6 text-center font-gothic">User data not available.</div>
   }
 
   return (  
@@ -251,6 +286,33 @@ export const PublicUserProfile: React.FC<PublicUserProfileProps> = ({ userId }) 
 
 
 
+      </div>
+
+      {/* Seller's Products */}
+      <div className="max-w-8xl mx-auto mt-12">
+        <div className={`rounded-md mb-8 px-4 py-4 text-center border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] ${getTrustTierBg(user.trustTier)}`}>
+          <h3 className={`font-metal text-3xl tracking-wider flex items-center justify-center space-x-4 ${getTrustTierTextColor(user.trustTier)}`}>
+            <div className="w-8 h-1 bg-black"></div>
+            <span>Products by {user.firstName} {user.lastName}</span>
+            <div className="w-8 h-1 bg-black"></div>
+          </h3>
+        </div>
+        {isProductsLoading ? (
+          <div className="text-center py-8 font-gothic text-gray-500">Loading products...</div>
+        ) : productsData && productsData.content && productsData.content.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {productsData.content.map((product: any) => (
+              <div
+                key={product.productId}
+                className={`mb-8 p-2 ${getProfilePictureBorder(user.trustTier)}`}
+              >
+                <ProductCard product={product} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8 font-gothic text-gray-500">No products found for this seller.</div>
+        )}
       </div>
 
       {/* Footer */}

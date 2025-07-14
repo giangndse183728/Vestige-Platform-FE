@@ -4,7 +4,7 @@ import { useOrderDetail } from '@/features/order/hooks/useOrderDetail';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { OrderStatus, EscrowStatus } from '@/features/order/schema';
+import { OrderStatus, OrderItemStatus, EscrowStatus, Buyer, orderItemStatusEnum } from '@/features/order/schema';
 import { formatVNDPrice, formatDate } from '@/utils/format';
 import { 
   Clock, 
@@ -17,23 +17,30 @@ import {
   MapPin,
   User,
   Shield,
+  Package,
+  Warehouse,
+  RotateCcw,
+  Phone,
+  Mail,
 } from 'lucide-react'
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { OrderItemStepper } from './CustomerOrdersTab';
 
-const statusConfig = {
+// Order status config (overall order)
+const orderStatusConfig = {
   PENDING: {
     label: 'Pending',
     color: 'bg-yellow-100 text-yellow-800',
     icon: Clock,
   },
-  CONFIRMED: {
-    label: 'Confirmed',
+  PROCESSING: {
+    label: 'Processing',
     color: 'bg-blue-100 text-blue-800',
-    icon: CheckCircle,
+    icon: Package,
   },
-  SHIPPED: {
-    label: 'Shipped',
+  OUT_FOR_DELIVERY: {
+    label: 'Out for Delivery',
     color: 'bg-purple-100 text-purple-800',
     icon: Truck,
   },
@@ -50,22 +57,56 @@ const statusConfig = {
   REFUNDED: {
     label: 'Refunded',
     color: 'bg-gray-100 text-gray-800',
-    icon: XCircle,
+    icon: RotateCcw,
   },
   EXPIRED: {
     label: 'Expired',
     color: 'bg-gray-100 text-gray-800',
     icon: AlertCircle,
   },
-  PAID: {
-    label: 'Paid',
-    color: 'bg-green-100 text-green-800',
-    icon: CheckCircle,
+};
+
+// OrderItem status config (individual items)
+const orderItemStatusConfig = {
+  PENDING: {
+    label: 'Pending',
+    color: 'bg-yellow-100 text-yellow-800',
+    icon: Clock,
   },
   PROCESSING: {
     label: 'Processing',
     color: 'bg-blue-100 text-blue-800',
     icon: Clock,
+  },
+  AWAITING_PICKUP: {
+    label: 'Awaiting Pickup',
+    color: 'bg-orange-100 text-orange-800',
+    icon: Package,
+  },
+  IN_WAREHOUSE: {
+    label: 'In Warehouse',
+    color: 'bg-indigo-100 text-indigo-800',
+    icon: Warehouse,
+  },
+  OUT_FOR_DELIVERY: {
+    label: 'Out for Delivery',
+    color: 'bg-purple-100 text-purple-800',
+    icon: Truck,
+  },
+  DELIVERED: {
+    label: 'Delivered',
+    color: 'bg-green-100 text-green-800',
+    icon: CheckCircle,
+  },
+  CANCELLED: {
+    label: 'Cancelled',
+    color: 'bg-red-100 text-red-800',
+    icon: XCircle,
+  },
+  REFUNDED: {
+    label: 'Refunded',
+    color: 'bg-gray-100 text-gray-800',
+    icon: RotateCcw,
   },
 };
 
@@ -135,14 +176,29 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
     );
   }
 
-  const getStatusIcon = (status: OrderStatus) => {
-    const config = statusConfig[status];
+  const getOrderStatusIcon = (status: OrderStatus) => {
+    const config = orderStatusConfig[status];
+    if (!config) {
+      return <AlertCircle className="w-4 h-4" />;
+    }
+    const IconComponent = config.icon;
+    return <IconComponent className="w-4 h-4" />;
+  };
+
+  const getOrderItemStatusIcon = (status: OrderItemStatus) => {
+    const config = orderItemStatusConfig[status];
+    if (!config) {
+      return <AlertCircle className="w-4 h-4" />;
+    }
     const IconComponent = config.icon;
     return <IconComponent className="w-4 h-4" />;
   };
 
   const getEscrowStatusIcon = (status: EscrowStatus) => {
     const config = escrowStatusConfig[status];
+    if (!config) {
+      return <AlertCircle className="w-4 h-4" />;
+    }
     const IconComponent = config.icon;
     return <IconComponent className="w-4 h-4" />;
   };
@@ -170,9 +226,9 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
-                  {getStatusIcon(order.status)}
-                  <Badge className={`${statusConfig[order.status].color} border-white font-metal`}>
-                    {statusConfig[order.status].label}
+                  {getOrderStatusIcon(order.status)}
+                  <Badge className={`${orderStatusConfig[order.status]?.color || 'bg-gray-100 text-gray-800'} border-white font-metal`}>
+                    {orderStatusConfig[order.status]?.label || order.status}
                   </Badge>
                 </div>
                 <span className="font-gothic text-sm text-white">
@@ -191,24 +247,25 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div className="text-center p-4 bg-white border-2 border-black shadow-sm">
                 <div className="text-xs text-gray-500 mb-2 font-gothic uppercase tracking-wider">Items</div>
-                <div className="font-bold font-metal text-2xl text-black">{order.totalItems}</div>
+                <div className="font-metal text-2xl text-black">{order.totalItems}</div>
               </div>
               <div className="text-center p-4 bg-white border-2 border-black shadow-sm">
                 <div className="text-xs text-gray-500 mb-2 font-gothic uppercase tracking-wider">Shipping Fee</div>
-                <div className="font-bold font-metal text-lg text-black">{formatVNDPrice(order.totalShippingFee)}</div>
+                <div className="font-metal text-lg text-black">{formatVNDPrice(order.totalShippingFee)}</div>
               </div>
               <div className="text-center p-4 bg-white border-2 border-black shadow-sm">
                 <div className="text-xs text-gray-500 mb-2 font-gothic uppercase tracking-wider">Platform Fee</div>
-                <div className="font-bold font-metal text-lg text-black">{formatVNDPrice(order.totalPlatformFee)}</div>
+                <div className="font-metal text-lg text-black">{formatVNDPrice(order.totalPlatformFee)}</div>
               </div>
               <div className="text-center p-4 bg-white border-2 border-black shadow-sm">
                 <div className="text-xs text-gray-500 mb-2 font-gothic uppercase tracking-wider">Sellers</div>
-                <div className="font-bold font-metal text-2xl text-black">{order.uniqueSellers}</div>
+                <div className="font-metal text-2xl text-black">{order.uniqueSellers}</div>
               </div>
             </div>
           </CardContent>
         </Card>
 
+      
         {/* Enhanced Order Items by Seller */}
         <div className="space-y-8">
           {Object.entries(order.itemsBySeller).map(([sellerId, items]) => (
@@ -235,8 +292,8 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                 </div>
               </CardHeader>
               <CardContent className="p-8 bg-white">
-                <div className="grid lg:grid-cols-2 gap-8">
-                  {/* Left Column - Product Details */}
+                <div className="space-y-8">
+                  {/* First Row - Product Details */}
                   <div className="space-y-6">
                     <div className="flex items-center gap-3 mb-6">
                       <div className="w-8 h-8 bg-red-900 rounded-full flex items-center justify-center">
@@ -245,7 +302,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                       <h4 className="font-metal text-xl text-black">Product Details</h4>
                     </div>
                     {items.map((item) => (
-                      <div key={item.orderItemId} className="border-2 border-gray-200 p-6  hover:border-black transition-colors">
+                      <div key={item.orderItemId} className="border-2 border-gray-200 p-6 hover:border-black transition-colors">
                         <div className="flex gap-6">
                           <div className="relative w-24 h-24 bg-gray-200 rounded-lg overflow-hidden border-2 border-gray-300 flex-shrink-0">
                             {item.product.primaryImageUrl ? (
@@ -262,7 +319,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h5 className="font-bold text-lg font-metal mb-3 text-black">{item.product.title}</h5>
+                            <h5 className=" text-lg font-metal mb-3 text-black">{item.product.title}</h5>
                             <p className="text-sm text-gray-600 mb-4 line-clamp-2">{item.product.description}</p>
                             
                             <div className="grid grid-cols-2 gap-4 mb-4">
@@ -297,8 +354,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                       </div>
                     ))}
                   </div>
-
-                  {/* Right Column - Status & Transaction Info */}
+                  {/* Second Row - Status & Tracking */}
                   <div className="space-y-6">
                     <div className="flex items-center gap-3 mb-6">
                       <div className="w-8 h-8 bg-black flex items-center justify-center">
@@ -306,57 +362,28 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                       </div>
                       <h4 className="font-metal text-xl text-black">Status & Tracking</h4>
                     </div>
-                    {items.map((item) => (
-                      <div key={item.orderItemId} className="border-2 border-gray-200 p-6  hover:border-black transition-colors">
-                        <div className="space-y-6">
-                          {/* Status Badges */}
-                          <div className="flex flex-wrap gap-3">
-                            <div className="flex items-center gap-2 bg-white border-2 border-gray-200 px-4 py-2">
-                              {getStatusIcon(item.status)}
-                              <Badge className={`${statusConfig[item.status].color} font-metal`}>
-                                {item.status}
-                              </Badge>
-                            </div>
-                            <div className="flex items-center gap-2 bg-white border-2 border-gray-200 px-4 py-2 ">
-                              {getEscrowStatusIcon(item.escrowStatus)}
-                              <Badge className={`${escrowStatusConfig[item.escrowStatus].color} font-metal`}>
-                                {escrowStatusConfig[item.escrowStatus].label}
-                              </Badge>
-                            </div>
-                          </div>
-
-                          {/* Transaction Details */}
-                          {item.transaction && (
-                            <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
-                              <h6 className="font-bold text-sm font-metal text-black border-b border-gray-300 pb-2">Transaction Details</h6>
-                              <div className="space-y-3 text-sm">
-                                <div className="flex justify-between items-center">
-                                  <span className="text-gray-500 font-gothic">Transaction ID:</span>
-                                  <span className="font-medium font-metal bg-white px-3 py-1 rounded border">#{item.transaction.transactionId}</span>
-                                </div>
-                                {item.transaction.trackingNumber && (
-                                  <div className="flex justify-between items-center">
-                                    <span className="text-gray-500 font-gothic">Tracking:</span>
-                                    <span className="font-medium font-metal bg-white px-3 py-1 rounded border">{item.transaction.trackingNumber}</span>
-                                  </div>
-                                )}
-                                {item.transaction.shippedAt && (
-                                  <div className="flex justify-between items-center">
-                                    <span className="text-gray-500 font-gothic">Shipped:</span>
-                                    <span className="font-medium text-sm font-metal bg-white px-3 py-1 rounded border">{formatDate(item.transaction.shippedAt)}</span>
-                                  </div>
-                                )}
-                                {item.transaction.deliveredAt && (
-                                  <div className="flex justify-between items-center">
-                                    <span className="text-gray-500 font-gothic">Delivered:</span>
-                                    <span className="font-medium text-sm font-metal bg-white px-3 py-1 rounded border">{formatDate(item.transaction.deliveredAt)}</span>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Notes */}
+                    {items.map((item) => {
+                      // Map invalid status to a valid one for the stepper
+                      let stepperStatus: OrderItemStatus;
+                      if (orderItemStatusEnum.options.includes(item.status as any)) {
+                        stepperStatus = item.status as OrderItemStatus;
+                      } else {
+                        stepperStatus = 'CANCELLED';
+                      }
+                      return (
+                        <div key={item.orderItemId} className="border-2 border-gray-200 p-6 hover:border-black transition-colors">
+                          <OrderItemStepper
+                            currentStatus={stepperStatus}
+                            productTitle={item.product.title}
+                            productImage={item.product.primaryImageUrl}
+                            price={item.price}
+                            sellerUsername={items[0].seller.username}
+                            sellerIsLegitProfile={items[0].seller.isLegitProfile}
+                            orderId={order.orderId}
+                            itemId={item.orderItemId}
+                            hideProductInfo={true}
+                          />
+                         
                           {item.notes && (
                             <div className="pt-4 border-t-2 border-gray-200">
                               <div className="text-sm text-gray-500 font-gothic uppercase tracking-wider mb-2">Notes</div>
@@ -364,8 +391,8 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                             </div>
                           )}
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               </CardContent>
@@ -373,15 +400,63 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
           ))}
         </div>
 
+        <Card variant="double" className="border-2 border-black mb-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] mt-8">
+          <CardHeader className="border-b-2 border-black bg-gradient-to-r from-red-800 to-red-950 text-white">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                <User className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="font-metal text-xl text-white">Buyer Information</h3>
+                <p className="font-gothic text-sm text-blue-100">Customer details</p>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-8 bg-gradient-to-br from-gray-50 to-white">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="p-4 bg-white border-2 border-gray-200 rounded-lg">
+                <div className="flex items-center gap-3 mb-2">
+                  <User className="w-5 h-5 text-red-600" />
+                  <span className="text-xs text-gray-500 font-gothic uppercase tracking-wider">Full Name</span>
+                </div>
+                <div className=" font-gothic text-lg text-black">
+                  {order.buyer.firstName} {order.buyer.lastName}
+                </div>
+                <div className="text-sm text-gray-600 font-gothic">@{order.buyer.username}</div>
+              </div>
+              
+              <div className="p-4 bg-white border-2 border-gray-200 rounded-lg">
+                <div className="flex items-center gap-3 mb-2">
+                  <Phone className="w-5 h-5 text-red-600" />
+                  <span className="text-xs text-gray-500 font-gothic uppercase tracking-wider">Phone Number</span>
+                </div>
+                <div className=" font-gothic text-lg text-black">
+                  {order.buyer.phoneNumber}
+                </div>
+              </div>
+              
+              <div className="p-4 bg-white border-2 border-gray-200 rounded-lg">
+                <div className="flex items-center gap-3 mb-2">
+                  <Mail className="w-5 h-5 text-red-600" />
+                  <span className="text-xs text-gray-500 font-gothic uppercase tracking-wider">Email Address</span>
+                </div>
+                <div className=" font-gothic text-lg text-black break-all">
+                  {order.buyer.email}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Enhanced Shipping Address */}
         {order.shippingAddress && (
           <Card variant="double" className="border-2 border-black mt-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-            <CardHeader className="border-b-2 border-black bg-gradient-to-r from-gray-100 to-gray-200">
+            <CardHeader className="border-b-2 border-black bg-gradient-to-r from-blue-800 to-blue-950">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-red-900 rounded-full flex items-center justify-center">
-                  <MapPin className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                  <MapPin className="w-6 h-6 text-blue-600" />
                 </div>
-                <h3 className="font-metal text-xl text-black">Shipping Address</h3>
+                <h3 className="font-metal text-xl text-white">Shipping Address</h3>
               </div>
             </CardHeader>
             <CardContent className="p-8 bg-white">
@@ -401,40 +476,10 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
           </Card>
         )}
 
-        {/* Enhanced Order Timeline */}
-        <Card variant="double" className="border-2 border-black mt-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-          <CardHeader className="border-b-2 border-black bg-gradient-to-r from-gray-100 to-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="font-metal text-xl text-black">Order Timeline</h3>
-            </div>
-          </CardHeader>
-          <CardContent className="p-8 bg-white">
-            <div className="space-y-6">
-              <div className="flex items-center gap-6">
-                <div className="w-4 h-4 bg-green-500 rounded-full border-4 border-white shadow-lg"></div>
-                <div className="flex-1">
-                  <div className=" font-metal text-lg text-black">Order Placed</div>
-                  <div className="text-sm text-gray-600 font-gothic">{formatDate(order.createdAt)}</div>
-                </div>
-              </div>
-              {order.stripePaymentIntentId && (
-                <div className="flex items-center gap-6">
-                  <div className="w-4 h-4 bg-blue-500 rounded-full border-4 border-white shadow-lg"></div>
-                  <div className="flex-1">
-                    <div className="font-metal text-lg text-black">Payment Processed</div>
-                    <div className="text-sm text-gray-600 font-gothic">Stripe Payment Intent: {order.stripePaymentIntentId}</div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+ 
 
         {/* Enhanced Footer */}
-        <div className="mt-12 border-t-4 border-black pt-6 text-center bg-white/90 p-6 rounded-lg">
+        <div className="mt-12 border-t-4 border-black pt-6 text-center bg-white/90 p-6">
           <p className="font-gothic text-sm text-gray-500">
             ORDER DETAILS HERALD • Published by Community Editorial Board • All Rights Reserved
           </p>

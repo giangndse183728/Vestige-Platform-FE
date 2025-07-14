@@ -1,5 +1,5 @@
-import { SubscriptionPlans } from "@/features/subscription/SubscriptionPlans";
+import { MembershipPlans } from "@/features/membership/components/MembershipPlans";
 
 export default function SubscriptionPage() {
-  return <SubscriptionPlans />;
+  return <MembershipPlans />;
 }

@@ -19,17 +19,15 @@ import { ROUTES } from "@/constants/routes";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showMasthead, setShowMasthead] = useState(true);
-  const { isAuthenticated, logout, isLoading } = useAuth();
+  const { isAuthenticated, logout, isLoading, user } = useAuth();
   const pathname = usePathname();
   const isHomePage = pathname === '/';
   const totalItems = useCartStore((state) => state.totalItems());
 
-  // Handle route changes
   useEffect(() => {
     setShowMasthead(isHomePage && window.scrollY === 0);
   }, [pathname, isHomePage]);
 
-  // Handle scroll
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -61,13 +59,43 @@ const Navbar = () => {
               <User className="h-5 w-5" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
+          <DropdownMenuContent variant="double" align="end" className="w-64">
+            {/* User Info Header */}
+            <div className="flex items-center gap-3 px-4 pt-4 pb-2 border-b border-black/10 mb-2">
+              <div className="w-12 h-12 overflow-hidden border-2 border-black bg-gray-200 flex items-center justify-center">
+                {user?.profilePictureUrl ? (
+                  <img src={user.profilePictureUrl} alt={user.username} className="w-full h-full object-cover" />
+                ) : (
+                  <User className="w-8 h-8 text-gray-400" />
+                )}
+              </div>
+              <div className="flex flex-col min-w-0">
+                <div className="font-metal text-base text-black truncate">{user?.username}</div>
+                <div className="text-xs text-gray-600 font-gothic break-all truncate">{user?.email}</div>
+              </div>
+            </div>
+            {/* Profile Tab */}
             <DropdownMenuItem asChild>
-              <Link href="/profile" className="flex items-center cursor-pointer">
+              <Link href="/profile" className="flex items-center cursor-pointer font-gothic font-semibold text-black">
                 <UserCircle className="mr-2 h-4 w-4" />
                 <span>Profile</span>
               </Link>
             </DropdownMenuItem>
+            {/* My Orders Tab */}
+            <DropdownMenuItem asChild>
+              <Link href="/my-orders" className="flex items-center cursor-pointer font-gothic text-black">
+                <ShoppingBag className="mr-2 h-4 w-4" />
+                <span>My Orders</span>
+              </Link>
+            </DropdownMenuItem>
+            {/* Seller Center Tab */}
+            <DropdownMenuItem asChild>
+              <Link href="/seller-center" className="flex items-center cursor-pointer font-gothic text-black">
+                <User className="mr-2 h-4 w-4" />
+                <span>Seller Center</span>
+              </Link>
+            </DropdownMenuItem>
+            {/* Logout */}
             <DropdownMenuItem 
               onClick={() => logout()}
               className="flex items-center cursor-pointer text-red-600"
@@ -109,12 +137,28 @@ const Navbar = () => {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
+            {/* Profile Tab */}
             <DropdownMenuItem asChild>
-              <Link href="/profile" className="flex items-center cursor-pointer">
+              <Link href="/profile" className="flex items-center cursor-pointer font-gothic font-semibold text-black">
                 <UserCircle className="mr-2 h-4 w-4" />
                 <span>Profile</span>
               </Link>
             </DropdownMenuItem>
+            {/* My Orders Tab */}
+            <DropdownMenuItem asChild>
+              <Link href="/my-orders" className="flex items-center cursor-pointer font-gothic text-black">
+                <ShoppingBag className="mr-2 h-4 w-4" />
+                <span>My Orders</span>
+              </Link>
+            </DropdownMenuItem>
+            {/* Seller Center Tab */}
+            <DropdownMenuItem asChild>
+              <Link href="/seller-center" className="flex items-center cursor-pointer font-gothic text-black">
+                <User className="mr-2 h-4 w-4" />
+                <span>Seller Center</span>
+              </Link>
+            </DropdownMenuItem>
+            {/* Logout */}
             <DropdownMenuItem 
               onClick={() => logout()}
               className="flex items-center cursor-pointer text-red-600"
@@ -254,12 +298,12 @@ const Navbar = () => {
                 <Heart className="h-5 w-5" />
               </button>
               </Link>
-              <Link href="/cart" className="p-2 text-black/80 hover:text-red-900 relative">
+              <div className="p-2 text-black/80 hover:text-red-900 relative">
                 <ShoppingBag className="h-5 w-5" />
                 <span className="absolute top-0 right-0 h-4 w-4 rounded-full bg-red-900/90 text-white text-[10px] flex items-center justify-center font-medium shadow-sm">
                   {totalItems || 0}
                 </span>
-              </Link>
+                </div>
               {renderAuthUI()}
             </>
           </div>

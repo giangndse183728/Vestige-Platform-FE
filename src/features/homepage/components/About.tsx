@@ -2,10 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { Card} from "@/components/ui/card";
-import { SubscriptionPlans } from "@/components/subscription/SubscriptionPlans";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Instagram, Facebook, ShoppingBag, UserPlus } from "lucide-react";
+import { FeedbackSection } from '@/features/feedback/components/FeedbackSection';
 
 function About() {
   const router = useRouter();
@@ -25,7 +25,7 @@ function About() {
         <div className="text-center py-6 border-b-1 border-black">
           <h1 className="text-6xl font-metal tracking-wider text-red-900 mb-2">BEHIND THE SCENES</h1>
           <div className="flex justify-center items-center gap-8 text-sm font-gothic">
-            <span>EST. 2024</span>
+            <span>EST. 2025</span>
             <span className="border-l border-r border-black px-4">FASHION • STREETWEAR • COMMUNITY</span>
             <span>GENERATION Z EDITION</span>
           </div>
@@ -240,14 +240,28 @@ function About() {
         </div>
       </div>
 
+      {/* Feedback Section */}
+      <FeedbackSection />
+
       {/* Subscription Section */}
-      <div className="border-3 border-red-900 bg-white relative"></div>
-      <SubscriptionPlans />
+      <div className="border-3 border-red-900 bg-white relative mt-10">
+        <div className="text-center p-8">
+          <h2 className="text-3xl font-metal text-black mb-4 tracking-wider">MEMBERSHIP PLANS</h2>
+          <p className="font-serif text-gray-600 mb-6">
+            Elevate your selling experience with our premium membership plans
+          </p>
+          <Link href="/subscription">
+            <Button className="bg-red-800 hover:bg-red-900 text-white font-gothic px-8 py-4 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all duration-300">
+              VIEW MEMBERSHIP PLANS
+            </Button>
+          </Link>
+        </div>
+      </div>
 
       {/* Newspaper Footer */}
       <div className="mt-12 border-t-2 border-red-800 pt-4 text-center">
         <p className="font-gothic text-xs text-gray-500">
-          © 2024 The Vestige Times • All Rights Reserved • Fashion News & Updates Daily
+          © 2025 The Vestige Times • All Rights Reserved • Fashion News & Updates Daily
         </p>
       </div>
     </div>

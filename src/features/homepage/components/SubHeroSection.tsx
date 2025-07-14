@@ -134,11 +134,11 @@ const SubHeroSection = () => {
 
               <FadeUp delay={0.2}>
                 <Link
-                  href="/collection"
+                  href="/marketplace"
                   className="inline-flex items-center group"
-                  aria-label="Collection"
+                  aria-label="Marketplace"
                 >
-                  <span className="font-gothic text-sm uppercase mr-2 text-[var(--dark-red)]">Collection</span>
+                  <span className="font-gothic text-sm uppercase mr-2 text-[var(--dark-red)]">Marketplace</span>
                   <span className="h-[1px] w-5 bg-[var(--dark-red)] group-hover:w-8 transition-all duration-300"></span>
                 </Link>
 

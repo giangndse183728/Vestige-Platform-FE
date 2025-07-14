@@ -81,3 +81,8 @@ export const getAdminAllOrders = async () => {
   const response = await api.get('/orders/admin/all');
   return response.data;
 };
+
+export const requestItemPickup = async (orderId: number, itemId: number) => {
+  const response = await api.post(`/orders/${orderId}/items/${itemId}/request-pickup`);
+  return response.data;
+};

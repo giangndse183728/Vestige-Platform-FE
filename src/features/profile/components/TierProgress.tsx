@@ -69,12 +69,6 @@ export const TierProgress: React.FC<TierProgressProps> = ({
             <span className="text-gray-300">Sales:</span>
             <span className="text-white font-bold">{requirements.completedSales}</span>
           </div>
-          {requirements.additionalRequirements.map((req, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <span className="text-gray-300">Extra:</span>
-              <span className="text-white font-bold">{req}</span>
-            </div>
-          ))}
         </div>
         {/* Tooltip arrow */}
         <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
