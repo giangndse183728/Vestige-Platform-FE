@@ -26,6 +26,7 @@ import { StripeAccountSection } from '@/features/payment/components/StripeAccoun
 import Image from 'next/image';
 import { TrustTier, Gender, TRUST_TIER_LABELS, TRUST_TIER_DESCRIPTIONS } from '@/constants/enum';
 import { TierProgress } from './TierProgress';
+import { MembershipStatusCard } from '@/features/membership/components/MembershipStatusCard';
 
 // Helper function to format gender display
 const formatGenderDisplay = (gender: string | null | undefined): string => {
@@ -265,7 +266,7 @@ export const Profile = () => {
           (previewTier || user?.trustTier) === TrustTier.RISING_SELLER ? 'rising-seller' :
           (previewTier || user?.trustTier) === TrustTier.NEW_SELLER ? 'stamp' :
           'stamp'
-        }>
+        } className='mb-10'>
       <CardContent>
           <div className="flex flex-col lg:flex-row gap-8">
             <div className="flex-shrink-0">
@@ -405,7 +406,7 @@ export const Profile = () => {
                   <div className="md:col-span-2">
                     <div className="border-b border-black pb-2">
                       <Label className="font-gothic text-sm text-gray-600">Bio</Label>
-                      <p className="font-metal text-lg text-black">{user.bio || "No bio provided"}</p>
+                      <p className="font-serif text-lg text-black">{user.bio || "No bio provided"}</p>
                     </div>
                   </div>
                 </div>
@@ -525,6 +526,8 @@ export const Profile = () => {
           </CardContent>
         </Card>
 
+        <ActivityStats user={user}  />
+
         <div className="border-2 border-black p-6 mt-10 my-8 bg-black/10">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
@@ -571,9 +574,9 @@ export const Profile = () => {
           )}
         </div>
 
+        <MembershipStatusCard className="mt-10" />
+        
         <StripeAccountSection />
-
-        <ActivityStats user={user} />
 
         <div className="mt-8 border-t-2 border-black pt-4 text-center">
           <p className="font-gothic text-xs text-gray-500">

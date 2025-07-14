@@ -270,7 +270,7 @@ const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, currentPage = "
 
         <div className="p-4 border-t border-black">
           <p className="font-gothic text-xs text-gray-500 text-center">
-            © 2024 Vestige Platform<br />
+            © 2025 Vestige Platform<br />
             All Rights Reserved
           </p>
         </div>

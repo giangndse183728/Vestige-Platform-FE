@@ -1,10 +1,15 @@
-import { Profile } from '@/features/profile/components/Profile';
+'use client';
+
 import RouteGuard from '@/components/auth/RouteGuard';
 
-export default function ProfilePage() {
+export default function UserLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <RouteGuard requireAuth={true}>
-      <Profile />
+      {children}
     </RouteGuard>
   );
 } 

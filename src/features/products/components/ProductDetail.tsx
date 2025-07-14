@@ -9,6 +9,8 @@ import { toast } from 'sonner';
 import { useState } from 'react';
 import { formatVNDPrice } from '@/utils/format';
 import { ProductStatus, BLOCKED_PRODUCT_STATUSES, PRODUCT_STATUS_MESSAGES, ProductCondition } from '@/constants/enum';
+import { useAuth } from '@/features/auth/hooks/useAuth';
+import { LoginModal } from '@/components/ui/login-modal';
 
 interface Seller {
   userId: number;
@@ -72,7 +74,9 @@ interface ProductDetailProps {
 export function ProductDetail({ product }: ProductDetailProps) {
   const addToCart = useCartStore((state) => state.addItem);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
 
   const handlePrevImage = () => {
     setSelectedImageIndex((prevIndex) =>
@@ -96,6 +100,11 @@ export function ProductDetail({ product }: ProductDetailProps) {
   };
 
   const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      setShowLoginModal(true);
+      return;
+    }
+
     const validImageUrl = product.images[0]?.imageUrl && isValidUrl(product.images[0].imageUrl) 
       ? product.images[0].imageUrl 
       : '/placeholder.png';
@@ -120,6 +129,14 @@ export function ProductDetail({ product }: ProductDetailProps) {
       },
     });
     toast.success('Added to cart');
+  };
+
+  const handleBuyNow = () => {
+    if (!isAuthenticated) {
+      setShowLoginModal(true);
+      return;
+    }
+    router.push(`/checkout?productId=${product.productId}`);
   };
 
   const formatDate = (dateString: string) => {
@@ -397,13 +414,13 @@ export function ProductDetail({ product }: ProductDetailProps) {
               <div className="flex flex-col ">
                 <button 
                   className="w-full bg-[var(--dark-red)] text-white py-3 font-medium hover:bg-red-700 transition-colors border-2 border-black -mr-[2px] -mb-[2px]"
-                  onClick={() => router.push(`/checkout?productId=${product.productId}`)}
+                  onClick={handleBuyNow}
                 >
                   Buy Now
                 </button>
                 <Button 
                   variant="corner-red" 
-                  onClick={handleAddToCart}
+                  disabled
                 >
                   Add to Cart
                 </Button>
@@ -420,6 +437,13 @@ export function ProductDetail({ product }: ProductDetailProps) {
           </div>
         </div>
       </div>
+
+      <LoginModal 
+        open={showLoginModal}
+        onOpenChange={setShowLoginModal}
+        title="Login Required"
+        description={`You need to be logged in to purchase "${product.title}". Please login or create an account to continue.`}
+      />
     </div>
   );
 } 

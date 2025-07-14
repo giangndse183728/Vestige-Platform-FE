@@ -39,6 +39,7 @@ export const profileStatsSchema = z.object({
 });
 
 export const profileUserSchema = profileFormSchema.extend({
+  userId: z.number(),
   username: z.string().min(3, { message: "Username must be at least 3 characters" }),
   email: z.string().email({ message: "Invalid email address" }),
   isVerified: z.boolean(),

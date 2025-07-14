@@ -9,22 +9,22 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useBuyerOrders } from '@/features/order/hooks/useBuyerOrders';
 import { ActualOrder, OrderStatus } from '@/features/order/schema';
-import { Package, Clock, CheckCircle, XCircle, Truck, ArrowRight, Calendar, DollarSign, AlertCircle, QrCode } from 'lucide-react';
+import { Package, Clock, CheckCircle, XCircle, Truck, ArrowRight, Calendar, DollarSign, AlertCircle, RotateCcw } from 'lucide-react';
 import { format } from 'date-fns';
 
-const statusConfig = {
+const statusConfig: Record<OrderStatus, { label: string; color: string; icon: typeof Clock }> = {
   PENDING: {
     label: 'Pending',
     color: 'bg-yellow-100 text-yellow-800',
     icon: Clock,
   },
-  CONFIRMED: {
-    label: 'Confirmed',
+  PROCESSING: {
+    label: 'Processing',
     color: 'bg-blue-100 text-blue-800',
-    icon: CheckCircle,
+    icon: Package,
   },
-  SHIPPED: {
-    label: 'Shipped',
+  OUT_FOR_DELIVERY: {
+    label: 'Out for Delivery',
     color: 'bg-purple-100 text-purple-800',
     icon: Truck,
   },
@@ -41,37 +41,12 @@ const statusConfig = {
   REFUNDED: {
     label: 'Refunded',
     color: 'bg-gray-100 text-gray-800',
-    icon: XCircle,
+    icon: RotateCcw,
   },
   EXPIRED: {
     label: 'Expired',
     color: 'bg-gray-100 text-gray-800',
     icon: AlertCircle,
-  },
-  PAID: {
-    label: 'Paid',
-    color: 'bg-green-100 text-green-800',
-    icon: CheckCircle,
-  },
-  PROCESSING: {
-    label: 'Processing',
-    color: 'bg-blue-100 text-blue-800',
-    icon: Clock,
-  },
-  AWAITING_PICKUP: {
-    label: 'Awaiting Pickup',
-    color: 'bg-orange-100 text-orange-800',
-    icon: QrCode,
-  },
-  IN_WAREHOUSE: {
-    label: 'In Warehouse',
-    color: 'bg-indigo-100 text-indigo-800',
-    icon: Package,
-  },
-  OUT_FOR_DELIVERY: {
-    label: 'Out for Delivery',
-    color: 'bg-purple-100 text-purple-800',
-    icon: Truck,
   },
 };
 
@@ -173,16 +148,15 @@ export function BuyerOrdersTab() {
             </div>
             
             <Tabs value={statusFilter} onValueChange={setStatusFilter} className="w-full">
-              <TabsList className="grid w-full grid-cols-5 lg:grid-cols-9 border-2 border-black">
+              <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 border-2 border-black">
                 <TabsTrigger value="ALL" className="font-gothic text-xs data-[state=active]:border-b-2 data-[state=active]:border-red-900">All</TabsTrigger>
                 <TabsTrigger value="PENDING" className="font-gothic text-xs data-[state=active]:border-b-2 data-[state=active]:border-red-900">Pending</TabsTrigger>
-                <TabsTrigger value="CONFIRMED" className="font-gothic text-xs data-[state=active]:border-b-2 data-[state=active]:border-red-900">Confirmed</TabsTrigger>
-                <TabsTrigger value="SHIPPED" className="font-gothic text-xs data-[state=active]:border-b-2 data-[state=active]:border-red-900">Shipped</TabsTrigger>
-                <TabsTrigger value="DELIVERED" className="font-gothic text-xs data-[state=active]:border-b-2 data-[state=active]:border-red-900">Delivered</TabsTrigger>
-                <TabsTrigger value="PAID" className="font-gothic text-xs data-[state=active]:border-b-2 data-[state=active]:border-red-900">Paid</TabsTrigger>
                 <TabsTrigger value="PROCESSING" className="font-gothic text-xs data-[state=active]:border-b-2 data-[state=active]:border-red-900">Processing</TabsTrigger>
+                <TabsTrigger value="OUT_FOR_DELIVERY" className="font-gothic text-xs data-[state=active]:border-b-2 data-[state=active]:border-red-900">Out for Delivery</TabsTrigger>
+                <TabsTrigger value="DELIVERED" className="font-gothic text-xs data-[state=active]:border-b-2 data-[state=active]:border-red-900">Delivered</TabsTrigger>
                 <TabsTrigger value="CANCELLED" className="font-gothic text-xs data-[state=active]:border-b-2 data-[state=active]:border-red-900">Cancelled</TabsTrigger>
                 <TabsTrigger value="REFUNDED" className="font-gothic text-xs data-[state=active]:border-b-2 data-[state=active]:border-red-900">Refunded</TabsTrigger>
+                <TabsTrigger value="EXPIRED" className="font-gothic text-xs data-[state=active]:border-b-2 data-[state=active]:border-red-900">Expired</TabsTrigger>
               </TabsList>
             </Tabs>
           </CardContent>
@@ -272,9 +246,11 @@ export function BuyerOrdersTab() {
                                   <div className="flex gap-2 mt-2">
                                     <Badge className={`text-xs ${
                                       item.itemStatus === 'DELIVERED' ? 'bg-green-100 text-green-800' :
-                                      item.itemStatus === 'SHIPPED' ? 'bg-purple-100 text-purple-800' :
+                                      item.itemStatus === 'OUT_FOR_DELIVERY' ? 'bg-purple-100 text-purple-800' :
                                       item.itemStatus === 'PROCESSING' ? 'bg-blue-100 text-blue-800' :
                                       item.itemStatus === 'CANCELLED' ? 'bg-red-100 text-red-800' :
+                                      item.itemStatus === 'REFUNDED' ? 'bg-gray-100 text-gray-800' :
+                                      item.itemStatus === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
                                       'bg-gray-100 text-gray-800'
                                     }`}>
                                       {item.itemStatus}
