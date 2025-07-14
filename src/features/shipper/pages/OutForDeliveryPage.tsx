@@ -4,15 +4,17 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Truck, RefreshCw, AlertCircle, User, Package, MapPin } from 'lucide-react';
+import { Truck, RefreshCw, AlertCircle, User, Package, MapPin, Camera } from 'lucide-react';
 import Image from 'next/image';
 import { getLogisticsListByStatus } from '@/features/order/services';
 import { PickupItem } from '@/features/order/schema';
+import { useRouter } from 'next/navigation';
 
 function OutForDeliveryPage() {
   const [outForDeliveryItems, setOutForDeliveryItems] = useState<PickupItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const fetchItems = async () => {
     try {
@@ -70,17 +72,17 @@ function OutForDeliveryPage() {
           <p className="font-gothic text-gray-600">No items out for delivery</p>
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-10 justify-center" style={{ gridTemplateColumns: '1fr' }}>
           {outForDeliveryItems.map((item) => (
-            <Card key={item.orderItemId} className="hover:border-gray-400 transition-colors w-full mx-auto p-4 text-base">
-              <CardContent className="p-4">
+            <Card key={item.orderItemId} className="hover:border-gray-400 transition-colors w-full max-w-4xl mx-auto p-4 text-base">
+              <CardContent className="p-3">
                 {/* Product Info */}
-                <div className="flex gap-4 mb-4">
-                  <div className="relative w-20 h-20 bg-gray-100 rounded overflow-hidden flex-shrink-0 flex items-center justify-center">
-                    <Package className="w-8 h-8 text-gray-400" />
+                <div className="flex gap-4 mb-3">
+                  <div className="relative w-16 h-16 bg-gray-100 rounded overflow-hidden flex-shrink-0 flex items-center justify-center">
+                    <Package className="w-7 h-7 text-gray-400" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-metal text-sm font-bold truncate mb-1">
+                    <h3 className="font-metal text-base font-bold truncate mb-1">
                       {item.productName || 'Unknown Product'}
                     </h3>
                     <Badge className="bg-purple-100 text-purple-800 border-2 border-purple-200 font-metal text-xs">
@@ -89,17 +91,44 @@ function OutForDeliveryPage() {
                   </div>
                 </div>
                 {/* Seller Info */}
-                <div className="flex items-center gap-2 mb-4 p-3 bg-gray-50 rounded border">
-                  <User className="w-4 h-4 text-gray-600" />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-gothic text-sm font-medium truncate">
-                      {(item.sellerFirstName || item.seller?.firstName || '') + ' ' + (item.sellerLastName || item.seller?.lastName || '') || item.sellerName || 'Unknown Seller'}
-                    </p>
-                    {item.sellerUsername && (
-                      <p className="font-gothic text-xs text-gray-600">
-                        @{item.sellerUsername}
-                      </p>
-                    )}
+                <div className="mb-2 p-2 rounded border border-blue-400 bg-blue-50">
+                  <div className="flex items-center gap-2 mb-1">
+                    <User className="w-4 h-4 text-blue-600" />
+                    <span className="font-bold text-blue-800 text-sm">Seller</span>
+                  </div>
+                  <div className="ml-6">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="font-gothic text-base font-semibold uppercase tracking-wide">{item.sellerInfo?.sellerFirstName} {item.sellerInfo?.sellerLastName}</span>
+                      <span className="font-gothic text-xs text-gray-600">@{item.sellerInfo?.sellerUsername}</span>
+                    </div>
+                    <div className="font-gothic text-xs text-gray-700 mt-0.5 whitespace-pre-line pl-1 leading-tight">
+                      {item.sellerInfo?.sellerAddressLine1}
+                      {item.sellerInfo?.sellerAddressLine2 && `, ${item.sellerInfo.sellerAddressLine2}`},
+                      {item.sellerInfo?.sellerCity && ` ${item.sellerInfo.sellerCity}`},
+                      {item.sellerInfo?.sellerState && ` ${item.sellerInfo.sellerState}`},
+                      {item.sellerInfo?.sellerCountry && ` ${item.sellerInfo.sellerCountry}`}
+                    </div>
+
+                  </div>
+                </div>
+                {/* Buyer Info */}
+                <div className="mb-3 p-2 rounded border border-green-400 bg-green-50">
+                  <div className="flex items-center gap-2 mb-1">
+                    <User className="w-4 h-4 text-green-600" />
+                    <span className="font-bold text-green-800 text-sm">Buyer</span>
+                  </div>
+                  <div className="ml-6">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="font-gothic text-base font-semibold uppercase tracking-wide">{item.buyerInfo?.buyerFirstName} {item.buyerInfo?.buyerLastName}</span>
+                      <span className="font-gothic text-xs text-gray-600">@{item.buyerInfo?.buyerUsername}</span>
+                    </div>
+                    <div className="font-gothic text-xs text-gray-700 mt-0.5 whitespace-pre-line pl-1 leading-tight">
+                      {item.buyerInfo?.buyerAddressLine1}
+                      {item.buyerInfo?.buyerAddressLine2 && `, ${item.buyerInfo.buyerAddressLine2}`},
+                      {item.buyerInfo?.buyerCity && ` ${item.buyerInfo.buyerCity}`},
+                      {item.buyerInfo?.buyerState && ` ${item.buyerInfo.buyerState}`},
+                      {item.buyerInfo?.buyerCountry && ` ${item.buyerInfo.buyerCountry}`}
+                    </div>
                   </div>
                 </div>
                 {/* Pickup Address */}
@@ -132,6 +161,13 @@ function OutForDeliveryPage() {
                     <span className="text-green-700 font-bold">{item.price?.toLocaleString() || 'N/A'} VND</span>
                   </div>
                 </div>
+                <Button
+                  className="w-full bg-black text-white hover:bg-gray-800 border-2 border-black font-metal text-lg py-3 mt-4 flex items-center justify-center gap-2"
+                  onClick={() => router.push(`/shipper/delivery/confirm/${item.orderItemId}`)}
+                >
+                  <Camera className="w-4 h-4 mr-2" />
+                  Confirm Delivery
+                </Button>
               </CardContent>
             </Card>
           ))}
@@ -141,4 +177,4 @@ function OutForDeliveryPage() {
   );
 }
 
-export default OutForDeliveryPage; 
+export default OutForDeliveryPage;  

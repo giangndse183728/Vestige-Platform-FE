@@ -23,6 +23,11 @@ interface ShipperLayoutProps {
 }
 
 export default function ShipperLayout({ children }: ShipperLayoutProps) {
+  const { logout } = useAuth?.() || {};
+  const handleLogout = () => {
+    if (logout) logout();
+    else window.location.href = '/login';
+  };
   return (
     <div className="min-h-screen bg-[#f8f7f3]/80">
       {/* Header */}
@@ -40,7 +45,14 @@ export default function ShipperLayout({ children }: ShipperLayoutProps) {
                 </p>
               </div>
             </div>
-            {/* Removed user info and logout button for consistency */}
+            <Button
+              onClick={handleLogout}
+              className="border-2 border-black font-metal text-base flex items-center gap-2 px-4 py-2 hover:bg-red-600 hover:text-white hover:border-red-600 transition-colors"
+              variant="outline"
+            >
+              <LogOut className="w-5 h-5 mr-1" />
+              Logout
+            </Button>
           </div>
         </div>
       </div>

@@ -128,17 +128,17 @@ function ShipperDashboard() {
           </Button>
         </div>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-10 justify-center" style={{ gridTemplateColumns: '1fr' }}>
           {pickups.map((pickup) => (
-            <Card key={pickup.orderItemId} className="hover:border-gray-400 transition-colors w-full mx-auto p-4 text-base">
-              <CardContent className="p-4">
+            <Card key={pickup.orderItemId} className="hover:border-gray-400 transition-colors w-full max-w-4xl mx-auto p-4 text-base">
+              <CardContent className="p-3">
                 {/* Product Info */}
-                <div className="flex gap-4 mb-4">
-                  <div className="relative w-20 h-20 bg-gray-100 rounded overflow-hidden flex-shrink-0 flex items-center justify-center">
-                    <Package className="w-8 h-8 text-gray-400" />
+                <div className="flex gap-4 mb-3">
+                  <div className="relative w-16 h-16 bg-gray-100 rounded overflow-hidden flex-shrink-0 flex items-center justify-center">
+                    <Package className="w-7 h-7 text-gray-400" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-metal text-sm font-bold truncate mb-1">
+                    <h3 className="font-metal text-base font-bold truncate mb-1">
                       {pickup.productName}
                     </h3>
                     <Badge className="bg-yellow-100 text-yellow-800 border-2 border-yellow-200 font-metal text-xs">
@@ -147,18 +147,47 @@ function ShipperDashboard() {
                   </div>
                 </div>
                 {/* Seller Info */}
-                <div className="flex items-center gap-2 mb-4 p-3 bg-gray-50 rounded border">
-                  <User className="w-4 h-4 text-gray-600" />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-gothic text-sm font-medium truncate">
-                      {pickup.sellerFirstName} {pickup.sellerLastName}
-                    </p>
-                    <p className="font-gothic text-xs text-gray-600">
-                      @{pickup.sellerUsername}
-                    </p>
+                <div className="mb-2 p-2 rounded border border-blue-400 bg-blue-50">
+                  <div className="flex items-center gap-2 mb-1">
+                    <User className="w-4 h-4 text-blue-600" />
+                    <span className="font-bold text-blue-800 text-sm">Seller</span>
+                  </div>
+                  <div className="ml-6">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="font-gothic text-base font-semibold uppercase tracking-wide">{pickup.sellerInfo?.sellerFirstName} {pickup.sellerInfo?.sellerLastName}</span>
+                      <span className="font-gothic text-xs text-gray-600">@{pickup.sellerInfo?.sellerUsername}</span>
+                    </div>
+                    <div className="font-gothic text-xs text-gray-700 mt-0.5 whitespace-pre-line pl-1 leading-tight">
+                      {pickup.sellerInfo?.sellerAddressLine1}
+                      {pickup.sellerInfo?.sellerAddressLine2 && `, ${pickup.sellerInfo.sellerAddressLine2}`},
+                      {pickup.sellerInfo?.sellerCity && ` ${pickup.sellerInfo.sellerCity}`},
+                      {pickup.sellerInfo?.sellerState && ` ${pickup.sellerInfo.sellerState}`},
+                      {pickup.sellerInfo?.sellerCountry && ` ${pickup.sellerInfo.sellerCountry}`}
+                    </div>
                   </div>
                 </div>
-                {/* Pickup Address */}
+                {/* Buyer Info */}
+                <div className="mb-3 p-2 rounded border border-green-400 bg-green-50">
+                  <div className="flex items-center gap-2 mb-1">
+                    <User className="w-4 h-4 text-green-600" />
+                    <span className="font-bold text-green-800 text-sm">Buyer</span>
+                  </div>
+                  <div className="ml-6">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="font-gothic text-base font-semibold uppercase tracking-wide">{pickup.buyerInfo?.buyerFirstName} {pickup.buyerInfo?.buyerLastName}</span>
+                      <span className="font-gothic text-xs text-gray-600">@{pickup.buyerInfo?.buyerUsername}</span>
+                    </div>
+                    <div className="font-gothic text-xs text-gray-700 mt-0.5 whitespace-pre-line pl-1 leading-tight">
+                      {pickup.buyerInfo?.buyerAddressLine1}
+                      {pickup.buyerInfo?.buyerAddressLine2 && `, ${pickup.buyerInfo.buyerAddressLine2}`},
+                      {pickup.buyerInfo?.buyerCity && ` ${pickup.buyerInfo.buyerCity}`},
+                      {pickup.buyerInfo?.buyerState && ` ${pickup.buyerInfo.buyerState}`},
+                      {pickup.buyerInfo?.buyerCountry && ` ${pickup.buyerInfo.buyerCountry}`}
+                    </div>
+                  </div>
+                </div>
+                {/* Pickup Address (ẩn nếu đã có buyer address) */}
+                {/*
                 <div className="flex items-start gap-2 mb-4 p-3 bg-blue-50 rounded">
                   <MapPin className="w-4 h-4 text-blue-600 mt-0.5" />
                   <div className="flex-1 min-w-0">
@@ -174,6 +203,7 @@ function ShipperDashboard() {
                     </p>
                   </div>
                 </div>
+                */}
                 {/* --- Order Info Section --- */}
                 <div className="mt-4 grid grid-cols-1 gap-2 text-xs font-gothic text-gray-700">
                   <div className="flex items-center gap-2">

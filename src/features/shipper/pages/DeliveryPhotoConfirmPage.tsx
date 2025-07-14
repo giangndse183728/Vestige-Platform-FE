@@ -1,18 +1,15 @@
-'use client';
-
+"use client";
 import { useState, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Camera, AlertCircle, Upload } from 'lucide-react';
+import { Camera, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
-import { confirmPickup } from '@/features/order/services';
+import { confirmDelivery } from '@/features/order/services';
 import { uploadMultipleImages } from '@/utils/imageUpload';
 import dynamic from 'next/dynamic';
 
 const Webcam = dynamic(() => import('react-webcam'), { ssr: false });
 
-function PickupConfirmPage({ itemId }: { itemId: number }) {
+export default function DeliveryPhotoConfirmPage({ itemId }: { itemId: number }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -39,7 +36,7 @@ function PickupConfirmPage({ itemId }: { itemId: number }) {
     }
   };
 
-  const handleConfirmPickup = async () => {
+  const handleConfirmDelivery = async () => {
     if (selectedFiles.length === 0) {
       setError('Please take a photo');
       return;
@@ -47,17 +44,17 @@ function PickupConfirmPage({ itemId }: { itemId: number }) {
     setIsProcessing(true);
     setError(null);
     try {
-      const uploadResults = await uploadMultipleImages(selectedFiles, `pickups/${itemId}`);
+      const uploadResults = await uploadMultipleImages(selectedFiles, `deliveries/${itemId}`);
       const urls = uploadResults.filter(r => r.success && r.url).map(r => r.url!);
       if (urls.length === 0) {
         setError('Failed to upload images.');
         setIsProcessing(false);
         return;
       }
-      await confirmPickup(itemId, urls);
-      window.location.href = '/shipper?success=pickup-confirmed';
+      await confirmDelivery(itemId, urls);
+      window.location.href = '/shipper?success=delivery-confirmed';
     } catch (err) {
-      setError('Error confirming pickup.');
+      setError('Error confirming delivery.');
     }
     setIsProcessing(false);
   };
@@ -69,9 +66,9 @@ function PickupConfirmPage({ itemId }: { itemId: number }) {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-white to-gray-100 z-10">
       <div className="w-full max-w-2xl bg-white/90 rounded-2xl shadow-2xl p-10 flex flex-col items-center border border-gray-200 max-h-[95vh] overflow-y-auto">
-        <h1 className="font-metal text-4xl font-bold text-center mb-4 text-black">Pickup Confirmation</h1>
+        <h1 className="font-metal text-4xl font-bold text-center mb-4 text-black">Delivery Confirmation</h1>
         <p className="text-center text-gray-700 mb-6 text-xl">
-          Please take a photo with your webcam as proof of pickup.
+          Please take a photo with your webcam as proof of delivery.
         </p>
         <div className="w-full flex flex-col gap-4 items-center mb-6">
           <Button
@@ -84,7 +81,7 @@ function PickupConfirmPage({ itemId }: { itemId: number }) {
             Take Photo
           </Button>
         </div>
-        <div className="text-gray-400 text-base mb-4">You must take 1 photo as proof of pickup.</div>
+        <div className="text-gray-400 text-base mb-4">You must take 1 photo as proof of delivery.</div>
         {selectedFiles.length > 0 && (
           <div className="grid grid-cols-1 gap-4 mt-4 w-full">
             {selectedFiles.map((file, index) => (
@@ -113,11 +110,11 @@ function PickupConfirmPage({ itemId }: { itemId: number }) {
           <div className="text-red-600 text-center font-semibold mt-6 text-lg">{error}</div>
         )}
         <Button
-          onClick={handleConfirmPickup}
+          onClick={handleConfirmDelivery}
           disabled={selectedFiles.length !== 1 || isProcessing}
           className="w-full bg-black text-white hover:bg-gray-900 border-2 border-black font-metal text-2xl py-4 mt-8 transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed shadow-md"
         >
-          {isProcessing ? 'Confirming...' : 'Confirm Pickup'}
+          {isProcessing ? 'Confirming...' : 'Confirm Delivery'}
         </Button>
       </div>
       {/* Webcam Modal Overlay */}
@@ -130,7 +127,6 @@ function PickupConfirmPage({ itemId }: { itemId: number }) {
               screenshotFormat="image/jpeg"
               width={600}
               height={450}
-              videoConstraints={{ facingMode: 'environment', width: 600, height: 450 }}
               className="rounded-2xl border shadow-lg max-w-full h-auto"
               style={{ objectFit: 'cover', maxWidth: '98vw', maxHeight: '80vh' }}
             />
@@ -141,19 +137,6 @@ function PickupConfirmPage({ itemId }: { itemId: number }) {
           </div>
         </div>
       )}
-      {/* Ẩn input file */}
-      <input
-        type="file"
-        accept="image/*"
-        multiple={false}
-        capture="environment"
-        onChange={() => {}}
-        className="hidden"
-        id="photo-upload"
-        disabled
-      />
     </div>
   );
-}
-
-export default PickupConfirmPage; 
+} 

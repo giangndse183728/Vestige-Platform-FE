@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { Trash2, Pencil, Search } from 'lucide-react';
 import { toast } from 'sonner';
+import { getMyProductDetail } from '@/features/products/services';
 
 export default function ProductManager() {
   const {
@@ -44,6 +45,7 @@ export default function ProductManager() {
     brandId: '',
   });
   const [activeTab, setActiveTab] = useState<'pending' | 'inactive' | 'active' | 'sold' | 'all'>('all');
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   // Filter products based on search query
   const filteredProducts = allProducts?.filter((product) => {
@@ -83,9 +85,11 @@ export default function ProductManager() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleViewDetail = (product: any) => {
-    setSelectedProduct(product);
+  const handleViewDetail = async (product: any) => {
+    const detail = await getMyProductDetail(product.productId);
+    setSelectedProduct(detail);
     setIsModalOpen(true);
+    setSelectedImageIndex(0);
   };
 
   const handleCloseModal = () => {
@@ -254,13 +258,49 @@ export default function ProductManager() {
           </DialogHeader>
           {selectedProduct && (
             <div className="flex flex-col sm:flex-row gap-12">
-              {/* Image */}
-              <div className="flex-shrink-0 flex justify-center items-start w-full sm:w-[400px]">
-                <img
-                  src={selectedProduct.primaryImageUrl}
-                  alt={selectedProduct.title}
-                  className="w-[350px] h-[350px] object-cover rounded border"
-                />
+              {/* Images */}
+              <div className="flex-shrink-0 flex flex-col items-center w-full sm:w-[400px]">
+                {selectedProduct.images && selectedProduct.images.length > 0 ? (
+                  <>
+                    <img
+                      src={selectedProduct.images[selectedImageIndex].imageUrl}
+                      alt={selectedProduct.title}
+                      className="w-[350px] h-[350px] object-cover rounded border mb-4"
+                    />
+                    <div className="flex gap-2 mt-2 flex-wrap justify-center">
+                      {selectedProduct.images.map((img, idx) => (
+                        <img
+                          key={img.imageId || idx}
+                          src={img.imageUrl}
+                          alt={`Thumbnail ${idx + 1}`}
+                          className={`w-14 h-14 object-cover rounded border cursor-pointer ${selectedImageIndex === idx ? 'ring-2 ring-black' : ''}`}
+                          onClick={() => setSelectedImageIndex(idx)}
+                        />
+                      ))}
+                    </div>
+                  </>
+                ) : selectedProduct.imageUrls && selectedProduct.imageUrls.length > 0 ? (
+                  <>
+                    <img
+                      src={selectedProduct.imageUrls[selectedImageIndex]}
+                      alt={selectedProduct.title}
+                      className="w-[350px] h-[350px] object-cover rounded border mb-4"
+                    />
+                    <div className="flex gap-2 mt-2 flex-wrap justify-center">
+                      {selectedProduct.imageUrls.map((url, idx) => (
+                        <img
+                          key={idx}
+                          src={url}
+                          alt={`Thumbnail ${idx + 1}`}
+                          className={`w-14 h-14 object-cover rounded border cursor-pointer ${selectedImageIndex === idx ? 'ring-2 ring-black' : ''}`}
+                          onClick={() => setSelectedImageIndex(idx)}
+                        />
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="w-[350px] h-[350px] flex items-center justify-center bg-gray-100 rounded border text-gray-400 mb-4">No Image</div>
+                )}
               </div>
               {/* Details */}
               <div className="flex-1 flex flex-col gap-4">
