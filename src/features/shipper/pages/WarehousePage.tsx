@@ -87,7 +87,7 @@ function WarehousePage() {
         </div>
       ) : (
         <div className="grid gap-10 justify-center" style={{ gridTemplateColumns: '1fr' }}>
-          {warehouseItems.map((item) => (
+          {warehouseItems.map((item: any) => (
             <Card key={item.orderItemId} className="hover:border-gray-400 transition-colors w-full max-w-4xl mx-auto p-4 text-base">
               <CardContent className="p-3">
                 {/* Product Info */}
