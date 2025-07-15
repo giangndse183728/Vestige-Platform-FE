@@ -11,7 +11,7 @@ export const metadata = generateSEOMetadata({
   description: "Where virtual expression meets innovative design. Explore our platform for digital fashion, virtual runway shows, and meta fashion concepts.",
   keywords: ["vestige", "fashion platform", "meta fashion"],
   image: {
-    url: "/fashion-visual-1.jpg",
+    url: "/gm.jpg",
     width: 1200,
     height: 630,
     alt: "Digital Fashion Platform"
