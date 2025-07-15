@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
@@ -17,6 +18,11 @@ const queryClient = new QueryClient();
 
 export default function LoginPage() {
   const [activeTab, setActiveTab] = useState("login");
+  const router = useRouter();
+
+  const handleLogoClick = () => {
+    router.push('/');
+  };
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -41,7 +47,10 @@ export default function LoginPage() {
                 <div className="absolute top-1 left-1 w-12 h-12 border-l-2 border-t-2 border-black/40"></div>
                 <div className="absolute top-1 right-1 w-12 h-12 border-r-2 border-t-2 border-black/40"></div>
             
-                <h1 className="font-metal text-3xl relative mt-2">
+                <h1 
+                  className="font-metal text-3xl relative mt-2 cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={handleLogoClick}
+                >
                   <span className="text-black">VES</span>
                   <span className="text-red-900">TIGE</span>
                 </h1>
@@ -60,7 +69,10 @@ export default function LoginPage() {
                 <div className="absolute top-1 left-1 w-12 h-12 border-l-2 border-t-2 border-black/40"></div>
                 <div className="absolute top-1 right-1 w-12 h-12 border-r-2 border-t-2 border-black/40"></div>
             
-                <h1 className="font-metal text-3xl relative mt-2">
+                <h1 
+                  className="font-metal text-3xl relative mt-2 cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={handleLogoClick}
+                >
                   <span className="text-black">VES</span>
                   <span className="text-red-900">TIGE</span>
                 </h1>

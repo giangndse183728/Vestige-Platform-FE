@@ -483,11 +483,7 @@ export function FilterProductLayout({ children }: FilterProductLayoutProps) {
                         Search: "{filters.search}"
                       </Badge>
                     )}
-                    {filters.category && filters.category !== 'all' && (
-                      <Badge variant="outline" className="border-2 border-red-600 text-red-600 font-serif">
-                        {categoryName || filters.category}
-                      </Badge>
-                    )}
+                 
                     {selectedBrands.map(brandId => {
                       const brand = brands?.find(b => b.brandId.toString() === brandId);
                       return (

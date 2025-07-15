@@ -12,7 +12,7 @@ import { toast } from "sonner";
 
 export function MembershipPlans() {
   const { data: plans, isLoading, error } = useMembershipPlans();
-  const { data: currentSubscription } = useCurrentSubscription();
+
 
   if (isLoading) {
     return (
@@ -105,7 +105,7 @@ export function MembershipPlans() {
     );
   }
 
-  // Sort plans by price (ascending)
+ 
   const sortedPlans = [...plans].sort((a, b) => a.price - b.price);
 
   return (
@@ -136,7 +136,6 @@ export function MembershipPlans() {
               <MembershipPlanCard 
                 key={plan.planId} 
                 plan={plan} 
-                currentSubscription={currentSubscription}
               />
             ))}
           </div>

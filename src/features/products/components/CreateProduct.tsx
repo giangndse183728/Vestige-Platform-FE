@@ -19,13 +19,18 @@ import * as z from 'zod';
 import { ImageUpload } from '@/components/ui/image-upload';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { formatVNDInput, unformatVND } from '@/utils/format';
-import { ProductStatus, ProductCondition } from '@/constants/enum';
+import {  ProductCondition } from '@/constants/enum';
+import { useStripeAccountStatus } from '@/features/payment/hooks/useStripeAccountStatus';
+import Link from 'next/link';
 
 export function CreateProduct() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { uploadMultipleImages, isUploading: isUploadingImages, uploadProgress } = useImageUpload({ folder: 'products', maxFiles: 8 });
+
+  // Stripe account status
+  const { data: stripeStatus, isLoading: isStripeLoading, error: stripeError, refetch: refetchStripeStatus } = useStripeAccountStatus();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -101,6 +106,12 @@ export function CreateProduct() {
     setIsLoading(true);
     setErrors({});
 
+    // Stripe status check
+    if (!stripeStatus?.hasAccount || !stripeStatus?.setupComplete) {
+      setIsLoading(false);
+      return;
+    }
+
     try {
       let uploadedImageUrls: string[] = [];
       if (formData.imageFiles.length > 0) {
@@ -158,7 +169,21 @@ export function CreateProduct() {
 
   return (
     <div className="container mx-auto py-4 mt-1 overflow-hidden px-6">
-
+      {isStripeLoading && (
+        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 text-yellow-700 rounded">
+          Checking Stripe account status...
+        </div>
+      )}
+      {stripeError && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded">
+          Failed to load Stripe account status. <button className="underline" onClick={() => refetchStripeStatus()}>Retry</button>
+        </div>
+      )}
+      {!isStripeLoading && !stripeError && (!stripeStatus?.hasAccount || !stripeStatus?.setupComplete) && (
+        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 text-yellow-700 rounded">
+          <b>Stripe account not fully set up.</b> You must connect and complete your Stripe account setup in <Link href="/profile">profile</Link> before you can publish products.
+        </div>
+      )}
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Column - Product Images */}
@@ -205,7 +230,7 @@ export function CreateProduct() {
                 <div className="flex flex-col gap-3">
                   <Button
                     type="submit"
-                    disabled={isLoading || isUploadingImages}
+                    disabled={isLoading || isUploadingImages || isStripeLoading || !!stripeError || !stripeStatus?.hasAccount || !stripeStatus?.setupComplete}
                     className="w-full bg-black text-white hover:bg-gray-800 border-2 border-black py-6 text-lg font-serif"
                   >
                     {isLoading || isUploadingImages ? 'PUBLISHING...' : 'PUBLISH PRODUCT'}

@@ -322,7 +322,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                         <div className="text-xs text-gray-500 mb-1">Size</div>
                         <div className="flex items-center">
                           <div className="px-3 py-1 bg-gray-50 border border-gray-200 rounded-sm">
-                            <span className="text-sm font-medium tracking-wider">{product.size}US</span>
+                            <span className="text-sm font-medium tracking-wider">{product.size}</span>
                           </div>
                         </div>
                       </div>
