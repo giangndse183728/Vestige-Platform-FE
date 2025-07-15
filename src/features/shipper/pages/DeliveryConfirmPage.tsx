@@ -5,12 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Package, MapPin, User, Camera, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
-import { getPickupList, confirmDelivery } from '@/features/order/services';
+import { getLogisticsListByStatus, confirmDelivery } from '@/features/order/services';
+import { uploadMultipleImages } from '@/utils/imageUpload';
 import { PickupItem } from '@/features/order/schema';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 
-const Webcam = dynamic(() => import('react-webcam'), { ssr: false });
+const Webcam = dynamic<any>(() => import('react-webcam').then(mod => mod.default), { ssr: false });
 
 export default function DeliveryConfirmPage({ itemId }: { itemId: number }) {
   const router = useRouter();
@@ -26,7 +27,7 @@ export default function DeliveryConfirmPage({ itemId }: { itemId: number }) {
     const fetchDeliveryDetails = async () => {
       try {
         setIsLoading(true);
-        const response = await getPickupList();
+        const response = await getLogisticsListByStatus('OUT_FOR_DELIVERY');
         const deliveryItem = response.data.find((item: PickupItem) => item.orderItemId === itemId);
         if (!deliveryItem) {
           setError('Delivery item not found');
@@ -77,7 +78,15 @@ export default function DeliveryConfirmPage({ itemId }: { itemId: number }) {
     try {
       setIsProcessing(true);
       setError(null);
-      await confirmDelivery(itemId, selectedFiles);
+      // Upload images and get URLs
+      const uploadResults = await uploadMultipleImages(selectedFiles, `deliveries/${itemId}`);
+      const urls = uploadResults.filter(r => r.success && r.url).map(r => r.url!);
+      if (urls.length === 0) {
+        setError('Failed to upload images.');
+        setIsProcessing(false);
+        return;
+      }
+      await confirmDelivery(itemId, urls);
       router.push('/shipper/delivery?success=delivery-confirmed');
     } catch (err) {
       setError('Failed to confirm delivery');
@@ -188,7 +197,7 @@ export default function DeliveryConfirmPage({ itemId }: { itemId: number }) {
             <div>
               <p className="font-gothic font-medium text-green-800">Delivery Address</p>
               <p className="font-gothic text-sm text-green-600">
-                {deliveryItem.order.shippingAddress.streetAddress}
+                {deliveryItem.order.shippingAddress.addressLine1}
               </p>
               <p className="font-gothic text-sm text-green-600">
                 {deliveryItem.order.shippingAddress.city}, {deliveryItem.order.shippingAddress.state}
@@ -253,7 +262,7 @@ export default function DeliveryConfirmPage({ itemId }: { itemId: number }) {
           <div className="bg-white rounded-2xl shadow-2xl p-8 flex flex-col items-center border border-gray-200 max-w-[98vw] max-h-[95vh]">
             <Webcam
               audio={false}
-              ref={webcamRef}
+              ref={webcamRef as any}
               screenshotFormat="image/jpeg"
               width={600}
               height={450}

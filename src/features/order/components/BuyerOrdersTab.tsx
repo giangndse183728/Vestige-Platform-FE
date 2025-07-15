@@ -18,6 +18,11 @@ const statusConfig: Record<OrderStatus, { label: string; color: string; icon: ty
     color: 'bg-yellow-100 text-yellow-800',
     icon: Clock,
   },
+  CONFIRMED: {
+    label: 'Confirmed',
+    color: 'bg-blue-100 text-blue-800',
+    icon: CheckCircle,
+  },
   PROCESSING: {
     label: 'Processing',
     color: 'bg-blue-100 text-blue-800',
@@ -61,6 +66,29 @@ const formatVNDPrice = (price: number) => {
 
 const formatDate = (dateString: string) => {
   return format(new Date(dateString), 'MMM dd, yyyy HH:mm');
+};
+
+const getOrderItemStatusColor = (status: any) => {
+  switch (status) {
+    case 'PENDING':
+      return 'bg-yellow-100 text-yellow-800';
+    case 'PROCESSING':
+      return 'bg-blue-100 text-blue-800';
+    case 'AWAITING_PICKUP':
+      return 'bg-orange-100 text-orange-800';
+    case 'IN_WAREHOUSE':
+      return 'bg-indigo-100 text-indigo-800';
+    case 'OUT_FOR_DELIVERY':
+      return 'bg-purple-100 text-purple-800';
+    case 'DELIVERED':
+      return 'bg-green-100 text-green-800';
+    case 'CANCELLED':
+      return 'bg-red-100 text-red-800';
+    case 'REFUNDED':
+      return 'bg-gray-100 text-gray-800';
+    default:
+      return 'bg-gray-100 text-gray-800';
+  }
 };
 
 export function BuyerOrdersTab() {
@@ -244,15 +272,7 @@ export function BuyerOrdersTab() {
                                     )}
                                   </p>
                                   <div className="flex gap-2 mt-2">
-                                    <Badge className={`text-xs ${
-                                      item.itemStatus === 'DELIVERED' ? 'bg-green-100 text-green-800' :
-                                      item.itemStatus === 'OUT_FOR_DELIVERY' ? 'bg-purple-100 text-purple-800' :
-                                      item.itemStatus === 'PROCESSING' ? 'bg-blue-100 text-blue-800' :
-                                      item.itemStatus === 'CANCELLED' ? 'bg-red-100 text-red-800' :
-                                      item.itemStatus === 'REFUNDED' ? 'bg-gray-100 text-gray-800' :
-                                      item.itemStatus === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-                                      'bg-gray-100 text-gray-800'
-                                    }`}>
+                                    <Badge className={`text-xs ${getOrderItemStatusColor(item.itemStatus)}`}>
                                       {item.itemStatus}
                                     </Badge>
                                   </div>

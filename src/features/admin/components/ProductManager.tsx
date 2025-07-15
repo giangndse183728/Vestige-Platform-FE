@@ -268,7 +268,7 @@ export default function ProductManager() {
                       className="w-[350px] h-[350px] object-cover rounded border mb-4"
                     />
                     <div className="flex gap-2 mt-2 flex-wrap justify-center">
-                      {selectedProduct.images.map((img, idx) => (
+                      {selectedProduct.images.map((img: { imageId?: string; imageUrl: string }, idx: number) => (
                         <img
                           key={img.imageId || idx}
                           src={img.imageUrl}
@@ -287,7 +287,7 @@ export default function ProductManager() {
                       className="w-[350px] h-[350px] object-cover rounded border mb-4"
                     />
                     <div className="flex gap-2 mt-2 flex-wrap justify-center">
-                      {selectedProduct.imageUrls.map((url, idx) => (
+                      {selectedProduct.imageUrls.map((url: string, idx: number) => (
                         <img
                           key={idx}
                           src={url}

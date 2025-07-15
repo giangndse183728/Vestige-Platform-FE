@@ -19,6 +19,11 @@ const statusConfig: Record<OrderStatus, { label: string; color: string; icon: ty
     color: 'bg-yellow-100 text-yellow-800',
     icon: Clock,
   },
+  CONFIRMED: {
+    label: 'Confirmed',
+    color: 'bg-blue-100 text-blue-800',
+    icon: CheckCircle,
+  },
   PROCESSING: {
     label: 'Processing',
     color: 'bg-blue-100 text-blue-800',

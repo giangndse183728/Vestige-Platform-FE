@@ -51,7 +51,7 @@ export const buyerSchema = z.object({
 export const escrowStatusEnum = z.enum(['HOLDING', 'RELEASED', 'REFUNDED', 'CANCELLED']);
 
 // Order status (overall order)
-export const orderStatusEnum = z.enum(['PENDING', 'PROCESSING', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED', 'REFUNDED', 'EXPIRED']);
+export const orderStatusEnum = z.enum(['PENDING', 'CONFIRMED', 'PROCESSING', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED', 'REFUNDED', 'EXPIRED']);
 
 // OrderItem status (individual items)
 export const orderItemStatusEnum = z.enum(['PENDING', 'PROCESSING', 'AWAITING_PICKUP', 'IN_WAREHOUSE', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED', 'REFUNDED']);
