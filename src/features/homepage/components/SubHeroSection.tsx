@@ -197,7 +197,7 @@ const SubHeroSection = () => {
                   >
                     <div className="flex items-center">
                       <span className="text-[var(--dark-red)] mr-3">—</span>
-                      <Link href={`/shop/${item.toLowerCase().replace(/\s+/g, '-')}`} className="font-serif text-black/80 hover:text-[var(--dark-red)]">
+                      <Link href={`/categories`} className="font-serif text-black/80 hover:text-[var(--dark-red)]">
                         {item}
                       </Link>
                     </div>
@@ -206,8 +206,8 @@ const SubHeroSection = () => {
               </ul>
 
               <FadeUp delay={0.7}>
-                <Link href="/shop/new-arrivals" className="mt-6 inline-flex items-center self-start group">
-                  <span className="font-gothic text-sm uppercase mr-2">View All New Arrivals</span>
+                <Link href="/categories" className="mt-6 inline-flex items-center self-start group">
+                  <span className="font-gothic text-sm uppercase mr-2">View All Category</span>
                   <MotionDiv
                     className="text-[var(--dark-red)]"
                     animate={{ x: [0, 5, 0] }}

@@ -1,12 +1,15 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Crown, ArrowRight, Calendar, CreditCard, CheckCircle, ExternalLink, DollarSign } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useCurrentSubscription } from '../hooks/useMembershipPlans';
 import { useConfirmPayment } from '../hooks/useMembershipActions';
+import { useMembershipPlans } from '../hooks/useMembershipPlans';
+import { useSubscribeToPlan } from '../hooks/useMembershipActions';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { useSearchParams } from 'next/navigation';
@@ -19,8 +22,16 @@ interface MembershipStatusCardProps {
 
 export function MembershipStatusCard({ className = "" }: MembershipStatusCardProps) {
   const { data: currentSubscription, refetch: refetchSubscription } = useCurrentSubscription();
+  const { data: plans = [] } = useMembershipPlans();
+  const subscribeToPlan = useSubscribeToPlan();
   const { mutate: confirmPayment, isPending: isConfirmingPayment } = useConfirmPayment();
   const searchParams = useSearchParams();
+  
+  // Confirmation dialog states
+  const [showExtendDialog, setShowExtendDialog] = useState(false);
+  const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState<number | null>(null);
+  const [selectedPlanName, setSelectedPlanName] = useState<string>('');
 
   // Handle PayOS payment confirmation
   useEffect(() => {
@@ -99,6 +110,43 @@ export function MembershipStatusCard({ className = "" }: MembershipStatusCardPro
       default:
         return 'UNKNOWN';
     }
+  };
+
+  const handleExtendClick = (planId: number, planName: string) => {
+    setSelectedPlanId(planId);
+    setSelectedPlanName(planName);
+    setShowExtendDialog(true);
+  };
+
+  const handleUpgradeClick = (planId: number, planName: string) => {
+    setSelectedPlanId(planId);
+    setSelectedPlanName(planName);
+    setShowUpgradeDialog(true);
+  };
+
+  const handleConfirmExtend = () => {
+    if (selectedPlanId) {
+      subscribeToPlan.mutate(selectedPlanId);
+      setShowExtendDialog(false);
+      setSelectedPlanId(null);
+      setSelectedPlanName('');
+    }
+  };
+
+  const handleConfirmUpgrade = () => {
+    if (selectedPlanId) {
+      subscribeToPlan.mutate(selectedPlanId);
+      setShowUpgradeDialog(false);
+      setSelectedPlanId(null);
+      setSelectedPlanName('');
+    }
+  };
+
+  const handleCancelDialog = () => {
+    setShowExtendDialog(false);
+    setShowUpgradeDialog(false);
+    setSelectedPlanId(null);
+    setSelectedPlanName('');
   };
 
   if (isConfirmingPayment) {
@@ -205,6 +253,115 @@ export function MembershipStatusCard({ className = "" }: MembershipStatusCardPro
           </Link>
         </div>
       )}
+      {/* Upgrade/Extend Button Logic */}
+      {(() => {
+        if (!plans.length || !currentSubscription?.plan?.id) return null;
+        // Sort plans by price (ascending) to determine which is higher
+        const sortedPlans = [...plans].sort((a, b) => a.price - b.price);
+        const currentPlanIdx = sortedPlans.findIndex(p => p.planId === currentSubscription.plan.id);
+        if (currentPlanIdx === -1) return null;
+        const isHighestPlan = currentPlanIdx === sortedPlans.length - 1;
+        const nextPlan = !isHighestPlan ? sortedPlans[currentPlanIdx + 1] : null;
+
+        if (isHighestPlan) {
+          // On highest plan, allow extend/subscribe again
+          return (
+            <div className="mt-4 flex justify-end">
+              <Button
+                className="bg-red-900 hover:bg-red-800 text-white font-gothic border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                onClick={() => handleExtendClick(currentSubscription.plan.id, currentSubscription.plan?.name || 'Current Plan')}
+                disabled={subscribeToPlan.isPending}
+              >
+                {subscribeToPlan.isPending ? 'Processing...' : 'Extend Current Membership'}
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          );
+        } else {
+          // Not on highest plan, allow upgrade
+          if (!nextPlan) return null;
+          return (
+            <div className="mt-4 flex justify-end gap-3">
+              <Button
+                className="bg-yellow-600 hover:bg-yellow-700 text-black font-gothic border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                onClick={() => handleUpgradeClick(nextPlan.planId, nextPlan.name)}
+                disabled={subscribeToPlan.isPending}
+              >
+                {subscribeToPlan.isPending ? 'Processing...' : `Upgrade to ${nextPlan.name}`}
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+              <Button
+                className="bg-red-900 hover:bg-red-800 text-white font-gothic border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                onClick={() => handleExtendClick(currentSubscription.plan.id, currentSubscription.plan?.name || 'Current Plan')}
+                disabled={subscribeToPlan.isPending}
+              >
+                {subscribeToPlan.isPending ? 'Processing...' : 'Extend Current Membership'}
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          );
+        }
+      })()}
+
+      {/* Extend Confirmation Dialog */}
+      <Dialog open={showExtendDialog} onOpenChange={setShowExtendDialog}>
+        <DialogContent className="border-4 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <DialogHeader>
+            <DialogTitle className="font-metal text-xl text-black">
+              Confirm Extension
+            </DialogTitle>
+            <DialogDescription className="font-gothic text-gray-600">
+              Are you sure you want to extend your {selectedPlanName} membership? This will process a new payment.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-3">
+            <Button
+              variant="outline"
+              onClick={handleCancelDialog}
+              className="border-2 border-black text-black hover:bg-gray-100 font-gothic"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmExtend}
+              className="bg-red-900 hover:bg-red-800 text-white font-gothic border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+              disabled={subscribeToPlan.isPending}
+            >
+              {subscribeToPlan.isPending ? 'Processing...' : 'Confirm Extension'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Upgrade Confirmation Dialog */}
+      <Dialog open={showUpgradeDialog} onOpenChange={setShowUpgradeDialog}>
+        <DialogContent className="border-4 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <DialogHeader>
+            <DialogTitle className="font-metal text-xl text-black">
+              Confirm Upgrade
+            </DialogTitle>
+            <DialogDescription className="font-gothic text-gray-600">
+              Are you sure you want to upgrade to {selectedPlanName}? This will process a new payment for the upgraded plan.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-3">
+            <Button
+              variant="outline"
+              onClick={handleCancelDialog}
+              className="border-2 border-black text-black hover:bg-gray-100 font-gothic"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmUpgrade}
+              className="bg-yellow-600 hover:bg-yellow-700 text-black font-gothic border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+              disabled={subscribeToPlan.isPending}
+            >
+              {subscribeToPlan.isPending ? 'Processing...' : 'Confirm Upgrade'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 } 

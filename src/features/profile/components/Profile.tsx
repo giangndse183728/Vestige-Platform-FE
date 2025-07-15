@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -27,6 +27,7 @@ import Image from 'next/image';
 import { TrustTier, Gender, TRUST_TIER_LABELS, TRUST_TIER_DESCRIPTIONS } from '@/constants/enum';
 import { TierProgress } from './TierProgress';
 import { MembershipStatusCard } from '@/features/membership/components/MembershipStatusCard';
+import { useImageUpload } from '@/hooks/useImageUpload';
 
 // Helper function to format gender display
 const formatGenderDisplay = (gender: string | null | undefined): string => {
@@ -60,6 +61,7 @@ export const Profile = () => {
   const [isAddingAddress, setIsAddingAddress] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [previewTier, setPreviewTier] = useState<TrustTier | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { user, isLoading, error, updateProfile, isUpdating } = useProfile();
   const {
@@ -73,6 +75,11 @@ export const Profile = () => {
     isDeleting,
     isSettingDefault
   } = useAddresses();
+
+  const { uploadSingleImage, isUploading: isUploadingImage } = useImageUpload({
+    folder: 'avatars',
+    maxFileSize: 5 * 1024 * 1024 // 5MB
+  });
 
   const formatDate = (dateString: string): string => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -166,6 +173,40 @@ export const Profile = () => {
 
   const handleTierPreview = (tier: TrustTier) => {
     setPreviewTier(tier);
+  };
+
+  const handleImageUpload = async (file: File) => {
+    try {
+      const result = await uploadSingleImage(file);
+      
+      if (result.success && result.url) {
+        setEditData(prev => ({
+          ...prev,
+          profilePictureUrl: result.url
+        }));
+        toast.success('Profile picture uploaded successfully');
+      } else {
+        toast.error(result.error || 'Failed to upload image');
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast.error('Failed to upload image');
+    }
+  };
+
+  const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      handleImageUpload(file);
+    }
+    // Reset the input value to allow selecting the same file again
+    if (event.target) {
+      event.target.value = '';
+    }
+  };
+
+  const handleCameraClick = () => {
+    fileInputRef.current?.click();
   };
 
   const getProfilePictureBorder = (tier: TrustTier | string) => {
@@ -303,10 +344,27 @@ export const Profile = () => {
                   {getProfilePictureAccents(previewTier || user?.trustTier || TrustTier.NEW_SELLER)}
                 </div>
                 {isEditing && (
-                  <button className="absolute bottom-2 right-2 bg-red-900 border-2 border-red-600 p-2 rounded-full hover:bg-red-800 text-white shadow-lg">
+                  <button 
+                    className="absolute bottom-2 right-2 bg-red-900 border-2 border-red-600 p-2 rounded-full hover:bg-red-800 text-white shadow-lg disabled:opacity-50"
+                    onClick={handleCameraClick}
+                    disabled={isUploadingImage}
+                  >
+                    {isUploadingImage ? (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
                     <Camera className="w-4 h-4" />
+                    )}
                   </button>
                 )}
+                
+                {/* Hidden file input for image upload */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileInputChange}
+                  className="hidden"
+                />
               </div>
               <div className="mt-4 text-center">
                 <h2 className="font-metal text-2xl text-black">{user.firstName} {user.lastName}</h2>
@@ -439,13 +497,28 @@ export const Profile = () => {
                       />
                     </div>
                     <div>
-                      <Label className="font-gothic text-sm text-black">Profile Picture URL</Label>
+                      <Label className="font-gothic text-sm text-black">Profile Picture</Label>
+                      <div className="flex items-center gap-2">
                       <Input 
                         value={editData.profilePictureUrl || ''}
                         onChange={(e) => handleInputChange('profilePictureUrl', e.target.value || null)}
                         className="border-black focus:border-black focus:ring-0"
-                        placeholder="https://example.com/image.jpg"
-                      />
+                          placeholder="Upload image to set profile picture"
+                          disabled
+                        />
+                        <button 
+                          type="button"
+                          className="p-2 bg-red-900 border-2 border-red-600 rounded-md hover:bg-red-800 text-white shadow-lg disabled:opacity-50"
+                          onClick={handleCameraClick}
+                          disabled={isUploadingImage}
+                        >
+                          {isUploadingImage ? (
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <Camera className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
                   <div className="space-y-4">
