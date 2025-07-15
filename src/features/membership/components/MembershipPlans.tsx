@@ -1,14 +1,9 @@
 'use client';
 
-import { Users, ShoppingBag, Instagram, Star } from "lucide-react";
 import { MembershipPlanCard } from "./MembershipPlanCard";
-import { useMembershipPlans, useCurrentSubscription } from "../hooks/useMembershipPlans";
-import { useConfirmPayment } from "../hooks/useMembershipActions";
+import { useMembershipPlans } from "../hooks/useMembershipPlans";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
-import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
-import { toast } from "sonner";
+
 
 export function MembershipPlans() {
   const { data: plans, isLoading, error } = useMembershipPlans();
@@ -34,8 +29,8 @@ export function MembershipPlans() {
               </div>
            
           </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-              {[...Array(2)].map((_, i) => (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto">
+              {[...Array(3)].map((_, i) => (
               <div key={i} className="border-2 border-black bg-white p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
                   <Skeleton className="h-12 w-12 mx-auto mb-4" />
                   <Skeleton className="h-8 w-3/4 mx-auto mb-2" />
@@ -111,7 +106,7 @@ export function MembershipPlans() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12">
       <div className="container mx-auto px-4 mt-5">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-8xl mx-auto">
           {/* Header Section */}
           <div className="mb-12">
             <div className="bg-red-900 text-white p-4 text-center mb-6 border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
@@ -131,7 +126,7 @@ export function MembershipPlans() {
           </div>
 
           {/* Membership Plans Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-20 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20 max-w-8xl mx-auto">
             {sortedPlans.map((plan) => (
               <MembershipPlanCard 
                 key={plan.planId} 

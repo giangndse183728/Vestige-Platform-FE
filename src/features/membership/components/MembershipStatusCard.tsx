@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Crown, ArrowRight, Calendar, CreditCard, CheckCircle, ExternalLink, DollarSign } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useCurrentSubscription } from '../hooks/useMembershipPlans';
+import { useMySubscription } from '../hooks/useMembershipPlans';
 import { useConfirmPayment } from '../hooks/useMembershipActions';
 import { useMembershipPlans } from '../hooks/useMembershipPlans';
 import { useSubscribeToPlan } from '../hooks/useMembershipActions';
@@ -21,7 +21,7 @@ interface MembershipStatusCardProps {
 }
 
 export function MembershipStatusCard({ className = "" }: MembershipStatusCardProps) {
-  const { data: currentSubscription, refetch: refetchSubscription } = useCurrentSubscription();
+  const { data: mySubscription, refetch: refetchMySubscription, isLoading } = useMySubscription();
   const { data: plans = [] } = useMembershipPlans();
   const subscribeToPlan = useSubscribeToPlan();
   const { mutate: confirmPayment, isPending: isConfirmingPayment } = useConfirmPayment();
@@ -55,7 +55,7 @@ export function MembershipStatusCard({ className = "" }: MembershipStatusCardPro
       }, {
         onSuccess: () => {
           // Refetch subscription data after successful confirmation
-          refetchSubscription();
+          refetchMySubscription();
           // Clean up URL parameters after processing
           const url = new URL(window.location.href);
           url.searchParams.delete('code');
@@ -67,7 +67,7 @@ export function MembershipStatusCard({ className = "" }: MembershipStatusCardPro
         }
       });
     }
-  }, [searchParams, confirmPayment, refetchSubscription]);
+  }, [searchParams, confirmPayment, refetchMySubscription]);
 
   const formatPrice = (price: number) => {
     return formatVNDPrice(price);
@@ -149,6 +149,21 @@ export function MembershipStatusCard({ className = "" }: MembershipStatusCardPro
     setSelectedPlanName('');
   };
 
+  if (isLoading) {
+    return (
+      <div className={`border-2 border-black p-6 bg-black/10 ${className}`}>
+        <div className="flex items-center justify-center py-8">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-spin">
+              <Crown className="w-8 h-8 text-blue-600" />
+            </div>
+            <h3 className="font-metal text-xl text-black mb-2">Loading Subscription</h3>
+            <p className="font-gothic text-gray-600">Please wait while we load your subscription status...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
   if (isConfirmingPayment) {
     return (
       <div className={`border-2 border-black p-6 bg-black/10 ${className}`}>
@@ -165,6 +180,8 @@ export function MembershipStatusCard({ className = "" }: MembershipStatusCardPro
     );
   }
 
+  const currentSubscription = mySubscription?.activeMembership;
+
   return (
     <div className={`border-2 border-black p-6 bg-black/10 ${className}`}>
       <div className="flex items-center justify-between mb-6">
@@ -176,19 +193,11 @@ export function MembershipStatusCard({ className = "" }: MembershipStatusCardPro
           <div className="h-6 w-[1px] bg-black"></div>
           <span className="font-gothic text-sm text-gray-600 tracking-wider">SECTION</span>
         </div>
-        <Link href="/subscription">
-          <Button
-            variant="outline"
-            className="border-2 border-black text-black hover:bg-gray-100 font-gothic shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-          >
-            Manage Plans
-            <ExternalLink className="w-4 h-4 ml-2" />
-          </Button>
-        </Link>
+     
       </div>
 
       {currentSubscription ? (
-        <Card className="border-4 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <Card className="border-4 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-none">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
@@ -231,7 +240,6 @@ export function MembershipStatusCard({ className = "" }: MembershipStatusCardPro
                   Active subscription with premium benefits
                 </span>
               </div>
-         
             </div>
           </CardContent>
         </Card>
@@ -253,6 +261,57 @@ export function MembershipStatusCard({ className = "" }: MembershipStatusCardPro
           </Link>
         </div>
       )}
+
+      {/* Queued Memberships */}
+      {mySubscription?.queuedMemberships && mySubscription.queuedMemberships.length > 0 && (
+        <div className="mt-8">
+          <div className="flex flex-col md:flex-row md:items-center mb-4 md:mb-6 md:justify-between w-full">
+            <div className="flex items-center gap-4 flex-1">
+              <h5 className="font-metal text-lg text-black">Upcoming/Queued Subscriptions</h5>
+              {mySubscription.totalBoostsAvailable !== undefined && (
+                <Badge className="bg-green-600 text-white font-gothic px-3 py-2 text-base rounded-none">
+                  Total Boosts Available: {mySubscription.totalBoostsAvailable}
+                </Badge>
+              )}
+            </div>
+            {mySubscription.finalExpirationDate && (
+              <div className="flex items-center gap-2 mt-2 md:mt-0">
+                <Calendar className="w-5 h-5 text-gray-700" />
+                <span className="font-gothic text-sm text-gray-700">
+                  Final Expiration Date:
+                  <span className="font-bold ml-1">{formatDate(mySubscription.finalExpirationDate)}</span>
+                </span>
+              </div>
+            )}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {mySubscription.queuedMemberships.map((queued) => (
+              <Card key={queued.id} className="border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-none">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Crown className="w-6 h-6 text-gray-400" />
+                      <div>
+                        <h6 className="font-metal text-base text-black">{queued.plan?.name}</h6>
+                        <p className="font-gothic text-xs text-gray-600">{queued.plan?.description}</p>
+                      </div>
+                    </div>
+                    <Badge className="bg-yellow-500 text-black font-metal tracking-wider">QUEUED</Badge>
+                  </div>
+                  <div className="flex flex-col gap-1 mb-2">
+                    <span className="font-gothic text-xs text-gray-600">Start: {formatDate(queued.startDate)}</span>
+                    <span className="font-gothic text-xs text-gray-600">End: {formatDate(queued.endDate)}</span>
+                  </div>
+                  <div className="mt-2 p-2 bg-gray-50 border">
+                    <span className="font-gothic text-xs text-gray-700">This subscription will activate after your current plan ends.</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Upgrade/Extend Button Logic */}
       {(() => {
         if (!plans.length || !currentSubscription?.plan?.id) return null;

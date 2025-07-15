@@ -9,7 +9,7 @@ interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 interface CardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
-  variant?: "default" | "decorated" | "decorated-image" | "stamp" | "double" | "rising-seller" | "pro-seller" | "elite-seller";
+  variant?: "default" | "decorated" | "decorated-image" | "stamp" | "double" | "rising-seller" | "pro-seller" | "elite-seller" | "new-seller";
   contentPadding?: string;
 }
 
@@ -371,6 +371,38 @@ const Card = React.forwardRef<
             return child;
           })}
         </div>
+      </div>
+    );
+  }
+
+  if (variant === "new-seller") {
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          "relative bg-white border-3 border-black ",
+          className
+        )}
+        {...props}
+      >
+        <div className="bg-gradient-to-r from-gray-200 to-gray-400 text-black p-3 border-b-3 border-black relative overflow-hidden">
+          <div className="relative flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-5 h-5 bg-gradient-to-br from-gray-400 to-gray-600 rotate-45 shadow-lg border-white border-4"></div>
+              <h3 className="font-metal text-xl tracking-wider">BASIC</h3>
+              
+            </div>
+            <div className="bg-black text-gray-200 px-3 py-1 border-2 border-gray-400 shadow-lg">
+              <span className="font-metal text-sm tracking-wider font-bold">TIER 0</span>
+            </div>
+          </div>
+        </div>
+        <div className="relative z-20 p-6 bg-white">
+          <div className="  bg-gradient-to-br from-gray-50 to-white p-4 border border-gray-200">
+            {children}
+          </div>
+        </div>
+        <div className="absolute bottom-0 left-0 w-full h-3 bg-gradient-to-r from-gray-300 via-gray-400 via-black to-gray-300"></div>
       </div>
     );
   }

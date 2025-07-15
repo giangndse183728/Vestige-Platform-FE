@@ -26,6 +26,9 @@ import {
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { OrderItemStepper } from './CustomerOrdersTab';
+import { SellerReview } from '@/features/seller/components/SellerReview';
+import React, { useRef, useState } from 'react';
+import OrderTemplate from './OrderTemplate';
 
 // Order status config (overall order)
 const orderStatusConfig = {
@@ -145,6 +148,9 @@ interface OrderDetailProps {
 export function OrderDetail({ orderId }: OrderDetailProps) {
   const { data: order, isLoading, error } = useOrderDetail(orderId);
   const router = useRouter();
+  const pdfRef = useRef<HTMLDivElement>(null);
+  const [showPdfTemplate, setShowPdfTemplate] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   if (isLoading) {
     return (
@@ -208,21 +214,67 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
     return <IconComponent className="w-4 h-4" />;
   };
 
+  const handleDownloadPdf = async () => {
+    setIsDownloading(true);
+    setShowPdfTemplate(true);
+    await new Promise(r => setTimeout(r, 100));
+    const html2canvas = (await import('html2canvas')).default;
+    const jsPDF = (await import('jspdf')).default;
+    if (!pdfRef.current) { setIsDownloading(false); return; }
+    const canvas = await html2canvas(pdfRef.current, { scale: 1.5 });
+    const imgData = canvas.toDataURL('image/jpeg', 0.92);
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgWidth = 210;
+    const pageHeight = 297;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    let heightLeft = imgHeight;
+    let position = 0;
+
+    pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    while (heightLeft >= 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
+    pdf.save(`Order_${order.orderId}.pdf`);
+    setShowPdfTemplate(false);
+    setIsDownloading(false);
+  };
+
   return (
     <div className="min-h-screen bg-[#f8f7f3]/80">
   
 
       <div className="max-w-7xl mx-auto p-6">
         {/* Back Button */}
-        <div className="mb-8">
+        <div className="mb-8 flex items-center justify-between">
           <Button 
             variant="outline" 
             onClick={() => router.back()}
             className="border-2 border-black font-gothic hover:bg-black hover:text-white transition-colors"
           >
-              <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft className="w-4 h-4 mr-2" />
             Back
-            </Button>
+          </Button>
+          <Button 
+            onClick={handleDownloadPdf} 
+            className="border-2 border-black font-gothic ml-4 min-w-[140px] flex items-center justify-center hover:bg-black hover:text-white transition-colors"
+            disabled={isDownloading || showPdfTemplate}
+            variant="outline"
+          >
+            {isDownloading || showPdfTemplate ? (
+              <span className="flex items-center gap-2">
+                <svg className="animate-spin h-4 w-4 mr-2 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
+                Generating...
+              </span>
+            ) : (
+              'Download PDF'
+            )}
+          </Button>
         </div>
 
         {/* Enhanced Order Summary Card */}
@@ -485,10 +537,19 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
 
         {/* Enhanced Footer */}
         <div className="mt-12 border-t-4 border-black pt-6 text-center bg-white/90 p-6">
+          {/* Seller Review Section */}
+          <SellerReview transactionId={order.orderId} orderStatus={order.status} />
           <p className="font-gothic text-sm text-gray-500">
             ORDER DETAILS HERALD • Published by Community Editorial Board • All Rights Reserved
           </p>
         </div>
+
+        {/* Hidden PDF Template for Export */}
+        {order && (
+          <div ref={pdfRef} style={{ display: showPdfTemplate ? 'block' : 'none' }}>
+            <OrderTemplate order={order} />
+          </div>
+        )}
       </div>
     </div>
   );

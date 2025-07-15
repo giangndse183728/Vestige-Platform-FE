@@ -14,8 +14,12 @@ export const signupBaseSchema = z.object({
     .refine((val) => /[a-z]/.test(val), { message: "Password must contain at least one lowercase letter" })
     .refine((val) => /[0-9]/.test(val), { message: "Password must contain at least one number" })
     .refine((val) => /[^A-Za-z0-9]/.test(val), { message: "Password must contain at least one special character" }),
-  firstName: z.string().min(1, { message: "First name is required" }),
-  lastName: z.string().min(1, { message: "Last name is required" }),
+  firstName: z.string()
+    .min(1, { message: "First name is required" })
+    .regex(/^[A-Za-z\s'-]+$/, { message: "First name can only contain letters, spaces, apostrophes and hyphens" }),
+  lastName: z.string()
+    .min(1, { message: "Last name is required" })
+    .regex(/^[A-Za-z\s'-]+$/, { message: "Last name can only contain letters, spaces, apostrophes and hyphens" }),
   phoneNumber: z.string()
     .regex(/^(\+?\d{1,3}[- ]?)?\d{9,10}$/, { message: "Invalid phone number format" }),
 });

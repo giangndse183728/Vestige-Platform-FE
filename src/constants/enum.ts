@@ -77,10 +77,10 @@ export enum AccountStatus {
 
 // Gender Enums
 export enum Gender {
-  MALE = 'male',
-  FEMALE = 'female',
-  OTHER = 'other',
-  PREFER_NOT_TO_SAY = 'prefer-not-to-say'
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
+  OTHER = 'OTHER',
+  PREFER_NOT_TO_SAY = 'PREFER_NOT_TO_SAY'
 }
 
 // Trust tier display names

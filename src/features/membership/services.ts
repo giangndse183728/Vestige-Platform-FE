@@ -1,5 +1,5 @@
 import axios from "@/libs/axios";
-import { MembershipPlansResponse, membershipPlansResponseSchema, SubscriptionPaymentResponse, subscriptionPaymentResponseSchema, CurrentSubscriptionResponse, currentSubscriptionResponseSchema } from "./schema";
+import { MembershipPlansResponse, membershipPlansResponseSchema, SubscriptionPaymentResponse, subscriptionPaymentResponseSchema, CurrentSubscriptionResponse, currentSubscriptionResponseSchema, mySubscriptionResponseSchema, MySubscriptionResponse } from "./schema";
 
 export const membershipService = {
   async getPlans(): Promise<MembershipPlansResponse> {
@@ -30,5 +30,10 @@ export const membershipService = {
   async getCurrentSubscription(): Promise<CurrentSubscriptionResponse> {
     const response = await axios.get("/memberships/current");
     return currentSubscriptionResponseSchema.parse(response.data);
+  },
+
+  async getMySubscription(): Promise<MySubscriptionResponse> {
+    const response = await axios.get("/memberships/my-subscription");
+    return response.data;
   },
 }; 
