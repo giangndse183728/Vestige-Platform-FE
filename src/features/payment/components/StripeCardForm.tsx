@@ -110,7 +110,7 @@ export const StripeCardForm: React.FC<StripeCardFormProps> = ({ order, onPayment
         )}
       </div>
       
-      <div className="bg-gray-50 p-4 rounded-lg">
+      {/* <div className="bg-gray-50 p-4 rounded-lg">
         <p className="text-sm text-gray-600 mb-2">Test Card Numbers:</p>
         <div className="space-y-1 text-xs text-gray-500">
           <p>• Visa: 4242 4242 4242 4242</p>
@@ -118,7 +118,7 @@ export const StripeCardForm: React.FC<StripeCardFormProps> = ({ order, onPayment
           <p>• Any future date for expiry</p>
           <p>• Any 3-digit CVC</p>
         </div>
-      </div>
+      </div> */}
 
       <Button
         type="submit"

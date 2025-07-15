@@ -2,8 +2,12 @@ import * as z from "zod";
 import { TrustTier, AccountStatus, Gender } from "@/constants/enum";
 
 export const profileFormSchema = z.object({
-  firstName: z.string().min(1, { message: "First name is required" }),
-  lastName: z.string().min(1, { message: "Last name is required" }),
+  firstName: z.string()
+    .min(1, { message: "First name is required" })
+    .regex(/^[A-Za-z\s'-]+$/, { message: "First name can only contain letters, spaces, apostrophes and hyphens" }),
+  lastName: z.string()
+    .min(1, { message: "Last name is required" })
+    .regex(/^[A-Za-z\s'-]+$/, { message: "Last name can only contain letters, spaces, apostrophes and hyphens" }),
   phoneNumber: z.string()
     .regex(/^(\+?\d{1,3}[- ]?)?\d{9,10}$/, { message: "Invalid phone number format" })
     .optional()

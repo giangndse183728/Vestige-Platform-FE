@@ -28,6 +28,7 @@ import { TrustTier, Gender, TRUST_TIER_LABELS, TRUST_TIER_DESCRIPTIONS } from '@
 import { TierProgress } from './TierProgress';
 import { MembershipStatusCard } from '@/features/membership/components/MembershipStatusCard';
 import { useImageUpload } from '@/hooks/useImageUpload';
+import { z } from 'zod';
 
 // Helper function to format gender display
 const formatGenderDisplay = (gender: string | null | undefined): string => {
@@ -62,6 +63,7 @@ export const Profile = () => {
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [previewTier, setPreviewTier] = useState<TrustTier | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const { user, isLoading, error, updateProfile, isUpdating } = useProfile();
   const {
@@ -92,29 +94,12 @@ export const Profile = () => {
   const handleEdit = () => {
     if (!user) return;
     
-    const convertGender = (gender: string | null | undefined): Gender | null => {
-      if (!gender) return null;
-      
-      switch (gender.toLowerCase()) {
-        case 'male':
-          return Gender.MALE;
-        case 'female':
-          return Gender.FEMALE;
-        case 'other':
-          return Gender.OTHER;
-        case 'prefer-not-to-say':
-          return Gender.PREFER_NOT_TO_SAY;
-        default:
-          return gender as Gender;
-      }
-    };
-    
     setEditData({
       firstName: user.firstName,
       lastName: user.lastName,
       phoneNumber: user.phoneNumber,
       dateOfBirth: user.dateOfBirth,
-      gender: convertGender(user.gender),
+      gender: user.gender,
       bio: user.bio,
       profilePictureUrl: user.profilePictureUrl
     });
@@ -124,10 +109,19 @@ export const Profile = () => {
   const handleSave = async () => {
     try {
       const validatedData = profileFormSchema.parse(editData);
+      setFormErrors({});
       await updateProfile(validatedData);
       setIsEditing(false);
     } catch (error) {
-      if (error instanceof Error) {
+      if (error instanceof z.ZodError) {
+        const fieldErrors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          const field = err.path.join('.');
+          fieldErrors[field] = err.message;
+        });
+        setFormErrors(fieldErrors);
+        toast.error('Please fix the form errors');
+      } else if (error instanceof Error) {
         toast.error(error.message);
       } else {
         toast.error('Failed to update profile');
@@ -478,6 +472,7 @@ export const Profile = () => {
                         onChange={(e) => handleInputChange('firstName', e.target.value)}
                         className="border-black focus:border-black focus:ring-0"
                       />
+                      {formErrors.firstName && <p className="text-xs text-red-600 mt-1">{formErrors.firstName}</p>}
                     </div>
                     <div>
                       <Label className="font-gothic text-sm text-black">Last Name</Label>
@@ -486,6 +481,7 @@ export const Profile = () => {
                         onChange={(e) => handleInputChange('lastName', e.target.value)}
                         className="border-black focus:border-black focus:ring-0"
                       />
+                      {formErrors.lastName && <p className="text-xs text-red-600 mt-1">{formErrors.lastName}</p>}
                     </div>
                     <div>
                       <Label className="font-gothic text-sm text-black">Phone Number</Label>
@@ -495,6 +491,7 @@ export const Profile = () => {
                         className="border-black focus:border-black focus:ring-0"
                         placeholder="+1 (555) 123-4567"
                       />
+                      {formErrors.phoneNumber && <p className="text-xs text-red-600 mt-1">{formErrors.phoneNumber}</p>}
                     </div>
                     <div>
                       <Label className="font-gothic text-sm text-black">Profile Picture</Label>
@@ -551,6 +548,7 @@ export const Profile = () => {
                           />
                         </PopoverContent>
                       </Popover>
+                      {formErrors.dateOfBirth && <p className="text-xs text-red-600 mt-1">{formErrors.dateOfBirth}</p>}
                     </div>
                     <div>
                       <Label className="font-gothic text-sm text-black">Gender</Label>
@@ -568,6 +566,7 @@ export const Profile = () => {
                           <SelectItem value={Gender.PREFER_NOT_TO_SAY}>Prefer not to say</SelectItem>
                         </SelectContent>
                       </Select>
+                      {formErrors.gender && <p className="text-xs text-red-600 mt-1">{formErrors.gender}</p>}
                     </div>
                   </div>
                   <div className="md:col-span-2">

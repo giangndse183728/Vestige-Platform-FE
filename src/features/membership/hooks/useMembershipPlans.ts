@@ -16,4 +16,12 @@ export const useCurrentSubscription = () => {
     queryFn: membershipService.getCurrentSubscription,
     select: (data) => data.data,
   });
+};
+
+export const useMySubscription = () => {
+  return useQuery({
+    queryKey: ["membership", "my-subscription"],
+    queryFn: membershipService.getMySubscription,
+    select: (data) => data.data,
+  });
 }; 

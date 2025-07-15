@@ -37,8 +37,8 @@ export function MembershipPlanCard({ plan }: MembershipPlanCardProps) {
         return "rising-seller";
       case "PRO_SELLER":
         return "pro-seller";
-      case "ELITE_SELLER":
-        return "elite-seller";
+      case "NEW_SELLER":
+        return "new-seller";
       default:
         return "default";
     }
@@ -116,7 +116,9 @@ export function MembershipPlanCard({ plan }: MembershipPlanCardProps) {
                 ? "bg-red-600 hover:bg-red-700 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]" 
                 : plan.requiredTrustTier === "PRO_SELLER"
                   ? "bg-red-800 hover:bg-red-900 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
-                  : "bg-red-900 hover:bg-red-950 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
+                  : plan.requiredTrustTier === "NEW_SELLER"
+                    ? "bg-gray-200 text-black hover:bg-gray-300 "
+                  : "bg-red-900 hover:bg-red-950"
             } transition-all duration-300`}
           >
             {subscribeToPlan.isPending 

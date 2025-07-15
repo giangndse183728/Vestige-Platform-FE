@@ -36,7 +36,7 @@ function PaymentSuccessPageContent() {
     // If all PayOS parameters are present, confirm the payment
     if (code !== null && status && orderCode) {
       confirmPayment({
-        code,
+        code: code || '',
         status,
         orderCode
       }, {
