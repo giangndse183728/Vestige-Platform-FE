@@ -7,7 +7,7 @@ import { confirmDelivery } from '@/features/order/services';
 import { uploadMultipleImages } from '@/utils/imageUpload';
 import dynamic from 'next/dynamic';
 
-const Webcam = dynamic(() => import('react-webcam'), { ssr: false });
+const Webcam = dynamic<any>(() => import('react-webcam').then(mod => mod.default), { ssr: false });
 
 export default function DeliveryPhotoConfirmPage({ itemId }: { itemId: number }) {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -123,7 +123,7 @@ export default function DeliveryPhotoConfirmPage({ itemId }: { itemId: number })
           <div className="bg-white rounded-2xl shadow-2xl p-8 flex flex-col items-center border border-gray-200 max-w-[98vw] max-h-[95vh]">
             <Webcam
               audio={false}
-              ref={webcamRef}
+              ref={webcamRef as any}
               screenshotFormat="image/jpeg"
               width={600}
               height={450}

@@ -95,7 +95,7 @@ function WarehousePage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-metal text-base font-bold truncate mb-1">
-                      {item.productName || 'Unknown Product'}
+                      {item.product?.title || 'Unknown Product'}
                     </h3>
                     <Badge className="bg-blue-100 text-blue-800 border-2 border-blue-200 font-metal text-xs">
                       {item.status}
@@ -110,69 +110,43 @@ function WarehousePage() {
                   </div>
                   <div className="ml-6">
                     <div className="flex items-center gap-2 mb-0.5">
-                      <span className="font-gothic text-base font-semibold uppercase tracking-wide">{item.sellerInfo?.sellerFirstName} {item.sellerInfo?.sellerLastName}</span>
-                      <span className="font-gothic text-xs text-gray-600">@{item.sellerInfo?.sellerUsername}</span>
+                      <span className="font-gothic text-base font-semibold uppercase tracking-wide">{item.seller.firstName} {item.seller.lastName}</span>
+                      <span className="font-gothic text-xs text-gray-600">@{item.seller.username}</span>
                     </div>
-                    <div className="font-gothic text-xs text-gray-700 mt-0.5 whitespace-pre-line pl-1 leading-tight">
-                      {item.sellerInfo?.sellerAddressLine1}
-                      {item.sellerInfo?.sellerAddressLine2 && `, ${item.sellerInfo.sellerAddressLine2}`},
-                      {item.sellerInfo?.sellerCity && ` ${item.sellerInfo.sellerCity}`},
-                      {item.sellerInfo?.sellerState && ` ${item.sellerInfo.sellerState}`},
-                      {item.sellerInfo?.sellerCountry && ` ${item.sellerInfo.sellerCountry}`}
-                    </div>
+                    {/* Seller không có address, bỏ hiển thị địa chỉ seller */}
                   </div>
                 </div>
                 {/* Buyer Info */}
-                <div className="mb-3 p-2 rounded border border-green-400 bg-green-50">
-                  <div className="flex items-center gap-2 mb-1">
-                    <User className="w-4 h-4 text-green-600" />
-                    <span className="font-bold text-green-800 text-sm">Buyer</span>
-                  </div>
-                  <div className="ml-6">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <span className="font-gothic text-base font-semibold uppercase tracking-wide">{item.buyerInfo?.buyerFirstName} {item.buyerInfo?.buyerLastName}</span>
-                      <span className="font-gothic text-xs text-gray-600">@{item.buyerInfo?.buyerUsername}</span>
-                    </div>
-                    <div className="font-gothic text-xs text-gray-700 mt-0.5 whitespace-pre-line pl-1 leading-tight">
-                      {item.buyerInfo?.buyerAddressLine1}
-                      {item.buyerInfo?.buyerAddressLine2 && `, ${item.buyerInfo.buyerAddressLine2}`},
-                      {item.buyerInfo?.buyerCity && ` ${item.buyerInfo.buyerCity}`},
-                      {item.buyerInfo?.buyerState && ` ${item.buyerInfo.buyerState}`},
-                      {item.buyerInfo?.buyerCountry && ` ${item.buyerInfo.buyerCountry}`}
-                    </div>
-                  </div>
-                </div>
+                {/* Không có thông tin buyer name/username trong PickupItem.order, ẩn phần này */}
                 {/* Pickup Address */}
                 {/* Ẩn nếu đã có seller address rõ ràng */}
-                {/*
-                {item.sellerAddressLine1 && (
+                {item.order.shippingAddress.addressLine1 && (
                   <div className="flex items-start gap-2 mb-4 p-3 bg-blue-50 rounded">
                     <MapPin className="w-4 h-4 text-blue-600 mt-0.5" />
                     <div className="flex-1 min-w-0">
                       <p className="font-gothic text-sm font-medium text-blue-800 mb-1">
-                        Pickup Address
+                        Delivery Address
                       </p>
                       <p className="font-gothic text-xs text-blue-700">
-                        {item.sellerAddressLine1}
-                        {item.sellerAddressLine2 && `, ${item.sellerAddressLine2}`},
-                        {item.sellerCity && ` ${item.sellerCity}`},
-                        {item.sellerState && ` ${item.sellerState}`},
-                        {item.sellerCountry && ` ${item.sellerCountry}`}
+                        {item.order.shippingAddress.addressLine1}
+                        {item.order.shippingAddress.addressLine2 && `, ${item.order.shippingAddress.addressLine2}`},
+                        {item.order.shippingAddress.city && ` ${item.order.shippingAddress.city}`},
+                        {item.order.shippingAddress.state && ` ${item.order.shippingAddress.state}`},
+                        {item.order.shippingAddress.country && ` ${item.order.shippingAddress.country}`}
                       </p>
                     </div>
                   </div>
                 )}
-                */}
                 {/* --- Order Info Section --- */}
                 <div className="mt-4 grid grid-cols-1 gap-2 text-xs font-gothic text-gray-700">
                   <div className="flex items-center gap-2">
                     <span className="font-semibold text-black">Order Code:</span>
-                    <span>{item.orderCode || 'N/A'}</span>
-                    <span className="ml-2 text-gray-400">(Order ID: {item.orderId || item.orderItemId})</span>
+                    <span>N/A</span>
+                    <span className="ml-2 text-gray-400">(Order ID: {item.orderItemId})</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="font-semibold text-black">Price:</span>
-                    <span className="text-green-700 font-bold">{item.price?.toLocaleString() || 'N/A'} VND</span>
+                    <span className="text-green-700 font-bold">N/A</span>
                   </div>
                 </div>
                 {/* Action Button */}

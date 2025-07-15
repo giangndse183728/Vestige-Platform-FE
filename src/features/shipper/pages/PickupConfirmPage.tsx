@@ -10,7 +10,7 @@ import { confirmPickup } from '@/features/order/services';
 import { uploadMultipleImages } from '@/utils/imageUpload';
 import dynamic from 'next/dynamic';
 
-const Webcam = dynamic(() => import('react-webcam'), { ssr: false });
+const Webcam = dynamic<any>(() => import('react-webcam').then(mod => mod.default), { ssr: false });
 
 function PickupConfirmPage({ itemId }: { itemId: number }) {
   const [isProcessing, setIsProcessing] = useState(false);

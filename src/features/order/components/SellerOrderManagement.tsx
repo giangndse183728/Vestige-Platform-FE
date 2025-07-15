@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { QRCode } from '@/components/ui/qr-code';
 import { useSellerOrders } from '@/features/order/hooks/useSellerOrders';
-import { requestPickup } from '@/features/order/services';
+import { requestItemPickup } from '@/features/order/services';
 import { ActualOrder, OrderStatus, EscrowStatus } from '@/features/order/schema';
 import { format } from 'date-fns';
 import { 
@@ -26,11 +26,30 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 
-const getStatusIcon = (status: OrderStatus) => {
+const getOrderStatusIcon = (status: OrderStatus) => {
   switch (status) {
     case 'PENDING':
       return <Clock className="w-4 h-4" />;
     case 'CONFIRMED':
+    case 'PROCESSING':
+      return <Package className="w-4 h-4" />;
+    case 'OUT_FOR_DELIVERY':
+      return <Truck className="w-4 h-4" />;
+    case 'DELIVERED':
+      return <CheckCircle className="w-4 h-4" />;
+    case 'CANCELLED':
+    case 'REFUNDED':
+    case 'EXPIRED':
+      return <XCircle className="w-4 h-4" />;
+    default:
+      return <Clock className="w-4 h-4" />;
+  }
+};
+
+const getOrderItemStatusIcon = (status: any) => {
+  switch (status) {
+    case 'PENDING':
+      return <Clock className="w-4 h-4" />;
     case 'PROCESSING':
       return <Package className="w-4 h-4" />;
     case 'AWAITING_PICKUP':
@@ -38,8 +57,6 @@ const getStatusIcon = (status: OrderStatus) => {
     case 'IN_WAREHOUSE':
       return <Package className="w-4 h-4" />;
     case 'OUT_FOR_DELIVERY':
-      return <Truck className="w-4 h-4" />;
-    case 'SHIPPED':
       return <Truck className="w-4 h-4" />;
     case 'DELIVERED':
       return <CheckCircle className="w-4 h-4" />;
@@ -57,6 +74,25 @@ const getStatusColor = (status: OrderStatus) => {
     case 'PENDING':
       return 'bg-yellow-100 text-yellow-800 border-yellow-200';
     case 'CONFIRMED':
+    case 'PROCESSING':
+      return 'bg-blue-100 text-blue-800 border-blue-200';
+    case 'OUT_FOR_DELIVERY':
+      return 'bg-purple-100 text-purple-800 border-purple-200';
+    case 'DELIVERED':
+      return 'bg-green-100 text-green-800 border-green-200';
+    case 'CANCELLED':
+    case 'REFUNDED':
+    case 'EXPIRED':
+      return 'bg-red-100 text-red-800 border-red-200';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-200';
+  }
+};
+
+const getOrderItemStatusColor = (status: any) => {
+  switch (status) {
+    case 'PENDING':
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
     case 'PROCESSING':
       return 'bg-blue-100 text-blue-800 border-blue-200';
     case 'AWAITING_PICKUP':
@@ -114,7 +150,7 @@ export function SellerOrderManagement() {
     try {
       setProcessingPickup(itemId);
       setPickupError(null);
-      await requestPickup(orderId, itemId);
+      await requestItemPickup(orderId, itemId);
       // Refresh the orders list
       await refetch();
     } catch (err) {
@@ -209,7 +245,7 @@ export function SellerOrderManagement() {
                 </div>
                 <div className="flex gap-2">
                   <Badge className={`border ${getStatusColor(order.status)}`}>
-                    {getStatusIcon(order.status)}
+                    {getOrderStatusIcon(order.status)}
                     <span className="ml-1">{order.status}</span>
                   </Badge>
                   {order.overallEscrowStatus && (
@@ -276,8 +312,8 @@ export function SellerOrderManagement() {
                           <h4 className="font-medium text-sm truncate">{item.productTitle}</h4>
                           <p className="text-sm text-gray-600">Seller: {item.sellerUsername}</p>
                           <div className="flex gap-2 mt-2">
-                            <Badge className={`text-xs ${getStatusColor(item.itemStatus)}`}>
-                              {item.itemStatus}
+                            <Badge className={`text-xs ${getOrderItemStatusColor(item.itemStatus)}`}>
+                              {getOrderItemStatusIcon(item.itemStatus)} {item.itemStatus}
                             </Badge>
                             <Badge className={`text-xs ${getEscrowStatusColor(item.escrowStatus)}`}>
                               {item.escrowStatus}
@@ -395,10 +431,8 @@ export function SellerOrderManagement() {
                       ['IN_WAREHOUSE', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(item.itemStatus) && (
                         <div key={index} className="flex items-center gap-2 text-sm">
                           <span className="font-gothic">{item.productTitle}:</span>
-                          <Badge className={`text-xs ${getStatusColor(item.itemStatus)}`}>
-                            {item.itemStatus === 'IN_WAREHOUSE' && 'In Warehouse'}
-                            {item.itemStatus === 'OUT_FOR_DELIVERY' && 'Out for Delivery'}
-                            {item.itemStatus === 'DELIVERED' && 'Delivered'}
+                          <Badge className={`text-xs ${getOrderItemStatusColor(item.itemStatus)}`}>
+                            {getOrderItemStatusIcon(item.itemStatus)} {item.itemStatus === 'IN_WAREHOUSE' && 'In Warehouse'}{item.itemStatus === 'OUT_FOR_DELIVERY' && 'Out for Delivery'}{item.itemStatus === 'DELIVERED' && 'Delivered'}
                           </Badge>
                         </div>
                       )
