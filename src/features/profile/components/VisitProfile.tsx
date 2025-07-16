@@ -25,6 +25,7 @@ import { ActivityStats } from './ActivityStats';
 import { TrustTier, TRUST_TIER_LABELS } from '@/constants/enum';
 import { useSellerProduct } from '@/features/products/hooks/useSellerProduct';
 import { ProductCard } from '@/features/products/components/ProductCard';
+import { SellerReviewList } from '@/features/seller/components/SellerReview';
 
 interface PublicUserProfileProps {
   userId?: number;
@@ -313,6 +314,8 @@ export const PublicUserProfile: React.FC<PublicUserProfileProps> = ({ userId }) 
         ) : (
           <div className="text-center py-8 font-gothic text-gray-500">No products found for this seller.</div>
         )}
+        {/* Seller Reviews Section */}
+        {user.userId && <SellerReviewList sellerId={user.userId} />}
       </div>
 
       {/* Footer */}

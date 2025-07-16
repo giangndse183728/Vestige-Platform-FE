@@ -3,16 +3,18 @@ import { ApiResponse } from '@/libs/axios';
 import { CreateOrderData, Order, OrdersResponse } from './schema';
 
 export const createOrder = async (data: CreateOrderData): Promise<Order> => {
-  const response = await api.post<ApiResponse<Order>>('/orders', data);
+  const response = await api.post<ApiResponse<Order>>('/orders/payos', data);
   return response.data.data;
 };
 
-export const confirmPayment = async (data: {
-  orderId: number;
-  stripePaymentIntentId: string;
-  clientSecret: string;
+export const confirmPayment = async (params: {
+  code: string;
+  status: string;
+  orderCode: string;
 }): Promise<any> => {
-  const response = await api.post<ApiResponse<any>>('/orders/confirm-payment', data);
+  const response = await api.post<ApiResponse<any>>('/payos/confirm-payment', {}, {
+    params
+  });
   return response.data.data;
 };
 

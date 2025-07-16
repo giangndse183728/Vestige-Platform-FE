@@ -21,7 +21,7 @@ const defaultFilters: ProductFilters = {
   brand: '',
   condition: '',
   sortDir: 'desc',
-  page: '1',
+  page: '0',
   size: '24'
 };
 
@@ -37,7 +37,7 @@ export const useFiltersStore = create<FiltersStore>((set, get) => ({
       if (key !== 'page' && key !== 'size') {
         return {
           ...state,
-          filters: { ...state.filters, [key]: apiValue, page: '1' }
+          filters: { ...state.filters, [key]: apiValue, page: '0' }
         };
       }
       return {
@@ -60,12 +60,12 @@ export const useFiltersStore = create<FiltersStore>((set, get) => ({
   
   setPageSize: (size) => set((state) => ({
     ...state,
-    filters: { ...state.filters, size: size.toString(), page: '1' }
+    filters: { ...state.filters, size: size.toString(), page: '0' }
   })),
   
   resetPagination: () => set((state) => ({
     ...state,
-    filters: { ...state.filters, page: '1' }
+    filters: { ...state.filters, page: '0' }
   })),
 }));
 

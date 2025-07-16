@@ -220,6 +220,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                   placeholder="Describe your product in detail..."
                   disabled={isLoading}
                 />
+                <div className={`text-xs mt-1 text-right ${formData.description.length < 10 || formData.description.length > 2000 ? 'text-red-600' : 'text-gray-500'}`}>{formData.description.length} / 2000</div>
                 {errors.description && <p className="text-red-600 text-xs mt-1">{errors.description}</p>}
               </div>
 

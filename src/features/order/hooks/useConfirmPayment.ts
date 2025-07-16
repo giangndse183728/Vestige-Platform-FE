@@ -2,9 +2,9 @@ import { useMutation } from '@tanstack/react-query';
 import { confirmPayment } from '../services';
 
 interface ConfirmPaymentData {
-  orderId: number;
-  stripePaymentIntentId: string;
-  clientSecret: string;
+  code: string;
+  status: string;
+  orderCode: string;
 }
 
 export const useConfirmPayment = () => {

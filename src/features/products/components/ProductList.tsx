@@ -18,7 +18,7 @@ export function ProductList() {
   }, [data?.pagination?.totalElements, setTotalProducts]);
 
   const handlePageChange = (page: number) => {
-    setPage(page);
+    setPage(page - 1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -43,7 +43,7 @@ export function ProductList() {
     );
   }
 
-  const currentPage = parseInt(filters.page || '1');
+  const currentPage = (data?.pagination?.currentPage ?? 0) + 1;
   const currentPageSize = parseInt(filters.size || '12');
   const totalPages = data?.pagination?.totalPages || 1;
 
