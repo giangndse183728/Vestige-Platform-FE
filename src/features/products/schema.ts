@@ -74,7 +74,7 @@ export const productDetailSchema = z.object({
 
 export const createProductSchema = z.object({
   title: z.string().min(1, 'Title is required'),
-  description: z.string().min(1, 'Description is required'),
+  description: z.string().min(10, 'Description must be at least 10 characters').max(2000, 'Description must be at most 2000 characters'),
   price: z.number().min(0, 'Price must be greater than or equal to 0'),
   originalPrice: z.number().min(0, 'Original price must be greater than or equal to 0'),
   condition: z.string().min(1, 'Condition is required'),
