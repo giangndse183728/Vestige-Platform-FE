@@ -82,6 +82,25 @@ export const getAdminAllOrders = async () => {
   return response.data;
 };
 
+export const getAdminAwaitingReleaseTransactions = async () => {
+  const response = await api.get('/orders/admin/transactions/awaiting-release');
+  return response.data;
+};
+
+export const releaseEscrowByAdmin = async (transactionId: number, notes?: string) => {
+  const response = await api.post(`/orders/admin/transactions/${transactionId}/release-escrow`, undefined, {
+    params: notes ? { notes } : undefined,
+  });
+  return response.data;
+};
+
+export const releaseAwaitingEscrowByAdmin = async (transactionId: number, notes?: string) => {
+  const response = await api.post(`/orders/admin/transactions/${transactionId}/release-awaiting-escrow`, undefined, {
+    params: notes ? { notes } : undefined,
+  });
+  return response.data;
+};
+
 // LOGISTICS SERVICES FOR SHIPPERS
 
 export const confirmPickup = async (orderItemId: number, photoUrls: string[]) => {
