@@ -538,7 +538,13 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
         {/* Enhanced Footer */}
         <div className="mt-12 border-t-4 border-black pt-6 text-center bg-white/90 p-6">
           {/* Seller Review Section */}
-          <SellerReview transactionId={order.orderId} orderStatus={order.status} />
+          {order.orderItems.map((item) => (
+            <SellerReview
+              key={item.transaction.transactionId}
+              transactionId={item.transaction.transactionId}
+              orderStatus={order.status}
+            />
+          ))}
           <p className="font-gothic text-sm text-gray-500">
             ORDER DETAILS HERALD • Published by Community Editorial Board • All Rights Reserved
           </p>

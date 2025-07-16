@@ -13,17 +13,12 @@ import { useAddresses } from '@/features/profile/hooks/useAddresses';
 import { CreateOrderData, Order } from '@/features/order/schema';
 import { useProductDetail } from '@/features/products/hooks/useProductDetail';
 import { toast } from 'sonner';
-import { MapPin, CreditCard, UserCircle, Shield, Star, ExternalLink } from 'lucide-react';
+import { MapPin, UserCircle, Shield, Star } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
-import { CompactStripeStatus } from '@/features/payment/components/CompactStripeStatus';
-import { Elements } from '@stripe/react-stripe-js';
-import { StripeCardForm, stripePromise } from '@/features/payment/components/StripeCardForm';
 import { AddressForm } from '@/features/profile/components/AddressForm';
 import { AddressList } from '@/features/profile/components/AddressList';
 import { AddressFormData, Address } from '@/features/profile/schema';
 import { Input } from '@/components/ui/input';
-import { useStripeAccountStatus } from '@/features/payment/hooks/useStripeAccountStatus';
 
 function CheckoutPageContent() {
   const router = useRouter();
@@ -33,7 +28,7 @@ function CheckoutPageContent() {
   const [orderData, setOrderData] = useState<CreateOrderData>({
     items: [],
     shippingAddressId: 0,
-    paymentMethod: 'STRIPE_CARD',
+    paymentMethod: 'PAYOS',
     notes: ''
   });
 
@@ -54,7 +49,7 @@ function CheckoutPageContent() {
   const { mutate: createOrder, isPending: isCreatingOrder } = useCreateOrder();
   const { addresses, isLoading: isLoadingAddresses, createAddress, updateAddress, deleteAddress, setDefaultAddress, isCreating, isUpdating: isUpdatingAddresses, isDeleting, isSettingDefault } = useAddresses();
   const { data: product, isLoading: isLoadingProduct } = useProductDetail(productId || '');
-  const { data: stripeStatus, isLoading: isStripeLoading, error: stripeError, refetch } = useStripeAccountStatus();
+  
 
   useEffect(() => {
     if (addresses && addresses.length > 0 && orderData.shippingAddressId === 0) {
@@ -94,14 +89,20 @@ function CheckoutPageContent() {
 
     // Create the order first
     createOrder(orderData, {
-      onSuccess: (order: Order) => {
-        toast.success('Order created successfully!');
-        setCreatedOrder(order);
-        if (orderData.paymentMethod === 'STRIPE_CARD') {
-          setShowPaymentForm(true);
-        } else {
-          // For COD orders
-          router.push(`/checkout/success?orderId=${order.orderId}`);
+      onSuccess: (data: string | { checkoutUrl: string } | Order) => {
+        if (typeof data === 'string') {
+          return;
+        }
+        if (typeof data === 'object' && data !== null && 'checkoutUrl' in data && typeof data.checkoutUrl === 'string') {
+          return;
+        }
+      
+        if (typeof data === 'object' && data !== null && 'orderId' in data && 'status' in data) {
+          toast.success('Order created successfully!');
+          setCreatedOrder(data);
+          if (orderData.paymentMethod === 'PAYOS') {
+            router.push(`/checkout/success?orderId=${data.orderId}`);
+          }
         }
       },
       onError: (error) => {
@@ -202,8 +203,7 @@ function CheckoutPageContent() {
     );
   }
 
-  // Show payment form if order was created and payment method is Stripe
-  if (showPaymentForm && createdOrder && orderData.paymentMethod === 'STRIPE_CARD') {
+  if (showPaymentForm && createdOrder && orderData.paymentMethod === 'PAYOS') {
     return (
       <div className="min-h-screen bg-[#f8f7f3]/80">
         <div className="max-w-2xl mx-auto p-6 mt-8">
@@ -213,13 +213,6 @@ function CheckoutPageContent() {
                 <h2 className="font-metal text-2xl mb-2">Complete Payment</h2>
                 <p className="text-gray-600">Order #{createdOrder.orderId}</p>
               </div>
-
-              <Elements stripe={stripePromise}>
-                <StripeCardForm
-                  order={createdOrder}
-                  onPaymentSuccess={handlePaymentSuccess}
-                />
-              </Elements>
 
               <div className="mt-4 text-center">
                 <Button
@@ -444,44 +437,6 @@ function CheckoutPageContent() {
                     />
                   </CardContent>
                 </Card>
-
-                {/* Stripe Banking Section */}
-                <Card variant="double" className="border-2 border-black">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2">
-                        <CreditCard className="w-5 h-5 text-blue-600" />
-                        <h3 className="font-metal text-lg">Stripe Banking Setup</h3>
-                      </div>
-                      <Link href="/profile">
-                        <button
-                          type="button"
-                          className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
-                        >
-                          <ExternalLink className="w-4 h-4 mr-2" />
-                          Go to Profile to Setup
-                        </button>
-                      </Link>
-                    </div>
-
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <div className="flex items-start gap-3">
-                        <CreditCard className="w-5 h-5 text-blue-600 mt-0.5" />
-                        <div>
-                          <h4 className="font-medium text-blue-900 mb-1">Complete Your Banking Setup</h4>
-                          <p className="text-sm text-blue-700 mb-3">
-                            Set up your Stripe banking account to receive payments and manage your business finances securely.
-                          </p>
-                          <div className="text-xs text-blue-600">
-                            • Secure payment processing<br />
-                            • Direct bank transfers<br />
-                            • Business account management
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
               </form>
             )}
           </div>
@@ -538,27 +493,17 @@ function CheckoutPageContent() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="COD">Cash on Delivery (COD)</SelectItem>
-                          <SelectItem value="STRIPE_CARD">Stripe Card</SelectItem>
+                          <SelectItem value="PAYOS">Banking</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
-
-                    {orderData.paymentMethod === 'STRIPE_CARD' && (
-                      <div className="pt-4 border-t border-gray-200">
-                        <CompactStripeStatus />
-                      </div>
-                    )}
 
                     <div className="pt-4 space-y-3">
                       <Button
                         type="submit"
                         disabled={
                           isProcessing ||
-                          !orderData.shippingAddressId ||
-                          (orderData.paymentMethod === 'STRIPE_CARD' &&
-                            (isStripeLoading || !!stripeError || !stripeStatus?.hasAccount || !stripeStatus?.setupComplete)
-                          )
+                          !orderData.shippingAddressId 
                         }
                         className="w-full text-white bg-red-900 hover:bg-red-800"
                         onClick={handleSubmit}

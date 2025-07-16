@@ -26,6 +26,8 @@ export const getProducts = async (filters?: ProductFilters): Promise<ProductsRes
   }
   
   if (filters?.sortDir) params.append('sortDir', filters.sortDir);
+  if (filters?.page) params.append('page', filters.page);
+  if (filters?.size) params.append('size', filters.size);
 
   const queryString = params.toString();
   const url = queryString ? `/products?${queryString}` : '/products';

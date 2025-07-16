@@ -647,8 +647,6 @@ export const Profile = () => {
         </div>
 
         <MembershipStatusCard className="mt-10" />
-        
-        <StripeAccountSection />
 
         <div className="mt-8 border-t-2 border-black pt-4 text-center">
           <p className="font-gothic text-xs text-gray-500">

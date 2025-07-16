@@ -10,7 +10,7 @@ export const orderItemSchema = z.object({
 export const createOrderSchema = z.object({
   items: z.array(orderItemSchema),
   shippingAddressId: z.number(),
-  paymentMethod: z.enum(['COD', 'STRIPE_CARD']),
+  paymentMethod: z.enum(['COD', 'PAYOS']),
   notes: z.string().optional(),
 });
 
