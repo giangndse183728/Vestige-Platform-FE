@@ -295,12 +295,12 @@ export default function AdminDashboard() {
                 },
                 {
                   title: "Avg Order Value",
-                  value: stats.orderStatistics?.data?.avgOrderValue?.toLocaleString('vi-VN') ?? 0,
+                  value: (stats.orderStatistics?.data?.avgOrderValue?.toLocaleString('vi-VN') ?? 0) + ' VND',
                   icon: BarChart3,
                 },
                 {
                   title: "Platform Fees Collected",
-                  value: stats.orderStatistics?.data?.platformFeesCollected?.toLocaleString('vi-VN') ?? 0,
+                  value: (stats.orderStatistics?.data?.platformFeesCollected?.toLocaleString('vi-VN') ?? 0) + ' VND',
                   icon: BarChart3,
                 },
               ].map((stat, index) => (
@@ -407,10 +407,13 @@ export default function AdminDashboard() {
                             <div key={key} className="flex flex-col mb-1">
                               <span className="font-semibold">{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:</span>
                               <span className="break-all text-gray-900 text-base font-semibold">{
-                                typeof value === 'number' ? value.toLocaleString('en-US') :
-                                typeof value === 'boolean' ? (value ? 'Yes' : 'No') :
-                                (value === null || value === undefined || value === '') ? '-' :
-                                (typeof value === 'object' ? JSON.stringify(value) : String(value))
+                                typeof value === 'number' && /amount|price|fee|total|revenue|value/i.test(key)
+                                  ? value.toLocaleString('vi-VN') + ' VND'
+                                  : typeof value === 'number'
+                                    ? value.toLocaleString('en-US')
+                                    : typeof value === 'boolean' ? (value ? 'Yes' : 'No')
+                                    : (value === null || value === undefined || value === '') ? '-' 
+                                    : (typeof value === 'object' ? JSON.stringify(value) : String(value))
                               }</span>
                             </div>
                           ))}

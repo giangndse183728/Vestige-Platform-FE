@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Pencil, Trash2, BarChart3, Users, Search, CheckCircle, XCircle, Eye, Package, ShoppingCart, CreditCard, ShieldCheck, ShieldX } from 'lucide-react';
 import { toast } from 'sonner';
 import React from 'react'; // Added missing import for React
+import Pagination from '@/components/ui/pagination';
 
 // Helper to format date string
 function formatDateString(val: string) {
@@ -20,6 +21,9 @@ function formatDateString(val: string) {
 }
 
 export default function UserManager() {
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize] = useState(20);
+  const [totalPages, setTotalPages] = useState(1);
   const { 
     usersQuery, 
     updateUser, 
@@ -29,7 +33,7 @@ export default function UserManager() {
     getUserActivitySummary,
     deactivateUser,
     getUserAdmin
-  } = useAdminUsers();
+  } = useAdminUsers(currentPage, pageSize);
   
   const [search, setSearch] = useState('');
   const [bulkSelected, setBulkSelected] = useState<number[]>([]);
@@ -42,6 +46,14 @@ export default function UserManager() {
 
   // Đảm bảo users luôn là mảng
   const users = Array.isArray(usersQuery.data?.data?.content) ? usersQuery.data.data.content : [];
+  React.useEffect(() => {
+    if (usersQuery.data?.pagination) {
+      setTotalPages(usersQuery.data.pagination.totalPages || 1);
+      if (currentPage + 1 > (usersQuery.data.pagination.totalPages || 1)) {
+        setCurrentPage(0);
+      }
+    }
+  }, [usersQuery.data, currentPage]);
 
   const filteredUsers = useMemo(() => {
     if (!search) return users;
@@ -153,53 +165,64 @@ export default function UserManager() {
             {usersQuery.error?.message || 'Failed to load users'}
           </div>
         ) : (
-          <table className="w-full">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
-                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Flags</th>
-                <th className="text-right py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Array.isArray(filteredUsers) && filteredUsers.map((user: any) => (
-                <tr key={user.userId} className="hover:bg-gray-50 border-b">
-                  <td className="py-3 px-6 text-sm text-gray-900">{user.userId}</td>
-                  <td className="py-3 px-6 text-sm text-gray-900">{user.username}</td>
-                  <td className="py-3 px-6 text-sm text-gray-900">{user.email}</td>
-                  <td className="py-3 px-6 text-sm text-gray-900">{user.firstName} {user.lastName}</td>
-                  <td className="py-3 px-6">
-                    <Badge variant={user.roleName === 'ADMIN' ? 'default' : 'secondary'}>
-                      {user.roleName}
-                    </Badge>
-                  </td>
-                  <td className="py-3 px-6 flex gap-2 items-center">
-                  {user.isLegitProfile ? (
-                    <ShieldCheck className="w-5 h-5 text-green-500" aria-label="Legit profile" />
-                  ) : (
-                    <ShieldX className="w-5 h-5 text-gray-400" aria-label="Not legit profile" />
-                  )}
-                  {user.isVerified ? (
-                    <CheckCircle className="w-5 h-5 text-green-500" aria-label="Verified" />
-                  ) : (
-                    <XCircle className="w-5 h-5 text-gray-400" aria-label="Not verified" />
-                  )}
-                </td>
-                  <td className="py-3 px-6 text-right">
-                    <div className="flex gap-2 justify-end">
-                      <Button size="sm" variant="outline" onClick={() => handleViewDetails(user)}>
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </td>
+          <>
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                  <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                  <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                  <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                  <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                  <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Flags</th>
+                  <th className="text-right py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {Array.isArray(filteredUsers) && filteredUsers.map((user: any) => (
+                  <tr key={user.userId} className="hover:bg-gray-50 border-b">
+                    <td className="py-3 px-6 text-sm text-gray-900">{user.userId}</td>
+                    <td className="py-3 px-6 text-sm text-gray-900">{user.username}</td>
+                    <td className="py-3 px-6 text-sm text-gray-900">{user.email}</td>
+                    <td className="py-3 px-6 text-sm text-gray-900">{user.firstName} {user.lastName}</td>
+                    <td className="py-3 px-6">
+                      <Badge variant={user.roleName === 'ADMIN' ? 'default' : 'secondary'}>
+                        {user.roleName}
+                      </Badge>
+                    </td>
+                    <td className="py-3 px-6 flex gap-2 items-center">
+                    {user.isLegitProfile ? (
+                      <ShieldCheck className="w-5 h-5 text-green-500" aria-label="Legit profile" />
+                    ) : (
+                      <ShieldX className="w-5 h-5 text-gray-400" aria-label="Not legit profile" />
+                    )}
+                    {user.isVerified ? (
+                      <CheckCircle className="w-5 h-5 text-green-500" aria-label="Verified" />
+                    ) : (
+                      <XCircle className="w-5 h-5 text-gray-400" aria-label="Not verified" />
+                    )}
+                  </td>
+                    <td className="py-3 px-6 text-right">
+                      <div className="flex gap-2 justify-end">
+                        <Button size="sm" variant="outline" onClick={() => handleViewDetails(user)}>
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {totalPages > 1 && (
+              <div className="py-4 flex justify-center">
+                <Pagination
+                  currentPage={currentPage + 1}
+                  totalPages={totalPages}
+                  onPageChange={page => setCurrentPage(page - 1)}
+                />
+              </div>
+            )}
+          </>
         )}
       </Card>
 
@@ -288,7 +311,7 @@ export default function UserManager() {
                   </div>
                   <div className="bg-purple-50 rounded-lg p-6 text-center">
                     <CreditCard className="w-8 h-8 mx-auto mb-2 text-purple-600" />
-                    <p className="text-2xl font-bold text-purple-900">{userStats.data.totalOrderValue ?? 0}</p>
+                    <p className="text-2xl font-bold text-purple-900">{userStats.data.totalOrderValue?.toLocaleString('vi-VN') ?? 0} VND</p>
                     <p className="text-sm text-purple-700">Total Order Value</p>
                   </div>
                   <div className="bg-yellow-50 rounded-lg p-6 text-center">

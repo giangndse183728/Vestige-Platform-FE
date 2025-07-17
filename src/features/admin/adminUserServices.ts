@@ -1,7 +1,7 @@
 import api from '@/libs/axios';
 
 // Basic CRUD operations
-export const getAllUsersAdmin = () => api.get('/users/admin');
+export const getAllUsersAdmin = (params?: { page?: number, size?: number }) => api.get('/users/admin', { params });
 export const getUserAdmin = (userId: number) => api.get(`/users/admin/${userId}`);
 export const updateUserAdmin = (userId: number, data: any) => api.patch(`/users/admin/${userId}`, data);
 export const bulkUpdateUserAdmin = (data: any) => api.patch('/users/admin/bulk-update', data);
