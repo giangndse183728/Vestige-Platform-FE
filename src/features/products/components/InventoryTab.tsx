@@ -12,19 +12,58 @@ import { Product } from '../schema';
 import Link from 'next/link';
 import { formatVNDPrice } from '@/utils/format';
 import Image from 'next/image';
+import { useDeleteProduct } from '../hooks/useMyProducts';
+import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 
 interface InventoryTabProps {
   onSwitchToAddProduct?: () => void;
+}
+
+function DeleteConfirmDialog({ open, onOpenChange, onConfirm, loading }: { open: boolean; onOpenChange: (open: boolean) => void; onConfirm: () => void; loading: boolean }) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <DialogHeader className="text-center space-y-4">
+          <DialogTitle className="font-metal text-xl">Delete Product</DialogTitle>
+          <DialogDescription className="font-gothic text-gray-600">
+            Are you sure you want to delete this product? This action cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="flex flex-row gap-3 mt-6 justify-center">
+          <button
+            onClick={onConfirm}
+            disabled={loading}
+            className="w-full font-gothic py-3 text-lg border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-red-600 hover:bg-red-700 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] text-white transition-all duration-300"
+          >
+            {loading ? 'Deleting...' : 'DELETE'}
+          </button>
+          <DialogClose asChild>
+            <button
+              className="w-full font-gothic border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all duration-300"
+              disabled={loading}
+            >
+              CANCEL
+            </button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 export function InventoryTab({ onSwitchToAddProduct }: InventoryTabProps) {
   const { data, isLoading, error } = useMyProducts();
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
 
   const { data: selectedProductDetail } = useMyProductDetail(
     selectedProductId?.toString() || ''
   );
+
+  const { mutateAsync: deleteProduct, isPending: isDeleting } = useDeleteProduct();
 
   if (isLoading) {
     return (
@@ -65,6 +104,8 @@ export function InventoryTab({ onSwitchToAddProduct }: InventoryTabProps) {
   const totalLikes = products.reduce((sum: number, product: Product) => sum + product.likesCount, 0);
   const totalValue = products.reduce((sum: number, product: Product) => sum + product.price, 0);
 
+  const visibleProducts = products.filter((product: Product) => product.status !== 'DELETED');
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'ACTIVE':
@@ -86,6 +127,11 @@ export function InventoryTab({ onSwitchToAddProduct }: InventoryTabProps) {
   const handleCloseModal = () => {
     setIsUpdateModalOpen(false);
     setSelectedProductId(null);
+  };
+
+  const handleDeleteClick = (product: Product) => {
+    setProductToDelete(product);
+    setDeleteDialogOpen(true);
   };
 
   return (
@@ -138,7 +184,7 @@ export function InventoryTab({ onSwitchToAddProduct }: InventoryTabProps) {
           </div>
         </CardHeader>
         <CardContent className="p-6">
-          {products.length === 0 ? (
+          {visibleProducts.length === 0 ? (
             <div className="text-center py-12">
               <Package className="w-16 h-16 mx-auto text-gray-400 mb-4" />
               <h3 className="font-serif text-xl font-bold mb-2">No Products Yet</h3>
@@ -152,7 +198,7 @@ export function InventoryTab({ onSwitchToAddProduct }: InventoryTabProps) {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {products.map((product: Product) => (
+              {visibleProducts.map((product: Product) => (
                 <div key={product.productId} className="group relative bg-white/90 backdrop-blur-sm overflow-hidden border-2 border-black -mr-[2px] -mb-[2px]">
 
                   <div className="absolute top-0 right-0 z-10 px-3 py-1 bg-black text-white text-xs font-metal uppercase shadow-sm">
@@ -215,6 +261,8 @@ export function InventoryTab({ onSwitchToAddProduct }: InventoryTabProps) {
                         size="sm" 
                         className="flex-1 border-2 border-black hover:bg-black hover:text-white font-serif text-xs"
                         onClick={() => handleEditClick(product)}
+                        disabled={product.status === 'SOLD'}
+                        title={product.status === 'SOLD' ? 'Sold products cannot be edited' : ''}
                       >
                         <Edit className="w-3 h-3 mr-1" />
                         Edit
@@ -223,14 +271,12 @@ export function InventoryTab({ onSwitchToAddProduct }: InventoryTabProps) {
                         variant="outline" 
                         size="sm" 
                         className="border-2 border-red-600 text-red-600 hover:bg-red-50 font-serif text-xs"
-                        onClick={() => {
-                          if (confirm('Are you sure you want to delete this product?')) {
-                            // TODO: Implement delete functionality
-                            console.log('Delete product:', product.productId);
-                          }
-                        }}
+                        disabled={isDeleting || product.status === 'SOLD'}
+                        onClick={() => handleDeleteClick(product)}
+                        title={product.status === 'SOLD' ? 'Sold products cannot be deleted' : ''}
                       >
                         <Trash2 className="w-3 h-3" />
+                        {isDeleting && productToDelete?.productId === product.productId ? 'Deleting...' : ''}
                       </Button>
                     </div>
                   </div>
@@ -246,6 +292,25 @@ export function InventoryTab({ onSwitchToAddProduct }: InventoryTabProps) {
         product={selectedProductDetail || null}
         isOpen={isUpdateModalOpen}
         onClose={handleCloseModal}
+      />
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={(open) => {
+          setDeleteDialogOpen(open);
+          if (!open) setProductToDelete(null);
+        }}
+        loading={isDeleting}
+        onConfirm={async () => {
+          if (!productToDelete) return;
+          try {
+            await deleteProduct(productToDelete.productId);
+            toast.success('Product deleted successfully!');
+            setDeleteDialogOpen(false);
+            setProductToDelete(null);
+          } catch (error) {
+            toast.error('Failed to delete product.');
+          }
+        }}
       />
     </div>
   );

@@ -134,7 +134,6 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
         categoryId: parseInt(formData.categoryId),
         brandId: parseInt(formData.brandId),
         imageUrls: finalImageUrls,
-        status: formData.status,
       };
 
       createProductSchema.parse({ ...submitData, status: undefined });
@@ -175,6 +174,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
   };
 
   const isLoading = updateProductMutation.isPending || isUploadingImages;
+  const isSold = product?.status === 'SOLD';
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()} >
@@ -187,7 +187,11 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
         <DialogHeader>
           <DialogTitle className="text-2xl font-metal font-bold">UPDATE PRODUCT</DialogTitle>
         </DialogHeader>
-
+        {isSold && (
+          <div className="mb-4 p-4 bg-yellow-100 border-2 border-yellow-600 text-yellow-800 font-serif text-center rounded">
+            This product has been SOLD and cannot be edited.
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic Information */}
           <Card variant="double" className="border-2 border-black">
@@ -204,7 +208,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                   onChange={handleInputChange}
                   className="border-2 border-black mt-1"
                   placeholder="Enter product title..."
-                  disabled={isLoading}
+                  disabled={isLoading || isSold}
                 />
                 {errors.title && <p className="text-red-600 text-xs mt-1">{errors.title}</p>}
               </div>
@@ -218,7 +222,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                   onChange={handleInputChange}
                   className="border-2 border-black mt-1 min-h-[120px]"
                   placeholder="Describe your product in detail..."
-                  disabled={isLoading}
+                  disabled={isLoading || isSold}
                 />
                 <div className={`text-xs mt-1 text-right ${formData.description.length < 10 || formData.description.length > 2000 ? 'text-red-600' : 'text-gray-500'}`}>{formData.description.length} / 2000</div>
                 {errors.description && <p className="text-red-600 text-xs mt-1">{errors.description}</p>}
@@ -237,7 +241,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                       className="border-2 border-black pr-14 mt-1"
                       placeholder="1.000.000"
                       autoComplete="off"
-                      disabled={isLoading}
+                      disabled={isLoading || isSold}
                     />
                     <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 select-none">VND</span>
                   </div>
@@ -256,7 +260,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                       className="border-2 border-black pr-14 mt-1"
                       placeholder="1.000.000"
                       autoComplete="off"
-                      disabled={isLoading}
+                      disabled={isLoading || isSold}
                     />
                     <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 select-none">VND</span>
                   </div>
@@ -278,7 +282,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                   <Select
                     value={formData.condition}
                     onValueChange={(value) => handleSelectChange('condition', value)}
-                    disabled={isLoading}
+                    disabled={isLoading || isSold}
                   >
                     <SelectTrigger className="border-2 border-black mt-1">
                       <SelectValue placeholder="Select condition" />
@@ -299,14 +303,13 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                   <Select
                     value={formData.status}
                     onValueChange={(value) => handleSelectChange('status', value)}
-                    disabled={isLoading}
+                    disabled={isLoading || isSold}
                   >
                     <SelectTrigger className="border-2 border-black mt-1">
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={ProductStatus.ACTIVE}>Active</SelectItem>
-                      <SelectItem value={ProductStatus.INACTIVE}>Inactive</SelectItem>
+                  
                       <SelectItem value={ProductStatus.DRAFT}>Draft</SelectItem>
                     </SelectContent>
                   </Select>
@@ -323,7 +326,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                     onChange={handleInputChange}
                     className="border-2 border-black mt-1"
                     placeholder="e.g., M, L, XL, 42, etc."
-                    disabled={isLoading}
+                    disabled={isLoading || isSold}
                   />
                   {errors.size && <p className="text-red-600 text-xs mt-1">{errors.size}</p>}
                 </div>
@@ -337,7 +340,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                     onChange={handleInputChange}
                     className="border-2 border-black mt-1"
                     placeholder="e.g., Black, Red, Blue, etc."
-                    disabled={isLoading}
+                    disabled={isLoading || isSold}
                   />
                   {errors.color && <p className="text-red-600 text-xs mt-1">{errors.color}</p>}
                 </div>
@@ -357,7 +360,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                 <BrandSelect
                   value={formData.brandId}
                   onValueChange={(value) => handleSelectChange('brandId', value)}
-                  disabled={isLoading}
+                  disabled={isLoading || isSold}
                 />
                 {errors.brandId && <p className="text-red-600 text-xs mt-1">{errors.brandId}</p>}
               </div>
@@ -378,7 +381,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
                 maxFiles={8}
                 isUploading={isUploadingImages}
                 uploadProgress={uploadProgress}
-                disabled={isLoading}
+                disabled={isLoading || isSold}
               />
               {errors.imageUrls && <p className="text-red-600 text-xs mt-2">{errors.imageUrls}</p>}
             </CardContent>
@@ -388,7 +391,7 @@ export function UpdateProductModal({ product, isOpen, onClose }: UpdateProductMo
           <div className="flex gap-4">
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || isSold}
               className="flex-1 bg-black text-white hover:bg-gray-800 border-2 border-black py-6 text-lg font-serif"
             >
               {isLoading ? 'UPDATING...' : 'UPDATE PRODUCT'}

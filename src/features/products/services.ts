@@ -96,6 +96,11 @@ export const updateProduct = async (id: number, data: UpdateProductRequest) => {
   return response.data.data;
 };
 
+export const deleteProduct = async (id: number) => {
+  const response = await api.delete(`/products/${id}`);
+  return response.data;
+};
+
 export const getAllProductStatuses = async (filters?: ProductFilters): Promise<any> => {
   const params = new URLSearchParams();
   if (filters?.search) params.append('search', filters.search);
@@ -154,5 +159,10 @@ export async function fetchNewArrivals(): Promise<ProductsResponse> {
 
 export async function fetchSellerProducts(sellerId: number): Promise<ProductsResponse> {
   const response = await api.get<ApiResponse<ProductsResponse>>(`/products?sellerId=${sellerId}`);
+  return response.data.data;
+}
+
+export async function fetchTopLikedProducts(): Promise<ProductsResponse> {
+  const response = await api.get<ApiResponse<ProductsResponse>>(`/products?&size=3&sortBy=likesCount&sortDir=desc`);
   return response.data.data;
 }

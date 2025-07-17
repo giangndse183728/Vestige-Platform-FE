@@ -10,7 +10,6 @@ export default function PaymentCancelPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Remove all payment-related params from the URL
     const url = new URL(window.location.href);
     url.searchParams.delete("code");
     url.searchParams.delete("id");

@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { getMyProducts } from '../services';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getMyProducts, deleteProduct } from '../services';
 import { ProductFilters } from '../schema';
 
 export const myProductKeys = {
@@ -12,5 +12,15 @@ export const useMyProducts = (filters?: ProductFilters) => {
   return useQuery({
     queryKey: myProductKeys.filtered(filters || {}),
     queryFn: () => getMyProducts(filters),
+  });
+};
+
+export const useDeleteProduct = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => deleteProduct(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: myProductKeys.all });
+    },
   });
 }; 
