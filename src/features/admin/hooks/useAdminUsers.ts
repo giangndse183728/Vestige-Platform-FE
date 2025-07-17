@@ -1,12 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as services from '../adminUserServices';
 
-export function useAdminUsers() {
+export function useAdminUsers(page = 0, size = 20) {
   const queryClient = useQueryClient();
 
   const usersQuery = useQuery({
-    queryKey: ['admin-users'],
-    queryFn: () => services.getAllUsersAdmin().then(res => res.data),
+    queryKey: ['admin-users', page, size],
+    queryFn: () => services.getAllUsersAdmin({ page, size }).then(res => res.data),
   });
 
   const updateUser = useMutation({
