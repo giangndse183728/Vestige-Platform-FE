@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Search, Heart, User, ShoppingBag, LogOut, UserCircle } from "lucide-react";
+import { Menu, X, Search, Heart, User, ShoppingBag, LogOut, UserCircle, Store } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/features/auth/hooks/useAuth";
@@ -91,7 +91,7 @@ const Navbar = () => {
             {/* Seller Center Tab */}
             <DropdownMenuItem asChild>
               <Link href="/seller-center" className="flex items-center cursor-pointer font-gothic text-black">
-                <User className="mr-2 h-4 w-4" />
+                <Store className="mr-2 h-4 w-4" />
                 <span>Seller Center</span>
               </Link>
             </DropdownMenuItem>
@@ -154,7 +154,7 @@ const Navbar = () => {
             {/* Seller Center Tab */}
             <DropdownMenuItem asChild>
               <Link href="/seller-center" className="flex items-center cursor-pointer font-gothic text-black">
-                <User className="mr-2 h-4 w-4" />
+                <Store className="mr-2 h-4 w-4" />
                 <span>Seller Center</span>
               </Link>
             </DropdownMenuItem>

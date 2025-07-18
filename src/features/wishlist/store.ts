@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { Product } from '@/features/products/schema';
+import api from '@/libs/axios';
 
 interface WishlistState {
   wishlist: Product[];
@@ -32,4 +33,14 @@ export const useWishlistStore = create<WishlistState>()(
       storage: createJSONStorage(() => localStorage), // (optional) by default, 'localStorage' is used
     }
   )
-); 
+);
+
+export const likeProduct = async (product: Product) => {
+  await api.post(`/products/${product.productId}/like`);
+  useWishlistStore.getState().addToWishlist(product);
+};
+
+export const unlikeProduct = async (productId: number) => {
+  await api.delete(`/products/${productId}/like`);
+  useWishlistStore.getState().removeFromWishlist(productId);
+}; 

@@ -5,7 +5,9 @@ import Link from 'next/link';
 import { Product } from '../schema';
 import { Eye, Heart } from 'lucide-react';
 import { formatVNDPrice } from '@/utils/format';
-import { useWishlistStore } from '@/features/wishlist/store';
+import { useWishlistStore, likeProduct, unlikeProduct } from '@/features/wishlist/store';
+import { useState } from 'react';
+import { toast } from 'sonner';
 import { cn } from '@/utils/cn';
 
 interface ProductCardProps {
@@ -13,16 +15,24 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const { addToWishlist, removeFromWishlist, isProductInWishlist } = useWishlistStore();
+  const { isProductInWishlist } = useWishlistStore();
   const isInWishlist = isProductInWishlist(product.productId);
+  const [isLiking, setIsLiking] = useState(false);
 
-  const handleWishlistToggle = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleWishlistToggle = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault(); // Prevent navigating to product page
     e.stopPropagation();
-    if (isInWishlist) {
-      removeFromWishlist(product.productId);
-    } else {
-      addToWishlist(product);
+    setIsLiking(true);
+    try {
+      if (isInWishlist) {
+        await unlikeProduct(product.productId);
+      } else {
+        await likeProduct(product);
+      }
+    } catch (error) {
+      toast.error('Failed to update wishlist.');
+    } finally {
+      setIsLiking(false);
     }
   };
 
@@ -79,9 +89,10 @@ export function ProductCard({ product }: ProductCardProps) {
                 <Eye className="w-4 h-4" />
                 {product.viewsCount}
               </span>
-              <button onClick={handleWishlistToggle} className="flex items-center gap-1 z-20">
+              <button onClick={handleWishlistToggle} className="flex items-center gap-1 z-20" disabled={isLiking}>
                 <Heart className={cn("w-4 h-4", isInWishlist ? 'text-red-500 fill-current' : '')} />
                 <span>{product.likesCount + (isInWishlist ? 1 : 0)}</span>
+                {isLiking && <span className="ml-1 animate-spin">...</span>}
               </button>
             </div>
           </div>

@@ -19,6 +19,7 @@ import { AddressForm } from '@/features/profile/components/AddressForm';
 import { AddressList } from '@/features/profile/components/AddressList';
 import { AddressFormData, Address } from '@/features/profile/schema';
 import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 
 function CheckoutPageContent() {
   const router = useRouter();
@@ -45,6 +46,8 @@ function CheckoutPageContent() {
     country: 'Vietnam',
     isDefault: false
   });
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [pendingSubmit, setPendingSubmit] = useState<React.FormEvent | null>(null);
 
   const { mutate: createOrder, isPending: isCreatingOrder } = useCreateOrder();
   const { addresses, isLoading: isLoadingAddresses, createAddress, updateAddress, deleteAddress, setDefaultAddress, isCreating, isUpdating: isUpdatingAddresses, isDeleting, isSettingDefault } = useAddresses();
@@ -81,13 +84,17 @@ function CheckoutPageContent() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setPendingSubmit(e);
+    setShowConfirmModal(true);
+  };
 
+  const handleConfirmCheckout = () => {
+    setShowConfirmModal(false);
+    if (pendingSubmit) {
     if (!orderData.shippingAddressId) {
       toast.error('Please select a shipping address');
       return;
     }
-
-    // Create the order first
     createOrder(orderData, {
       onSuccess: (data: string | { checkoutUrl: string } | Order) => {
         if (typeof data === 'string') {
@@ -110,6 +117,8 @@ function CheckoutPageContent() {
         console.error('Order creation error:', error);
       }
     });
+      setPendingSubmit(null);
+    }
   };
 
   const handlePaymentSuccess = () => {
@@ -526,6 +535,20 @@ function CheckoutPageContent() {
           </div>
         </div>
       </div>
+      <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Checkout</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 font-gothic text-lg text-center">
+            Are you sure you want to place this order?
+          </div>
+          <DialogFooter className="flex flex-row gap-3 justify-center">
+            <Button onClick={handleConfirmCheckout} className="bg-red-900 text-white w-full">Confirm</Button>
+            <Button variant="outline" onClick={() => setShowConfirmModal(false)} className="w-full">Cancel</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

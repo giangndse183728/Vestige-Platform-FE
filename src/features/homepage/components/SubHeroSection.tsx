@@ -12,6 +12,8 @@ import {
 } from '../../../components/animation/AnimatedWrapper';
 import { Button } from '../../../components/ui/button';
 import { ContinueExploring } from '@/components/ui/footer-section';
+import { Suspense } from 'react';
+import TopLikedProductsList from '../../products/components/TopLikedProductsList';
 
 const SubHeroSection = () => {
   return (
@@ -185,25 +187,14 @@ const SubHeroSection = () => {
               <div className="absolute bottom-0 right-0 w-8 h-8 border-t border-l border-black/60"></div>
 
               <div className="mb-6">
-                <h4 className="font-gothic text-xs uppercase tracking-widest mb-2">New Arrivals</h4>
+                <h4 className="font-gothic text-xs uppercase tracking-widest mb-2">Most Wanted</h4>
                 <div className="h-[1px] w-12 bg-[var(--dark-red)]"></div>
               </div>
 
-              <ul className="space-y-4">
-                {['Avant-Garde Blazers', 'Architectural Accessories', 'Deconstructed Denim', 'Monochrome Essentials'].map((item, index) => (
-                  <FadeUp
-                    key={index}
-                    delay={0.3 + index * 0.1}
-                  >
-                    <div className="flex items-center">
-                      <span className="text-[var(--dark-red)] mr-3">—</span>
-                      <Link href={`/categories`} className="font-serif text-black/80 hover:text-[var(--dark-red)]">
-                        {item}
-                      </Link>
-                    </div>
-                  </FadeUp>
-                ))}
-              </ul>
+              {/* Top Liked Products */}
+              <Suspense fallback={<div className="text-center text-gray-500 font-gothic">Loading...</div>}>
+                <TopLikedProductsList />
+              </Suspense>
 
               <FadeUp delay={0.7}>
                 <Link href="/categories" className="mt-6 inline-flex items-center self-start group">

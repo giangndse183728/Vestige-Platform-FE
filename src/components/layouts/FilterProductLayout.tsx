@@ -471,6 +471,8 @@ export function FilterProductLayout({ children }: FilterProductLayoutProps) {
                       <SelectContent className="rounded-none bg-white">
                         <SelectItem value="desc">Newest First</SelectItem>
                         <SelectItem value="asc">Oldest First</SelectItem>
+                        <SelectItem value="most_viewed">Most Viewed</SelectItem>
+                        <SelectItem value="most_liked">Most Liked</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

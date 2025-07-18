@@ -6,16 +6,24 @@ import { useFiltersStore } from "../hooks/useFilters";
 import { useEffect } from 'react';
 import Pagination from '@/components/ui/pagination';
 import PageSizeSelector from '@/components/ui/page-size-selector';
+import { useTopViewedProducts } from '../hooks/useTopProducts';
+import { useTopLikedProducts } from "../hooks/useTopProducts";
 
 export function ProductList() {
   const { filters, setTotalProducts, setPage, setPageSize } = useFiltersStore();
-  const { data, isLoading, error } = useProducts(filters);
+  const useMostViewed = filters.sortDir === 'most_viewed';
+  const useMostLiked = filters.sortDir === 'most_liked';
+  const { data, isLoading, error } = useMostViewed
+    ? useTopViewedProducts()
+    : useMostLiked
+    ? useTopLikedProducts()
+    : useProducts(filters);
 
   useEffect(() => {
-    if (data?.pagination?.totalElements !== undefined) {
+    if (data?.pagination?.totalElements !== undefined && !useMostViewed && !useMostLiked) {
       setTotalProducts(data.pagination.totalElements);
     }
-  }, [data?.pagination?.totalElements, setTotalProducts]);
+  }, [data?.pagination?.totalElements, setTotalProducts, useMostViewed, useMostLiked]);
 
   const handlePageChange = (page: number) => {
     setPage(page - 1);
@@ -54,7 +62,7 @@ export function ProductList() {
           <ProductCard key={product.productId} product={product} />
         ))}
       </div>
-      {data?.content && data.content.length > 0 && (
+      {!useMostViewed && !useMostLiked && data?.content && data.content.length > 0 && (
         <div className="flex flex-col items-center gap-4 py-8 ">
           <div className="flex items-center justify-between w-full max-w-4xl ">
             <PageSizeSelector
