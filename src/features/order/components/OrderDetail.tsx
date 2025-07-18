@@ -29,6 +29,7 @@ import { OrderItemStepper } from './CustomerOrdersTab';
 import { SellerReview } from '@/features/seller/components/SellerReview';
 import React, { useRef, useState } from 'react';
 import OrderTemplate from './OrderTemplate';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 
 // Order status config (overall order)
 const orderStatusConfig = {
@@ -147,6 +148,8 @@ interface OrderDetailProps {
 
 export function OrderDetail({ orderId }: OrderDetailProps) {
   const { data: order, isLoading, error } = useOrderDetail(orderId);
+  const { user } = useAuth();
+  const isBuyer = user && order && user.userId === order.buyer.userId;
   const router = useRouter();
   const pdfRef = useRef<HTMLDivElement>(null);
   const [showPdfTemplate, setShowPdfTemplate] = useState(false);
@@ -302,21 +305,31 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
           </CardHeader>
           <CardContent className="p-8 bg-gradient-to-br from-gray-50 to-white">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {isBuyer && (
               <div className="text-center p-4 bg-white border-2 border-black shadow-sm">
                 <div className="text-xs text-gray-500 mb-2 font-gothic uppercase tracking-wider">Items</div>
                 <div className="font-metal text-2xl text-black">{order.totalItems}</div>
               </div>
+            )}
               <div className="text-center p-4 bg-white border-2 border-black shadow-sm">
                 <div className="text-xs text-gray-500 mb-2 font-gothic uppercase tracking-wider">Shipping Fee</div>
                 <div className="font-metal text-lg text-black">{formatVNDPrice(order.totalShippingFee)}</div>
               </div>
+              {/* Platform Fee - only show if not buyer */}
+              {!isBuyer && (
+                <div className="text-center p-4 bg-white border-2 border-black shadow-sm">
+                  <div className="text-xs text-gray-500 mb-2 font-gothic uppercase tracking-wider">Platform Fee</div>
+                  <div className="font-metal text-lg text-black">{formatVNDPrice(order.totalPlatformFee)}</div>
+                </div>
+              )}
+              
               <div className="text-center p-4 bg-white border-2 border-black shadow-sm">
-                <div className="text-xs text-gray-500 mb-2 font-gothic uppercase tracking-wider">Platform Fee</div>
-                <div className="font-metal text-lg text-black">{formatVNDPrice(order.totalPlatformFee)}</div>
+                <div className="text-xs text-gray-500 mb-2 font-gothic uppercase tracking-wider">Created At</div>
+                <div className="font-metal text-xl text-black">{formatDate(order.createdAt)}</div>
               </div>
               <div className="text-center p-4 bg-white border-2 border-black shadow-sm">
-                <div className="text-xs text-gray-500 mb-2 font-gothic uppercase tracking-wider">Sellers</div>
-                <div className="font-metal text-2xl text-black">{order.uniqueSellers}</div>
+                <div className="text-xs text-gray-500 mb-2 font-gothic uppercase tracking-wider">Paid At</div>
+                <div className="font-metal text-xl text-black">{order.paidAt ? formatDate(order.paidAt) : 'Not Paid'}</div>
               </div>
             </div>
           </CardContent>
@@ -439,8 +452,17 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                             orderId={order.orderId}
                             itemId={item.orderItemId}
                             hideProductInfo={true}
+                            isBuyer={isBuyer}
                           />
-                         
+                          {/* Escrow Status for sellers only */}
+                          {!isBuyer && (
+                            <div className="mt-10 flex items-center gap-2 bg-gray-50 border-l-4 border-blue-400 p-3 rounded">
+                              {getEscrowStatusIcon(item.escrowStatus)}
+                              <span className="font-gothic text-sm text-blue-900">
+                                Escrow: {escrowStatusConfig[item.escrowStatus]?.label || item.escrowStatus}
+                              </span>
+                            </div>
+                          )}
                           {item.notes && (
                             <div className="pt-4 border-t-2 border-gray-200">
                               <div className="text-sm text-gray-500 font-gothic uppercase tracking-wider mb-2">Notes</div>

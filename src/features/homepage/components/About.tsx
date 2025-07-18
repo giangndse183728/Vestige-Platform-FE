@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Instagram, Facebook, ShoppingBag, UserPlus } from "lucide-react";
 import { FeedbackSection } from '@/features/feedback/components/FeedbackSection';
+import { useInView } from 'react-intersection-observer';
 
 function About() {
   const router = useRouter();
@@ -17,6 +18,8 @@ function About() {
   const handleExploreMarketplace = () => {
     router.push('/marketplace');
   };
+
+  const { ref: feedbackRef, inView: feedbackInView } = useInView({ triggerOnce: true, rootMargin: '200px' });
 
   return (
     <div className="mx-auto my-8 max-w-8xl px-6 bg-white/80">
@@ -241,7 +244,9 @@ function About() {
       </div>
 
       {/* Feedback Section */}
-      <FeedbackSection />
+      <div ref={feedbackRef}>
+        {feedbackInView && <FeedbackSection />}
+      </div>
 
       {/* Subscription Section */}
       <div className="border-3 border-red-900 bg-white relative mt-10">

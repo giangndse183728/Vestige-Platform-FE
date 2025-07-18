@@ -41,7 +41,7 @@ export default function WishlistPage() {
 
     const mainFeatured = wishlistItems[0];
     const sidebarStories = wishlistItems.slice(1, 2);
-    const normalGrid = wishlistItems.slice(5);
+    const normalGrid = wishlistItems.slice(3);
 
     return (
         <div className="container mx-auto py-8 mt-10 bg-black/10">

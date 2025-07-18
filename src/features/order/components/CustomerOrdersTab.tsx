@@ -76,6 +76,7 @@ interface OrderItemStepperProps {
   orderId: number;
   itemId: number;
   hideProductInfo?: boolean;
+  isBuyer?: boolean;
 }
 
 const OrderItemStepper = ({ 
@@ -88,6 +89,7 @@ const OrderItemStepper = ({
   orderId,
   itemId,
   hideProductInfo = false,
+  isBuyer = false,
 }: OrderItemStepperProps) => {
   const { mutate: requestPickup, isPending: isRequestingPickup } = useRequestPickup();
 
@@ -250,7 +252,7 @@ const OrderItemStepper = ({
       </div>
       
       {/* Request Pickup Button */}
-      {currentStatus === 'PROCESSING' && (
+      {!isBuyer && currentStatus === 'PROCESSING' && (
         <div className="mt-4 pt-4 border-t-2 border-black">
           <Button
             onClick={handleRequestPickup}
@@ -432,6 +434,7 @@ export function CustomerOrdersTab() {
                                 orderId={order.orderId}
                                 itemId={item.orderItemId}
                                 hideProductInfo={false}
+                                isBuyer={false} // Assuming all items in a single order are from the same buyer
                               />
                             ))}
                           </div>

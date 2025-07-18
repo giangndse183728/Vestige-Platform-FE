@@ -3,25 +3,29 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import clsx from "clsx";
-import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FadeUp, Marquee } from '../../../components/animation/AnimatedWrapper';
-import { useTopViewedProducts } from '@/features/products/hooks/useTopViewedProducts';
+import { useTopViewedProducts } from "@/features/products/hooks/useTopProducts";
 import { useNewArrivals } from '@/features/products/hooks/useNewArrivals';
 import { Product } from '@/features/products/schema';
-import { formatVNDPrice } from '@/utils/format';
 import { ProductCard } from '@/features/products/components/ProductCard';
+import dynamic from "next/dynamic";
+import { useInView } from 'react-intersection-observer';
+
 
 export default function NewspaperSlider() {
+
   const router = useRouter();
-  const { data: topViewedData, isLoading: isLoadingTopViewed, isError: isErrorTopViewed } = useTopViewedProducts();
+  const { ref: topViewedRef, inView: topViewedInView } = useInView({ triggerOnce: true, rootMargin: '200px' });
+  const { ref: newArrivalsRef, inView: newArrivalsInView } = useInView({ triggerOnce: true, rootMargin: '200px' });
+
+  const { data: topViewedData, isLoading: isLoadingTopViewed, isError: isErrorTopViewed } = useTopViewedProducts({ enabled: topViewedInView });
   const [topViewedCurrentPage, setTopViewedCurrentPage] = useState(0);
   const topViewedProducts: Product[] = topViewedData?.content || [];
   const topViewedTotalPages = Math.ceil(topViewedProducts.length / 4);
 
 
-  const { data: newArrivalsData, isLoading: isLoadingNewArrivals, isError: isErrorNewArrivals } = useNewArrivals();
+  const { data: newArrivalsData, isLoading: isLoadingNewArrivals, isError: isErrorNewArrivals } = useNewArrivals({ enabled: newArrivalsInView });
   const [newArrivalsCurrentPage, setNewArrivalsCurrentPage] = useState(0);
   const newArrivalsProducts: Product[] = newArrivalsData?.content || [];
   const newArrivalsTotalPages = Math.ceil(newArrivalsProducts.length / 4);
@@ -207,7 +211,7 @@ export default function NewspaperSlider() {
   
   return (
     <section className="w-full relative overflow-hidden">
-      <div className="container mx-auto relative z-10"> 
+      <div className="container mx-auto relative z-10" ref={topViewedRef}>
         <FadeUp delay={0.2}>
           <div className="flex flex-col items-center justify-center max-w-full mx-auto bg-white/60 backdrop-blur-3xs border-black p-8 relative overflow-hidden">
             <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 0, 0, 0.08) 1px, transparent 1px)`, backgroundSize: '24px 24px' }} />
@@ -244,7 +248,7 @@ export default function NewspaperSlider() {
         </div>
       </FadeUp>
 
-      <div className="container mx-auto relative z-10">
+      <div className="container mx-auto relative z-10" ref={newArrivalsRef}>
         {renderNewArrivalsSlider()}
       </div>
     </section>

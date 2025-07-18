@@ -15,6 +15,7 @@ import {
 import { Trash2, Pencil, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { getMyProductDetail } from '@/features/products/services';
+import Pagination from '@/components/ui/pagination';
 
 export default function ProductManager() {
   const {
@@ -46,6 +47,9 @@ export default function ProductManager() {
   });
   const [activeTab, setActiveTab] = useState<'pending' | 'inactive' | 'active' | 'sold' | 'all'>('all');
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [pageSize] = useState(20);
 
   // Filter products based on search query
   const filteredProducts = allProducts?.filter((product) => {
@@ -56,9 +60,9 @@ export default function ProductManager() {
     );
   });
 
-  // Các status cho từng tab (thêm Inactive)
+  // Các status cho từng tab (chuẩn backend)
   const statusTabs = [
-    { key: 'pending', label: 'Pending Approval', statuses: ['PENDING_PAYMENT', 'DRAFT'] },
+    { key: 'pending', label: 'Pending Approval', statuses: ['DRAFT'] },
     { key: 'inactive', label: 'Inactive', statuses: ['INACTIVE'] },
     { key: 'active', label: 'Active', statuses: ['ACTIVE'] },
     { key: 'sold', label: 'Sold', statuses: ['SOLD'] },
@@ -80,10 +84,33 @@ export default function ProductManager() {
     return filteredProducts?.filter(product => tab && tab.statuses.includes(product.status)).length || 0;
   };
 
+  const getTabStatuses = (tabKey: string) => {
+    const tab = statusTabs.find(t => t.key === tabKey);
+    return tab && tab.statuses.length > 0 ? tab.statuses : [];
+  };
+
+  // useEffect fetch đúng status và page
   useEffect(() => {
-    fetchAllProducts();
+    const statuses = getTabStatuses(activeTab);
+    const statusParam = statuses.length > 0 ? statuses[0] : undefined; // chỉ lấy 1 status cho đúng backend
+    fetchAllProducts({
+      page: String(currentPage), // page=0 là trang đầu
+      size: String(pageSize),
+      status: statusParam
+    }).then(res => {
+      setTotalPages(res.pagination?.totalPages || 1);
+      if (currentPage + 1 > (res.pagination?.totalPages || 1)) {
+        setCurrentPage(0);
+      }
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentPage, pageSize, activeTab]);
+
+  // Khi đổi tab, reset về trang đầu
+  const handleTabChange = (tabKey: typeof activeTab) => {
+    setActiveTab(tabKey);
+    setCurrentPage(0);
+  };
 
   const handleViewDetail = async (product: any) => {
     const detail = await getMyProductDetail(product.productId);
@@ -192,12 +219,9 @@ export default function ProductManager() {
           <button
             key={tab.key}
             className={`px-4 py-2 rounded-t font-semibold border-b-2 ${activeTab === tab.key ? 'border-black text-black bg-white' : 'border-transparent text-gray-500 bg-gray-50'}`}
-            onClick={() => setActiveTab(tab.key as typeof activeTab)}
+            onClick={() => handleTabChange(tab.key as typeof activeTab)}
           >
             {tab.label}
-            <span className="ml-2 inline-block min-w-[1.5em] px-2 py-0.5 text-xs font-bold rounded-full bg-gray-200 text-gray-700 align-middle">
-              {getTabCount(tab.key)}
-            </span>
           </button>
         ))}
       </div>
@@ -210,44 +234,55 @@ export default function ProductManager() {
           ) : allProductsError ? (
             <div className="text-red-600 py-8 text-center">{allProductsError}</div>
           ) : (
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-50">
-                  <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                  <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                  <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Brand</th>
-                  <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                  <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                  <th className="text-right py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {displayedProducts && displayedProducts.length > 0 ? (
-                  displayedProducts.map((product) => (
-                    <tr key={product.productId} className="hover:bg-gray-50">
-                      <td className="py-4 px-6 text-sm text-gray-900">{product.productId}</td>
-                      <td className="py-4 px-6 text-sm text-gray-900">{product.title}</td>
-                      <td className="py-4 px-6">
-                        <Badge variant={product.status === 'ACTIVE' ? 'default' : 'secondary'}>{product.status}</Badge>
-                      </td>
-                      <td className="py-4 px-6 text-sm text-gray-900">{product.brandName || '-'}</td>
-                      <td className="py-4 px-6 text-sm text-gray-900">{product.categoryName || '-'}</td>
-                      <td className="py-4 px-6 text-sm text-gray-900">{product.price} VND</td>
-                      <td className="py-4 px-6 text-right">
-                        <Button size="sm" variant="outline" onClick={() => handleViewDetail(product)}>
-                          View Detail
-                        </Button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={7} className="text-center py-8 text-gray-500">No products found.</td>
+            <>
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gray-50">
+                    <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                    <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                    <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Brand</th>
+                    <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                    <th className="text-left py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                    <th className="text-right py-3 px-6 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {displayedProducts && displayedProducts.length > 0 ? (
+                    displayedProducts.map((product) => (
+                      <tr key={product.productId} className="hover:bg-gray-50">
+                        <td className="py-4 px-6 text-sm text-gray-900">{product.productId}</td>
+                        <td className="py-4 px-6 text-sm text-gray-900">{product.title}</td>
+                        <td className="py-4 px-6">
+                          <Badge variant={product.status === 'ACTIVE' ? 'default' : 'secondary'}>{product.status}</Badge>
+                        </td>
+                        <td className="py-4 px-6 text-sm text-gray-900">{product.brandName || '-'}</td>
+                        <td className="py-4 px-6 text-sm text-gray-900">{product.categoryName || '-'}</td>
+                        <td className="py-4 px-6 text-sm text-gray-900">{product.price} VND</td>
+                        <td className="py-4 px-6 text-right">
+                          <Button size="sm" variant="outline" onClick={() => handleViewDetail(product)}>
+                            View Detail
+                          </Button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={7} className="text-center py-8 text-gray-500">No products found.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+              {totalPages > 1 && (
+                <div className="py-4 flex justify-center">
+                  <Pagination
+                    currentPage={currentPage + 1}
+                    totalPages={totalPages}
+                    onPageChange={page => setCurrentPage(page - 1)}
+                  />
+                </div>
+              )}
+            </>
           )}
         </div>
       </Card>
