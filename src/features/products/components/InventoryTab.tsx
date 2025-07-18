@@ -15,6 +15,10 @@ import Image from 'next/image';
 import { useDeleteProduct } from '../hooks/useMyProducts';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import Pagination from '@/components/ui/pagination';
+import PageSizeSelector from '@/components/ui/page-size-selector';
+import { useFiltersStore } from '../hooks/useFilters';
+import React from 'react';
 
 interface InventoryTabProps {
   onSwitchToAddProduct?: () => void;
@@ -53,11 +57,13 @@ function DeleteConfirmDialog({ open, onOpenChange, onConfirm, loading }: { open:
 }
 
 export function InventoryTab({ onSwitchToAddProduct }: InventoryTabProps) {
-  const { data, isLoading, error } = useMyProducts();
+  const { filters, setPage, setPageSize } = useFiltersStore();
+  const { data, isLoading, error } = useMyProducts(filters);
   const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  const [statusFilter, setStatusFilter] = React.useState<'ACTIVE' | 'SOLD' | 'DRAFT'>('ACTIVE');
 
   const { data: selectedProductDetail } = useMyProductDetail(
     selectedProductId?.toString() || ''
@@ -104,7 +110,10 @@ export function InventoryTab({ onSwitchToAddProduct }: InventoryTabProps) {
   const totalLikes = products.reduce((sum: number, product: Product) => sum + product.likesCount, 0);
   const totalValue = products.reduce((sum: number, product: Product) => sum + product.price, 0);
 
-  const visibleProducts = products.filter((product: Product) => product.status !== 'DELETED');
+  // Filter out deleted products, then filter by status
+  const visibleProducts = products
+    .filter((product: Product) => product.status !== 'DELETED')
+    .filter((product: Product) => product.status === statusFilter);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -134,53 +143,57 @@ export function InventoryTab({ onSwitchToAddProduct }: InventoryTabProps) {
     setDeleteDialogOpen(true);
   };
 
+  const handlePageChange = (page: number) => {
+    setPage(page - 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const currentPage = (data?.pagination?.currentPage ?? 0) + 1;
+  const currentPageSize = parseInt(filters.size || '12');
+  const totalPages = data?.pagination?.totalPages || 1;
+
   return (
     <div className="space-y-6">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card variant="double" className="border-2 border-black">
-          <CardContent className="pt-10 text-center">
-            <Package className="w-8 h-8 mx-auto mb-2 text-[var(--dark-red)]" />
-            <div className="font-gothic text-2xl font-bold">{totalProducts}</div>
-            <div className="text-sm font-mono text-gray-600">Total Products</div>
-          </CardContent>
-        </Card>
-        
-        <Card variant="double" className="border-2 border-black">
-          <CardContent className="pt-10 text-center">
-            <Eye className="w-8 h-8 mx-auto mb-2 text-[var(--dark-red)]" />
-            <div className="font-serif text-2xl font-bold">{totalViews}</div>
-            <div className="text-sm font-mono text-gray-600">Total Views</div>
-          </CardContent>
-        </Card>
-        
-        <Card variant="double" className="border-2 border-black">
-          <CardContent className="pt-10 text-center">
-            <Heart className="w-8 h-8 mx-auto mb-2 text-[var(--dark-red)]" />
-            <div className="font-serif text-2xl font-bold">{totalLikes}</div>
-            <div className="text-sm font-mono text-gray-600">Total Likes</div>
-          </CardContent>
-        </Card>
-        
-        <Card variant="double"className='border-2 border-black'>
-          <CardContent className="pt-10 text-center">
-            <DollarSign className="w-8 h-8 mx-auto mb-2 text-[var(--dark-red)]" />
-            <div className="font-gothic text-2xl font-bold">{formatVNDPrice(totalValue)}</div>
-            <div className="text-sm font-mono text-gray-600">Total Value</div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Products Grid */}
       <Card variant="double" className="border-2 border-black">
         <CardHeader className="border-b-2 border-black bg-black text-white">
           <div className="flex items-center justify-between">
-            <CardTitle className="font-metal text-xl font-normal">MY INVENTORY</CardTitle>
-            {totalProducts > 0 && (
-              <Badge variant="outline" className="border-2 border-white text-white font-serif rounded-none">
-                {totalProducts} {totalProducts === 1 ? 'item' : 'items'}
-              </Badge>
-            )}
+            <div className="flex items-center gap-3">
+              <CardTitle className="font-metal text-xl font-normal">MY INVENTORY</CardTitle>
+              {totalProducts > 0 && (
+                <Badge variant="outline" className="border-2 border-white text-white font-serif rounded-none">
+                  {totalProducts} {totalProducts === 1 ? 'item' : 'items'}
+                </Badge>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant={statusFilter === 'ACTIVE' ? 'default' : 'outline'}
+                className="font-gothic text-xs"
+                onClick={() => setStatusFilter('ACTIVE')}
+              >
+                ACTIVE
+              </Button>
+              <Button
+                variant={statusFilter === 'SOLD' ? 'default' : 'outline'}
+                className="font-gothic text-xs"
+                onClick={() => setStatusFilter('SOLD')}
+              >
+                SOLD
+              </Button>
+              <Button
+                variant={statusFilter === 'DRAFT' ? 'default' : 'outline'}
+                className="font-gothic text-xs"
+                onClick={() => setStatusFilter('DRAFT')}
+              >
+                DRAFT
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-6">
@@ -197,9 +210,10 @@ export function InventoryTab({ onSwitchToAddProduct }: InventoryTabProps) {
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {visibleProducts.map((product: Product) => (
-                <div key={product.productId} className="group relative bg-white/90 backdrop-blur-sm overflow-hidden border-2 border-black -mr-[2px] -mb-[2px]">
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {visibleProducts.map((product: Product) => (
+                  <div key={product.productId} className="group relative bg-white/90 backdrop-blur-sm overflow-hidden border-2 border-black -mr-[2px] -mb-[2px]">
 
                   <div className="absolute top-0 right-0 z-10 px-3 py-1 bg-black text-white text-xs font-metal uppercase shadow-sm">
                     {product.condition}
@@ -283,6 +297,23 @@ export function InventoryTab({ onSwitchToAddProduct }: InventoryTabProps) {
                 </div>
               ))}
             </div>
+            <div className="flex flex-col items-center gap-4 py-8 ">
+              <div className="flex items-center justify-between w-full max-w-4xl ">
+                <PageSizeSelector
+                  currentPageSize={currentPageSize}
+                  onPageSizeChange={handlePageSizeChange}
+                />
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+                <div className="text-sm text-gray-600 font-gothic">
+                  Showing {visibleProducts.length} of {data?.pagination?.totalElements} products
+                </div>
+              </div>
+            </div>
+          </>
           )}
         </CardContent>
       </Card>

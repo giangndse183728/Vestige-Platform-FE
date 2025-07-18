@@ -137,8 +137,22 @@ export function CreateProduct() {
       createProductSchema.parse(productData);
 
       await createProduct(productData);
-      toast.success('Product created successfully');
+      toast.success('Product created successfully. Check your inventory');
+      // Clear the form
+      setFormData({
+        title: '',
+        description: '',
+        price: '',
+        originalPrice: '',
+        condition: ProductCondition.NEW,
+        size: '',
+        color: '',
+        categoryId: '',
+        brandId: '',
+        imageFiles: [],
+      });
       router.push('/seller-center');
+      
     } catch (error) {
       if (error instanceof z.ZodError) {
         const fieldErrors: Record<string, string> = {};

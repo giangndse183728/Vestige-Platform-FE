@@ -123,6 +123,7 @@ export const orderSchema = z.object({
   totalItems: z.number(),
   uniqueSellers: z.number(),
   createdAt: z.string(),
+  paidAt: z.string().nullable(),
   stripePaymentIntentId: z.string().optional(),
   orderItems: z.array(orderItemDetailSchema),
   shippingAddress: addressSchema.omit({ isDefault: true, createdAt: true }),
