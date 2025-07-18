@@ -31,7 +31,7 @@ export default function LoginPage() {
         <div 
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: 'url(https://www.miamidesigndistrict.com/images/listings/large/363_rick-owens_1630503172238324.jpg)',
+            backgroundImage: 'url(/loginBackground.jpg)',
           }}
         >
           <div className={`absolute inset-0 bg-black transition-opacity duration-500 ${activeTab === 'signup' ? 'opacity-40' : 'opacity-90'}`} />
