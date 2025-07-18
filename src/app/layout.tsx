@@ -65,6 +65,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preload" href="/background.jpg" as="image" />
+        <link rel="icon" type="image/png" href="/fav.png" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} ${metalMania.variable} ${cinzel.variable} antialiased text-gray-900 overlay-scroll`}>
       <QueryClientProvider client={queryClient}>

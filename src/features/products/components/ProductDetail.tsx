@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Star, Heart, Eye, Shield, UserCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Star, Heart, Eye, Shield, User, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useCartStore } from '@/features/cart/hooks';
@@ -366,7 +366,13 @@ export function ProductDetail({ product }: ProductDetailProps) {
             </div>
 
             <div className="p-5 bg-white/90 backdrop-blur-sm border-2 border-black -mr-[2px] -mb-[2px]">
-              <h3 className="font-medium text-xl mb-2 font-metal">Seller Information</h3>
+              <div className="flex items-center gap-2 mb-2">
+                <h3 className="font-medium text-xl font-metal">Seller Information</h3>
+                <Link href={`/users/${product.seller.userId}`} className="relative group">
+                  <ExternalLink className="w-5 h-5 text-gray-500 hover:text-[var(--dark-red)] transition-colors cursor-pointer" />
+                  <span className="absolute left-1/2 -translate-x-1/2 -top-8 px-2 py-1 rounded bg-black text-white text-xs opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-20">View Profile</span>
+                </Link>
+              </div>
               <Link 
                 href={`/users/${product.seller.userId}`}
                 className="block hover:bg-gray-50 transition-colors rounded-lg p-2 -m-2"
@@ -383,7 +389,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                         />
                       ) : (
                         <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                          <UserCircle className="w-6 h-6 text-gray-400" />
+                          <User className="w-6 h-6 text-gray-400" />
                         </div>
                       )}
                     </div>
