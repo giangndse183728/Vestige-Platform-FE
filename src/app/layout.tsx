@@ -62,6 +62,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+      <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-QTWVS39KG8"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-QTWVS39KG8');
+          `}
+        </Script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preload" href="/background.jpg" as="image" />
