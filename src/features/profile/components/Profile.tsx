@@ -8,9 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarIcon, User, Edit3, Save, X, Camera } from 'lucide-react';
+import { User, Edit3, Save, X, Camera } from 'lucide-react';
 import { useProfile } from '../hooks/useProfile';
 import { profileFormSchema, ProfileFormData } from '../schema';
 import { ProfileSkeleton } from './ProfileSkeleton';
@@ -20,15 +18,13 @@ import { AddressForm } from './AddressForm';
 import { AddressList } from './AddressList';
 import { AddressFormData, Address } from '../schema';
 import { ActivityStats } from './ActivityStats';
-import { format } from 'date-fns';
-import { cn } from '@/utils/cn';
-import { StripeAccountSection } from '@/features/payment/components/StripeAccountSection';
 import Image from 'next/image';
 import { TrustTier, Gender, TRUST_TIER_LABELS, TRUST_TIER_DESCRIPTIONS } from '@/constants/enum';
 import { TierProgress } from './TierProgress';
 import { MembershipStatusCard } from '@/features/membership/components/MembershipStatusCard';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { z } from 'zod';
+import { DatePickerDemo } from '@/components/ui/date-picker';
 
 // Helper function to format gender display
 const formatGenderDisplay = (gender: string | null | undefined): string => {
@@ -521,33 +517,10 @@ export const Profile = () => {
                   <div className="space-y-4">
                     <div>
                       <Label className="font-gothic text-sm text-black">Date of Birth</Label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant={"outline"}
-                            size={"sm"}
-                            className={cn(
-                              "w-[240px] justify-start text-left font-normal",
-                              !editData.dateOfBirth && "text-muted-foreground"
-                            )}
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {editData.dateOfBirth ? (
-                              format(new Date(editData.dateOfBirth), "PPP")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={editData.dateOfBirth ? new Date(editData.dateOfBirth) : undefined}
-                            onSelect={(date) => handleInputChange('dateOfBirth', date ? date.toISOString().split('T')[0] : null)}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
+                      <DatePickerDemo
+                        value={editData.dateOfBirth || ""} // truyền string luôn
+                        onChange={(dateString: string) => handleInputChange('dateOfBirth', dateString)}
+                      />
                       {formErrors.dateOfBirth && <p className="text-xs text-red-600 mt-1">{formErrors.dateOfBirth}</p>}
                     </div>
                     <div>
@@ -600,51 +573,62 @@ export const Profile = () => {
 
         <ActivityStats user={user}  />
 
-        <div className="border-2 border-black p-6 mt-10 my-8 bg-black/10">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <h4 className="font-metal text-2xl font-bold text-black tracking-wider">
-                ADDRESSES
-              </h4>
-              <div className="h-6 w-[1px] bg-black"></div>
-              <span className="font-gothic text-sm text-gray-600 tracking-wider">SECTION</span>
+        {/* Replace the address section container div with a Card */}
+        <Card
+          className="border-2 border-black bg-white/80 rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] mt-10 my-8"
+          style={{
+            backgroundImage:
+              'repeating-linear-gradient(180deg, rgba(0,0,0,0.04) 0px, rgba(0,0,0,0.04) 1px, transparent 1px, transparent 25px)',
+            backdropFilter: 'blur(1px)'
+          }}
+        >
+          <CardContent className="p-8">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <h4 className="font-metal text-2xl font-bold text-black tracking-wider">
+                  ADDRESSES
+                </h4>
+                <div className="h-6 w-[1px] bg-black"></div>
+                <span className="font-gothic text-sm text-gray-600 tracking-wider">SECTION</span>
+              </div>
+              {!isAddingAddress && (
+                <Button
+                  onClick={handleAddAddress}
+                  variant={'double'}
+                >
+                  Add New Address
+                </Button>
+              )}
             </div>
-            {!isAddingAddress && (
-             
-                  <Button
-                onClick={handleAddAddress}
-                variant={'double'}
-           
+            {isAddingAddress ? (
+              <div
+                className="border-2 border-black p-6 rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,0.3)]"
+                style={{
+                  background: 'linear-gradient(180deg, rgba(253, 230, 138, 0.4) 0%, rgba(255,255,255,0.7) 100%)'
+                }}
               >
-                Add New Address
-              </Button>
-             
-            )}
-          </div>
-
-          {isAddingAddress ? (
-            <div className="border-2 border-black p-6">
-              <h5 className="font-metal text-xl mb-4">
-                {editingAddress ? 'Edit Address' : 'Add New Address'}
-              </h5>
-              <AddressForm
-                initialData={editingAddress || undefined}
-                onSubmit={handleSubmitAddress}
-                onCancel={handleCancelAddress}
-                isSubmitting={isCreating || isUpdatingAddresses}
+                <h5 className="font-metal text-xl mb-4">
+                  {editingAddress ? 'Edit Address' : 'Add New Address'}
+                </h5>
+                <AddressForm
+                  initialData={editingAddress || undefined}
+                  onSubmit={handleSubmitAddress}
+                  onCancel={handleCancelAddress}
+                  isSubmitting={isCreating || isUpdatingAddresses}
+                />
+              </div>
+            ) : (
+              <AddressList
+                addresses={addresses}
+                onEdit={handleEditAddress}
+                onDelete={deleteAddress}
+                onSetDefault={setDefaultAddress}
+                isDeleting={isDeleting}
+                isSettingDefault={isSettingDefault}
               />
-            </div>
-          ) : (
-            <AddressList
-              addresses={addresses}
-              onEdit={handleEditAddress}
-              onDelete={deleteAddress}
-              onSetDefault={setDefaultAddress}
-              isDeleting={isDeleting}
-              isSettingDefault={isSettingDefault}
-            />
-          )}
-        </div>
+            )}
+          </CardContent>
+        </Card>
 
         <MembershipStatusCard className="mt-10" />
 

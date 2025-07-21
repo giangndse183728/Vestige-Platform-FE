@@ -65,6 +65,33 @@ body {
   font-family: var(--font-cinzel), serif;
 }
 
+.rdrCalendarWrapper {
+  padding: 0px !important; /* hoặc giá trị bạn muốn */
+}
+
+.rdrMonthAndYearWrapper {
+  padding: 0px 10px 10px !important;
+}
+
+.rdrWeekDay {
+  color: #900000 !important; /* hoặc màu đỏ bạn muốn */
+  letter-spacing: 1px;
+}
+
+.rdrMonthAndYearWrapper select {
+  font-size: 14px !important;
+  padding-right: 22px !important;
+  padding-left: 10px !important;
+
+}
+
+.rdrMonthAndYearWrapper option {
+  height: 100px !important;
+  overflow-y: auto !important;
+}
+
+
+
 
 .dark {
   --background: #252525;
