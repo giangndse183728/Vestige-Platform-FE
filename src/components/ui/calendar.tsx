@@ -67,9 +67,12 @@ function Calendar({
           <ChevronRight className={cn("size-4", className)} {...props} />
         ),
       }}
+      captionLayout="dropdown"
+      fromYear={1900}
+      toYear={new Date().getFullYear()}
       {...props}
     />
   )
 }
-
 export { Calendar }
+

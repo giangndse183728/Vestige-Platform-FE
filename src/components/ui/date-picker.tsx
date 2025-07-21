@@ -1,46 +1,64 @@
 "use client"
 
 import * as React from "react"
-import { format } from "date-fns"
+import { format, parse } from "date-fns"
 import { CalendarIcon } from "lucide-react"
-
 import { cn } from "@/utils/cn"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+import { Calendar as RDRCalendar } from 'react-date-range';
+import 'react-date-range/dist/styles.css';
+import 'react-date-range/dist/theme/default.css';
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
-export function DatePickerDemo({ value, onChange, ref }: any) {
-    return (
-      <Popover>
+export function DatePickerDemo({ value, onChange, inputClassName, wrapperClassName }: any) {
+  const [open, setOpen] = React.useState(false);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  // Parse value for calendar
+  const parsedDate = value ? parse(value, "yyyy-MM-dd", new Date()) : new Date();
+
+  // Handle input change
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(e.target.value);
+  };
+
+  // Handle calendar change
+  const handleCalendarChange = (date: Date) => {
+    if (date) {
+      onChange(format(date, "yyyy-MM-dd"));
+      setOpen(false);
+    }
+  };
+
+  return (
+    <div className={wrapperClassName || "relative w-full"}>
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button
-            ref={ref}
-            variant={"outline"}
-            className={cn(
-              "w-full h-11 mt-1 justify-start text-left font-normal",
-              !value && "text-muted-foreground"
-            )}
-          >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {value ? format(value, "PPP") : <span>Pick a date</span>}
-          </Button>
+          <div className="flex items-center gap-2 cursor-pointer">
+            <input
+              ref={inputRef}
+              type="text"
+              placeholder="YYYY-MM-DD"
+              className={cn("border px-2 py-2 w-full", inputClassName)}
+              value={value || ""}
+              onChange={handleInputChange}
+              readOnly
+            />
+          
+          </div>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
-            mode="single"
-            selected={value}
-            onSelect={onChange}
-            initialFocus
-            disabled={(date) =>
-                date > new Date() || date < new Date("1900-01-01")
-              }
+        <PopoverContent className="p-0 rounded-none font-metal w-full bg-white border mt-2 left-0" align="start">
+          <RDRCalendar
+            
+            date={parsedDate}
+            onChange={handleCalendarChange}
+            showMonthAndYearPickers={true}
+            minDate={new Date(1950, 0, 1)}
+            maxDate={new Date()}
+            color="#900000"
           />
         </PopoverContent>
       </Popover>
-    )
-  }
+    </div>
+  );
+}
   

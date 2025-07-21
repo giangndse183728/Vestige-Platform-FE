@@ -126,7 +126,7 @@ export function MembershipPlans() {
           </div>
 
           {/* Membership Plans Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20 max-w-8xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20 max-w-7xl mx-auto">
             {sortedPlans.map((plan) => (
               <MembershipPlanCard 
                 key={plan.planId} 
