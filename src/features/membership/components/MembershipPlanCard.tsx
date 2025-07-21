@@ -76,6 +76,9 @@ export function MembershipPlanCard({ plan }: MembershipPlanCardProps) {
     setShowActiveSubscriptionDialog(false);
   };
 
+  // Hide Basic plan
+  if (plan.name.toLowerCase() === 'basic') return null;
+
   return (
     <div className="relative">   
       <Card variant={getCardVariant()} className="">

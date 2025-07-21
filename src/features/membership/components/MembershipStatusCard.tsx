@@ -186,7 +186,7 @@ export function MembershipStatusCard({ className = "" }: MembershipStatusCardPro
     <div className={`border-2 border-black p-6 bg-black/10 ${className}`}>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <Crown className="w-6 h-6 text-yellow-600" />
+          
           <h4 className="font-metal text-2xl font-bold text-black tracking-wider">
             MEMBERSHIP STATUS
           </h4>

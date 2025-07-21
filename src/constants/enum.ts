@@ -56,7 +56,7 @@ export enum ProductCondition {
   LIKE_NEW = 'LIKE_NEW',
   USED_EXCELLENT = 'USED_EXCELLENT',
   USED_GOOD = 'USED_GOOD',
-  FAIR = 'FAIR'
+  FAIR = 'USED_FAIR'
 }
 
 // User Trust Tier Enums
