@@ -14,7 +14,7 @@ export const getUserActivitySummaryAdmin = () => api.get('/users/admin/activity-
 
 // Additional user management features
 export const activateUserAdmin = (userId: number) => api.patch(`/users/admin/${userId}/activate`);
-export const deactivateUserAdmin = (userId: number) => api.patch(`/users/admin/${userId}/deactivate`);
+export const deactivateUserAdmin = (userId: number) => api.patch(`/users/admin/${userId}`);
 export const changeUserRoleAdmin = (userId: number, role: string) => api.patch(`/users/admin/${userId}/role`, { role });
 export const resetUserPasswordAdmin = (userId: number) => api.post(`/users/admin/${userId}/reset-password`);
 export const getUserOrdersAdmin = (userId: number) => api.get(`/users/admin/${userId}/orders`);
