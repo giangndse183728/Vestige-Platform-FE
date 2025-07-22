@@ -273,10 +273,6 @@ function CheckoutSuccessPageContent() {
                           {order.totalShippingFee === 0 ? 'Free' : formatCurrency(order.totalShippingFee)}
                         </span>
                       </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Platform Fee:</span>
-                        <span>{formatCurrency(order.totalPlatformFee)}</span>
-                      </div>
                       <Separator />
                       <div className="flex justify-between font-metal text-lg">
                         <span>Total:</span>
