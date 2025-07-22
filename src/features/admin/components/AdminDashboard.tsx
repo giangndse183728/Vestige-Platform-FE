@@ -294,8 +294,8 @@ export default function AdminDashboard() {
                   icon: ShoppingBag,
                 },
                 {
-                  title: "Avg Order Value",
-                  value: (stats.orderStatistics?.data?.avgOrderValue?.toLocaleString('vi-VN') ?? 0) + ' VND',
+                  title: "Total Revenue",
+                  value: (stats.orderStatistics?.data?.totalRevenue?.toLocaleString('vi-VN') ?? 0) + ' VND',
                   icon: BarChart3,
                 },
                 {
