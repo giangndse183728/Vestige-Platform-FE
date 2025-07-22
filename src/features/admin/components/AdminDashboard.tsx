@@ -36,11 +36,31 @@ import { getAdminAwaitingReleaseTransactions } from '@/features/order/services';
 import { releaseEscrowByAdmin } from '@/features/order/services';
 import { toast } from 'sonner';
 import EscrowAwaitingReleaseManager from './EscrowAwaitingReleaseManager';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const ORDER_STATUSES = [
+  { value: "ALL", label: "All Orders" },
+  { value: "PENDING", label: "Pending" },
+  { value: "PROCESSING", label: "Processing" },
+  { value: "OUT_FOR_DELIVERY", label: "Out For Delivery" },
+  { value: "DELIVERED", label: "Delivered" },
+  { value: "CANCELLED", label: "Cancelled" },
+  { value: "REFUNDED", label: "Refunded" },
+  { value: "EXPIRED", label: "Expired" }
+];
 
 function AdminAllOrdersTable({ onShowDetail }: { onShowDetail: (order: any) => void }) {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [filteredOrders, setFilteredOrders] = useState<any[]>([]);
 
   useEffect(() => {
     setLoading(true);
@@ -48,6 +68,7 @@ function AdminAllOrdersTable({ onShowDetail }: { onShowDetail: (order: any) => v
     getAdminAllOrders()
       .then((res) => {
         setOrders(res.data?.content || []);
+        setFilteredOrders(res.data?.content || []);
       })
       .catch((err) => {
         setError(err?.response?.data?.message || err.message || 'Error fetching orders');
@@ -55,43 +76,86 @@ function AdminAllOrdersTable({ onShowDetail }: { onShowDetail: (order: any) => v
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    if (statusFilter === "ALL") {
+      setFilteredOrders(orders);
+    } else {
+      setFilteredOrders(orders.filter(order => order.status === statusFilter));
+    }
+  }, [statusFilter, orders]);
+
   if (loading) return <div className="p-4 text-center">Loading order list...</div>;
   if (error) return <div className="p-4 text-center text-red-500">{error}</div>;
-  if (!orders.length) return <div className="p-4 text-center text-gray-500">No orders found.</div>;
 
   return (
-    <>
-      <div className="overflow-x-auto">
-        <table className="min-w-full border rounded-xl shadow-sm overflow-hidden">
+    <div className="space-y-6"> {/* Increased space-y from 4 to 6 */}
+      {/* Status Tabs */}
+      <div className="border-b border-gray-200">
+        <UITabs defaultValue={statusFilter} onValueChange={setStatusFilter}>
+          <UITabsList className="flex flex-wrap gap-2 mb-4"> {/* Added gap-2 and mb-4 */}
+            {ORDER_STATUSES.map((status) => (
+              <UITabsTrigger
+                key={status.value}
+                value={status.value}
+                className="px-6 py-3 text-sm font-medium rounded-lg" // Adjusted padding and added rounded-lg
+              >
+                {status.label}
+                {statusFilter === status.value && filteredOrders.length > 0 && (
+                  <Badge variant="secondary" className="ml-2">
+                    {filteredOrders.length}
+                  </Badge>
+                )}
+              </UITabsTrigger>
+            ))}
+          </UITabsList>
+        </UITabs>
+      </div>
+
+      {/* Orders Table */}
+      <div className="overflow-x-auto rounded-lg"> {/* Added rounded-lg */}
+        <table className="min-w-full border rounded-xl shadow-sm">
           <thead className="bg-gray-100">
             <tr>
-              <th className="py-2 px-4 text-xs font-bold text-gray-700 text-center uppercase">ID</th>
-              <th className="py-2 px-4 text-xs font-bold text-gray-700 text-center uppercase">Status</th>
-              <th className="py-2 px-4 text-xs font-bold text-gray-700 text-center uppercase">Amount</th>
-              <th className="py-2 px-4 text-xs font-bold text-gray-700 text-center uppercase">Items</th>
-              <th className="py-2 px-4 text-xs font-bold text-gray-700 text-center uppercase">Created At</th>
-              <th className="py-2 px-4 text-xs font-bold text-gray-700 text-center uppercase">Detail</th>
+              <th className="py-3 px-6 text-xs font-bold text-gray-700 uppercase">ID</th>
+              <th className="py-3 px-6 text-xs font-bold text-gray-700 uppercase">Status</th>
+              <th className="py-3 px-6 text-xs font-bold text-gray-700 uppercase">Amount</th>
+              <th className="py-3 px-6 text-xs font-bold text-gray-700 uppercase">Items</th>
+              <th className="py-3 px-6 text-xs font-bold text-gray-700 uppercase">Created At</th>
+              <th className="py-3 px-6 text-xs font-bold text-gray-700 uppercase">Detail</th>
             </tr>
           </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order.orderId} className="border-b last:border-b-0 hover:bg-gray-50 transition">
-                <td className="py-2 px-4 text-center">{order.orderId}</td>
-                <td className="py-2 px-4 text-center">{order.status}</td>
-                <td className="py-2 px-4 text-center">{order.totalAmount?.toLocaleString('vi-VN') || '-'}</td>
-                <td className="py-2 px-4 text-center">{order.totalItems}</td>
-                <td className="py-2 px-4 text-center">{order.createdAt ? new Date(order.createdAt).toLocaleString('vi-VN') : '-'}</td>
-                <td className="py-2 px-4 text-center">
-                  <Button size="sm" variant="outline" onClick={() => onShowDetail(order)}>
-                    View Detail
-                  </Button>
+          <tbody className="divide-y divide-gray-200">
+            {filteredOrders.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="py-8 text-center text-gray-500">
+                  No orders found for the selected status.
                 </td>
               </tr>
-            ))}
+            ) : (
+              filteredOrders.map((order) => (
+                <tr key={order.orderId} className="hover:bg-gray-50 transition-colors">
+                  <td className="py-4 px-6 text-sm">{order.orderId}</td>
+                  <td className="py-4 px-6 text-sm">{order.status}</td>
+                  <td className="py-4 px-6 text-sm">{order.totalAmount?.toLocaleString('vi-VN') || '-'}</td>
+                  <td className="py-4 px-6 text-sm">{order.totalItems}</td>
+                  <td className="py-4 px-6 text-sm">{order.createdAt ? new Date(order.createdAt).toLocaleString('vi-VN') : '-'}</td>
+                  <td className="py-4 px-6">
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      className="hover:bg-gray-100" 
+                      onClick={() => onShowDetail(order)}
+                    >
+                      View Detail
+                    </Button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
-    </>
+    </div>
   );
 }
 
@@ -482,4 +546,4 @@ export default function AdminDashboard() {
       </div>
     </div>
   );
-} 
+}
