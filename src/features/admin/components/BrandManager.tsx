@@ -153,7 +153,7 @@ export default function BrandManager() {
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value.trim() })}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="mt-1"
                 required={true}
               />
@@ -164,7 +164,7 @@ export default function BrandManager() {
                 id="logoUrl"
                 type="url"
                 value={formData.logoUrl}
-                onChange={(e) => setFormData({ ...formData, logoUrl: e.target.value.trim() })}
+                onChange={(e) => setFormData({ ...formData, logoUrl: e.target.value })}
                 className="mt-1"
                 required={true}
               />
@@ -237,4 +237,4 @@ export default function BrandManager() {
       </Card>
     </div>
   );
-} 
+}

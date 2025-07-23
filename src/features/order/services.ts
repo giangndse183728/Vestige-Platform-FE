@@ -79,8 +79,8 @@ export const getAdminBuyerAnalytics = async () => {
   return response.data;
 };
 
-export const getAdminAllOrders = async () => {
-  const response = await api.get('/orders/admin/all');
+export const getAdminAllOrders = async (params?: { page?: number, size?: number, status?: string }) => {
+  const response = await api.get('/orders/admin/all', { params });
   return response.data;
 };
 

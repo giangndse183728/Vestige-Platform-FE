@@ -1,14 +1,15 @@
-import { useState, useMemo } from 'react';
+'use client';
+
+import { useState, useEffect } from 'react';
 import { useAdminUsers } from '../hooks/useAdminUsers';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Pencil, Trash2, BarChart3, Users, Search, CheckCircle, XCircle, Eye, Package, ShoppingCart, CreditCard, ShieldCheck, ShieldX } from 'lucide-react';
+import { Search, CheckCircle, XCircle, Eye, Package, ShoppingCart, CreditCard, BarChart3, Users } from 'lucide-react';
 import { toast } from 'sonner';
-import React from 'react'; // Added missing import for React
+import React from 'react';
 import Pagination from '@/components/ui/pagination';
 
 // Helper to format date string
@@ -23,9 +24,8 @@ function formatDateString(val: string) {
 export default function UserManager() {
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize] = useState(20);
-  const [totalPages, setTotalPages] = useState(1);
   const { 
-    usersQuery, 
+    usersQuery,
     updateUser, 
     deleteUser, 
     bulkUpdate, 
@@ -44,26 +44,21 @@ export default function UserManager() {
   const [showUserDetails, setShowUserDetails] = useState(false);
   const [userDetails, setUserDetails] = useState<any | null>(null);
 
-  // Đảm bảo users luôn là mảng
+  // Đảm bảo users luôn là mảng và có pagination data
   const users = Array.isArray(usersQuery.data?.data?.content) ? usersQuery.data.data.content : [];
-  React.useEffect(() => {
-    if (usersQuery.data?.pagination) {
-      setTotalPages(usersQuery.data.pagination.totalPages || 1);
-      if (currentPage + 1 > (usersQuery.data.pagination.totalPages || 1)) {
-        setCurrentPage(0);
-      }
-    }
-  }, [usersQuery.data, currentPage]);
-
-  const filteredUsers = useMemo(() => {
-    if (!search) return users;
-    return users.filter((u: any) =>
-      u.username?.toLowerCase().includes(search.toLowerCase()) ||
-      u.email?.toLowerCase().includes(search.toLowerCase()) ||
-      u.firstName?.toLowerCase().includes(search.toLowerCase()) ||
-      u.lastName?.toLowerCase().includes(search.toLowerCase())
+  const totalPages = usersQuery.data?.data?.pagination?.totalPages || 1;
+  
+  // Filter users based on search query (chỉ search cơ bản)
+  const filteredUsers = search ? users.filter((user: any) => {
+    const query = search.toLowerCase();
+    return (
+      user.userId?.toString().includes(query) ||
+      user.username?.toLowerCase().includes(query) ||
+      user.email?.toLowerCase().includes(query) ||
+      user.firstName?.toLowerCase().includes(query) ||
+      user.lastName?.toLowerCase().includes(query)
     );
-  }, [users, search]);
+  }) : users;
 
   const handleViewDetails = (user: any) => {
     setUserDetails(user);
@@ -80,6 +75,8 @@ export default function UserManager() {
     try {
       await deleteUser.mutateAsync(userId);
       toast.success('User deactivated successfully!');
+      // Refresh users list after deletion
+      usersQuery.refetch();
     } catch (e: any) {
       toast.error(e?.message || 'Failed to deactivate user');
     }
@@ -90,6 +87,8 @@ export default function UserManager() {
       await bulkUpdate.mutateAsync({ userIds: bulkSelected, status });
       toast.success('Bulk update completed successfully!');
       setBulkSelected([]);
+      // Refresh users list after bulk update
+      usersQuery.refetch();
     } catch (e: any) {
       toast.error(e?.message || 'Bulk update failed');
     }
@@ -101,9 +100,9 @@ export default function UserManager() {
     try {
       const stats = await getUserStatistics(userId);
       setUserStats(stats);
-    } catch (e) {
+    } catch (e: any) {
       setUserStats(null);
-      toast.error('Failed to load user statistics');
+      toast.error(e?.message || 'Failed to load user statistics');
     }
   };
 
@@ -111,20 +110,20 @@ export default function UserManager() {
     setShowActivity(true);
     setActivitySummary(null);
     try {
-      const summary = await getUserActivitySummary();
-      setActivitySummary(summary);
-    } catch (e) {
+      const activity = await getUserActivitySummary();
+      setActivitySummary(activity);
+    } catch (e: any) {
       setActivitySummary(null);
-      toast.error('Failed to load activity summary');
+      toast.error(e?.message || 'Failed to load activity summary');
     }
   };
 
   const handleBanUser = async (userId: number) => {
-    if (!window.confirm('Are you sure you want to ban (deactivate) this user?')) return;
     try {
       await deactivateUser.mutateAsync(userId);
-      toast.success('User has been banned (deactivated) successfully!');
+      toast.success('User banned successfully!');
       setShowUserDetails(false);
+      // Refresh users list after banning
       usersQuery.refetch();
     } catch (e: any) {
       toast.error(e?.message || 'Failed to ban user');
@@ -161,9 +160,7 @@ export default function UserManager() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
           </div>
         ) : usersQuery.error ? (
-          <div className="text-red-600 py-8 text-center">
-            {usersQuery.error?.message || 'Failed to load users'}
-          </div>
+          <div className="text-red-600 py-8 text-center">{usersQuery.error?.message || 'Failed to load users'}</div>
         ) : (
           <>
             <table className="w-full">
@@ -179,7 +176,7 @@ export default function UserManager() {
                 </tr>
               </thead>
               <tbody>
-                {Array.isArray(filteredUsers) && filteredUsers.map((user: any) => (
+                {filteredUsers && filteredUsers.length > 0 ? filteredUsers.map((user: any) => (
                   <tr key={user.userId} className="hover:bg-gray-50 border-b">
                     <td className="py-3 px-6 text-sm text-gray-900">{user.userId}</td>
                     <td className="py-3 px-6 text-sm text-gray-900">{user.username}</td>
@@ -190,18 +187,20 @@ export default function UserManager() {
                         {user.roleName}
                       </Badge>
                     </td>
-                    <td className="py-3 px-6 flex gap-2 items-center">
-                    {user.isLegitProfile ? (
-                      <ShieldCheck className="w-5 h-5 text-green-500" aria-label="Legit profile" />
-                    ) : (
-                      <ShieldX className="w-5 h-5 text-gray-400" aria-label="Not legit profile" />
-                    )}
-                    {user.isVerified ? (
-                      <CheckCircle className="w-5 h-5 text-green-500" aria-label="Verified" />
-                    ) : (
-                      <XCircle className="w-5 h-5 text-gray-400" aria-label="Not verified" />
-                    )}
-                  </td>
+                    <td className="py-3 px-6">
+                      <div className="flex gap-2 items-center">
+                        {user.isLegitProfile ? (
+                          <CheckCircle className="w-5 h-5 text-green-500" aria-label="Legit profile" />
+                        ) : (
+                          <XCircle className="w-5 h-5 text-gray-400" aria-label="Not legit profile" />
+                        )}
+                        {user.isVerified ? (
+                          <CheckCircle className="w-5 h-5 text-blue-500" aria-label="Verified" />
+                        ) : (
+                          <XCircle className="w-5 h-5 text-gray-400" aria-label="Not verified" />
+                        )}
+                      </div>
+                    </td>
                     <td className="py-3 px-6 text-right">
                       <div className="flex gap-2 justify-end">
                         <Button size="sm" variant="outline" onClick={() => handleViewDetails(user)}>
@@ -210,7 +209,13 @@ export default function UserManager() {
                       </div>
                     </td>
                   </tr>
-                ))}
+                )) : (
+                  <tr>
+                    <td colSpan={6} className="text-center py-8 text-gray-500">
+                      No users found.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
             {totalPages > 1 && (
