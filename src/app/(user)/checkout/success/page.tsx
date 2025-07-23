@@ -277,7 +277,7 @@ function CheckoutSuccessPageContent() {
                       <div className="flex justify-between font-metal text-lg">
                         <span>Total:</span>
                         <span className="text-red-900">
-                          {formatCurrency(order.totalAmount + order.totalShippingFee + order.totalPlatformFee)}
+                          {formatCurrency(order.totalAmount + order.totalShippingFee)}
                         </span>
                       </div>
                     </div>
