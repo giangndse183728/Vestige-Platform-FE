@@ -14,7 +14,7 @@ export function useTopViewedProducts(options = {}): UseQueryResult<ProductsRespo
 export function useTopLikedProducts(options = {}): UseQueryResult<ProductsResponse, Error> {
   return useQuery({
     queryKey: ['top-liked-products'],
-    queryFn: fetchTopViewedProducts, // Replace with correct function if needed
+    queryFn: fetchTopLikedProducts, 
     ...options,
   });
 } 
