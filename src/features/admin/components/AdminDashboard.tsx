@@ -30,7 +30,8 @@ import { Tabs as UITabs, TabsList as UITabsList, TabsTrigger as UITabsTrigger, T
 import UserManager from './UserManager';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
-import { getAdminAllOrders } from '@/features/order/services';
+import { useAdminOrders } from '../hooks/useAdminOrders';
+import Pagination from '@/components/ui/pagination';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog';
 import { getAdminAwaitingReleaseTransactions } from '@/features/order/services';
 import { releaseEscrowByAdmin } from '@/features/order/services';
@@ -56,53 +57,47 @@ const ORDER_STATUSES = [
 ];
 
 function AdminAllOrdersTable({ onShowDetail }: { onShowDetail: (order: any) => void }) {
-  const [orders, setOrders] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize] = useState(20);
   const [statusFilter, setStatusFilter] = useState("ALL");
-  const [filteredOrders, setFilteredOrders] = useState<any[]>([]);
+  
+  // Use admin orders hook with pagination
+  const { ordersQuery } = useAdminOrders(
+    currentPage, 
+    pageSize, 
+    statusFilter === "ALL" ? undefined : statusFilter
+  );
 
-  useEffect(() => {
-    setLoading(true);
-    setError(null);
-    getAdminAllOrders()
-      .then((res) => {
-        setOrders(res.data?.content || []);
-        setFilteredOrders(res.data?.content || []);
-      })
-      .catch((err) => {
-        setError(err?.response?.data?.message || err.message || 'Error fetching orders');
-      })
-      .finally(() => setLoading(false));
-  }, []);
+  // Extract data from query
+  const orders = Array.isArray(ordersQuery.data?.content) ? ordersQuery.data.content : [];
+  const totalPages = ordersQuery.data?.pagination?.totalPages || 1;
+  const totalElements = ordersQuery.data?.pagination?.totalElements || 0;
 
-  useEffect(() => {
-    if (statusFilter === "ALL") {
-      setFilteredOrders(orders);
-    } else {
-      setFilteredOrders(orders.filter(order => order.status === statusFilter));
-    }
-  }, [statusFilter, orders]);
+  // Handle status filter change
+  const handleStatusChange = (newStatus: string) => {
+    setStatusFilter(newStatus);
+    setCurrentPage(0); // Reset to first page when filter changes
+  };
 
-  if (loading) return <div className="p-4 text-center">Loading order list...</div>;
-  if (error) return <div className="p-4 text-center text-red-500">{error}</div>;
+  if (ordersQuery.isLoading) return <div className="p-4 text-center">Loading order list...</div>;
+  if (ordersQuery.error) return <div className="p-4 text-center text-red-500">{ordersQuery.error?.message || 'Error fetching orders'}</div>;
 
   return (
     <div className="space-y-6"> {/* Increased space-y from 4 to 6 */}
       {/* Status Tabs */}
       <div className="border-b border-gray-200">
-        <UITabs defaultValue={statusFilter} onValueChange={setStatusFilter}>
-          <UITabsList className="flex flex-wrap gap-2 mb-4"> {/* Added gap-2 and mb-4 */}
+        <UITabs value={statusFilter} onValueChange={handleStatusChange}>
+          <UITabsList className="flex flex-wrap gap-2 mb-4">
             {ORDER_STATUSES.map((status) => (
               <UITabsTrigger
                 key={status.value}
                 value={status.value}
-                className="px-6 py-3 text-sm font-medium rounded-lg" // Adjusted padding and added rounded-lg
+                className="px-6 py-3 text-sm font-medium rounded-lg"
               >
                 {status.label}
-                {statusFilter === status.value && filteredOrders.length > 0 && (
+                {statusFilter === status.value && totalElements > 0 && (
                   <Badge variant="secondary" className="ml-2">
-                    {filteredOrders.length}
+                    {totalElements}
                   </Badge>
                 )}
               </UITabsTrigger>
@@ -125,14 +120,14 @@ function AdminAllOrdersTable({ onShowDetail }: { onShowDetail: (order: any) => v
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {filteredOrders.length === 0 ? (
+            {orders.length === 0 ? (
               <tr>
                 <td colSpan={6} className="py-8 text-center text-gray-500">
                   No orders found for the selected status.
                 </td>
               </tr>
             ) : (
-              filteredOrders.map((order) => (
+              orders.map((order: any) => (
                 <tr key={order.orderId} className="hover:bg-gray-50 transition-colors">
                   <td className="py-4 px-6 text-sm">{order.orderId}</td>
                   <td className="py-4 px-6 text-sm">{order.status}</td>
@@ -155,6 +150,17 @@ function AdminAllOrdersTable({ onShowDetail }: { onShowDetail: (order: any) => v
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-6">
+          <Pagination
+            currentPage={currentPage + 1} // Convert to 1-based for UI
+            totalPages={totalPages}
+            onPageChange={(page: number) => setCurrentPage(page - 1)} // Convert back to 0-based
+          />
+        </div>
+      )}
     </div>
   );
 }
