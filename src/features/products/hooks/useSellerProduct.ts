@@ -13,10 +13,10 @@ const EMPTY_PRODUCTS_RESPONSE: ProductsResponse = {
   filters: {},
 };
 
-export function useSellerProduct(sellerId?: number) {
+export function useSellerProduct(sellerId?: number, page: number = 0, size: number = 12) {
   return useQuery({
-    queryKey: ['seller-products', sellerId],
-    queryFn: () => (sellerId ? fetchSellerProducts(sellerId) : Promise.resolve(EMPTY_PRODUCTS_RESPONSE)),
+    queryKey: ['seller-products', sellerId, page, size],
+    queryFn: () => (sellerId ? fetchSellerProducts(sellerId, page, size) : Promise.resolve(EMPTY_PRODUCTS_RESPONSE)),
     enabled: !!sellerId,
   });
 }

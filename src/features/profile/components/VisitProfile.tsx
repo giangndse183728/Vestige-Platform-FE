@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
@@ -26,6 +26,8 @@ import { TrustTier, TRUST_TIER_LABELS } from '@/constants/enum';
 import { useSellerProduct } from '@/features/products/hooks/useSellerProduct';
 import { ProductCard } from '@/features/products/components/ProductCard';
 import { SellerReviewList } from '@/features/seller/components/SellerReview';
+import Pagination from '@/components/ui/pagination';
+import PageSizeSelector from '@/components/ui/page-size-selector';
 
 interface PublicUserProfileProps {
   userId?: number;
@@ -37,8 +39,26 @@ export const PublicUserProfile: React.FC<PublicUserProfileProps> = ({ userId }) 
   
   const { user, isLoading, error } = usePublicProfile(profileId);
 
+  const [page, setPage] = React.useState(0);
+  const [pageSize, setPageSize] = React.useState(12);
+  const productHeaderRef = useRef<HTMLDivElement>(null);
+
+  const handlePageChange = (p: number) => {
+    setPage(p - 1);
+    if (productHeaderRef.current) {
+      productHeaderRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setPage(0);
+    if (productHeaderRef.current) {
+      productHeaderRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   // Always call the hook, even if user is not available yet
-  const { data: productsData, isLoading: isProductsLoading } = useSellerProduct(user?.userId);
+  const { data: productsData, isLoading: isProductsLoading } = useSellerProduct(user?.userId, page, pageSize);
 
   if (!user) {
     return <div className="p-6 text-center font-gothic">User data not available.</div>
@@ -291,7 +311,10 @@ export const PublicUserProfile: React.FC<PublicUserProfileProps> = ({ userId }) 
 
       {/* Seller's Products */}
       <div className="max-w-8xl mx-auto mt-12">
-        <div className={`rounded-md mb-8 px-4 py-4 text-center border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] ${getTrustTierBg(user.trustTier)}`}>
+        <div
+          ref={productHeaderRef}
+          className={`rounded-md mb-8 px-4 py-4 text-center border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] ${getTrustTierBg(user.trustTier)}`}
+        >
           <h3 className={`font-metal text-3xl tracking-wider flex items-center justify-center space-x-4 ${getTrustTierTextColor(user.trustTier)}`}>
             <div className="w-8 h-1 bg-black"></div>
             <span>Products by {user.firstName} {user.lastName}</span>
@@ -301,16 +324,34 @@ export const PublicUserProfile: React.FC<PublicUserProfileProps> = ({ userId }) 
         {isProductsLoading ? (
           <div className="text-center py-8 font-gothic text-gray-500">Loading products...</div>
         ) : productsData && productsData.content && productsData.content.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {productsData.content.map((product: any) => (
-              <div
-                key={product.productId}
-                className={`mb-8 p-2 ${getProfilePictureBorder(user.trustTier)}`}
-              >
-                <ProductCard product={product} />
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              {productsData.content.map((product: any) => (
+                <div
+                  key={product.productId}
+                  className={`mb-8 p-2 ${getProfilePictureBorder(user.trustTier)}`}
+                >
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-col items-center gap-4 py-8 ">
+              <div className="flex items-center justify-between w-full max-w-4xl ">
+                <PageSizeSelector
+                  currentPageSize={pageSize}
+                  onPageSizeChange={handlePageSizeChange}
+                />
+                <Pagination
+                  currentPage={(productsData.pagination?.currentPage ?? 0) + 1}
+                  totalPages={productsData.pagination?.totalPages || 1}
+                  onPageChange={handlePageChange}
+                />
+                <div className="text-sm text-gray-600 font-gothic">
+                  Showing {productsData.content.length} of {productsData.pagination?.totalElements} products
+                </div>
               </div>
-            ))}
-          </div>
+            </div>
+          </>
         ) : (
           <div className="text-center py-8 font-gothic text-gray-500">No products found for this seller.</div>
         )}
