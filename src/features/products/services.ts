@@ -157,8 +157,14 @@ export async function fetchNewArrivals(): Promise<ProductsResponse> {
   return response.data.data;
 }
 
-export async function fetchSellerProducts(sellerId: number): Promise<ProductsResponse> {
-  const response = await api.get<ApiResponse<ProductsResponse>>(`/products?sellerId=${sellerId}`);
+export async function fetchSellerProducts(sellerId: number, page: number = 0, size: number = 12): Promise<ProductsResponse> {
+  const params = new URLSearchParams();
+  params.append('sellerId', sellerId.toString());
+  params.append('page', page.toString());
+  params.append('size', size.toString());
+  const queryString = params.toString();
+  const url = `/products?${queryString}`;
+  const response = await api.get<ApiResponse<ProductsResponse>>(url);
   return response.data.data;
 }
 
