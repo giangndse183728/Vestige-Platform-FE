@@ -1,0 +1,497 @@
+[
+  {
+    "productId": 1,
+    "slug": "mschf-big-red-boot-boots",
+    "title": "MSCHF Big Red Boot Boots",
+    "price": 11500000,
+    "condition": "NEW",
+    "brandName": "MSCHF",
+    "categoryName": "Boots",
+    "primaryImageUrl": "https://i.ebayimg.com/images/g/mwEAAOSw1VBlAA6D/s-l1200.jpg",
+    "viewsCount": 2890,
+    "likesCount": 436,
+    "status": "ACTIVE",
+    "color": "Red",
+    "size": "44",
+    "images": [
+      {
+        "imageId": 37,
+        "imageUrl": "https://i.ebayimg.com/images/g/mwEAAOSw1VBlAA6D/s-l1200.jpg",
+        "isPrimary": true,
+        "displayOrder": 1
+      },
+      {
+        "imageId": 38,
+        "imageUrl": "https://www.highsnobiety.com/static-assets/dato/1682694918-mschf-big-red-boot-17.jpg",
+        "isPrimary": false,
+        "displayOrder": 2
+      },
+      {
+        "imageId": 39,
+        "imageUrl": "https://media-photos.depop.com/b1/16443763/1689920107_d984e098f8ce48ae8961793d12fc40fb/P0.jpg",
+        "isPrimary": false,
+        "displayOrder": 3
+      },
+      {
+        "imageId": 40,
+        "imageUrl": "https://d2w9rnfcy7mm78.cloudfront.net/22209321/original_a4ed17cb6afd6c8a10acc97715e0988f.png?1686504785?bc=0",
+        "isPrimary": false,
+        "displayOrder": 4
+      }
+    ],
+    "discountPercentage": 5,
+    "hasDiscount": true
+  },
+  {
+    "productId": 2,
+    "slug": "rick-owens-kiss-boot",
+    "title": "Rick Owens Kiss Boot",
+    "price": 30000000,
+    "condition": "USED_EXCELLENT",
+    "brandName": "Rick Owens",
+    "categoryName": "Boots",
+    "primaryImageUrl": "https://img4.dhresource.com/webp/m/0x0/f3/albu/km/o/22/066f9480-44bc-43e3-9157-99b9f93897c8.jpg",
+    "viewsCount": 1245,
+    "likesCount": 89,
+    "status": "ACTIVE",
+    "color": "Black",
+    "size": "43",
+    "images": [
+      {
+        "imageId": 1,
+        "imageUrl": "https://img4.dhresource.com/webp/m/0x0/f3/albu/km/o/22/066f9480-44bc-43e3-9157-99b9f93897c8.jpg",
+        "isPrimary": true,
+        "displayOrder": 1
+      },
+      {
+        "imageId": 2,
+        "imageUrl": "https://media-photos.depop.com/b1/39419969/1597387432_b229669e4a2541d0b8445e43739bdee7/P0.jpg",
+        "isPrimary": false,
+        "displayOrder": 2
+      },
+      {
+        "imageId": 3,
+        "imageUrl": "https://static.mercdn.net/item/detail/orig/photos/m87511478698_1.jpg?1732164881",
+        "isPrimary": false,
+        "displayOrder": 3
+      },
+      {
+        "imageId": 4,
+        "imageUrl": "https://tshop.r10s.jp/bring-sg/cabinet/item20240902-12/9224h110020-4.jpg?fitin=720%3A720",
+        "isPrimary": false,
+        "displayOrder": 4
+      }
+    ],
+    "discountPercentage": 19,
+    "hasDiscount": true
+  },
+  {
+    "productId": 4,
+    "slug": "shox-mr4-x-martine-rose-black",
+    "title": "Nike x Martine Rose Black",
+    "price": 9000000,
+    "condition": "USED_EXCELLENT",
+    "brandName": "Nike",
+    "categoryName": "Sneakers",
+    "primaryImageUrl": "https://static.nike.com/a/images/w_1280,q_auto,f_auto/ffc52e9f-1cbc-4f39-8875-d88ac4cb8af0/shox-mr4-x-martine-rose-black-dq2401-001-release-date.jpg",
+    "viewsCount": 1890,
+    "likesCount": 289 ,
+    "status": "ACTIVE",
+    "color": "Black",
+    "size": "42",
+    "images": [
+      {
+        "imageId": 13,
+        "imageUrl": "https://static.nike.com/a/images/w_1280,q_auto,f_auto/ffc52e9f-1cbc-4f39-8875-d88ac4cb8af0/shox-mr4-x-martine-rose-black-dq2401-001-release-date.jpg",
+        "isPrimary": true,
+        "displayOrder": 1
+      },
+      {
+        "imageId": 14,
+        "imageUrl": "https://static.nike.com/a/images/w_1280,q_auto,f_auto/50decb8c-147f-4fb2-86fe-495621546fc5/shox-mr4-x-martine-rose-black-dq2401-001-release-date.jpg",
+        "isPrimary": false,
+        "displayOrder": 2
+      },
+      {
+        "imageId": 15,
+        "imageUrl": "https://static.nike.com/a/images/w_1280,q_auto,f_auto/d534370e-0aa8-49d4-9de3-6058a45a1e11/shox-mr4-x-martine-rose-black-dq2401-001-release-date.jpg",
+        "isPrimary": false,
+        "displayOrder": 3
+      },
+      {
+        "imageId": 16,
+        "imageUrl": "https://www.ourdailydose.net/media/odd-images/image_banner_NIKE_SHOX_MR4_X_MARTINE_ROSE_odd.jpg",
+        "isPrimary": false,
+        "displayOrder": 4
+      }
+    ],
+    "discountPercentage": 10,
+    "hasDiscount": true
+  },
+  {
+    "productId": 3,
+    "slug": "chrome-hearts-dice-key-chain",
+    "title": "CH Dice Key Chain",
+    "price": 12500000,
+    "condition": "NEW",
+    "brandName": "Chrome Hearts",
+    "categoryName": "Jewelry",
+    "primaryImageUrl": "https://shengliroadmarket.com/cdn/shop/products/chrome-hearts-925-silver-dice-key-chain-579030.jpg?v=1740035865&width=1080",
+    "viewsCount": 4521,
+    "likesCount": 312,
+    "status": "ACTIVE",
+    "color": "Gray",
+    "size": "M",
+    "images": [
+      {
+        "imageId": 17,
+        "imageUrl": "https://shengliroadmarket.com/cdn/shop/products/chrome-hearts-925-silver-dice-key-chain-579030.jpg?v=1740035865&width=1080",
+        "isPrimary": true,
+        "displayOrder": 1
+      },
+      {
+        "imageId": 18,
+        "imageUrl": "https://media-assets.grailed.com/prd/listing/47906152/022c4d5420f1472aa8486350758267e3",
+        "isPrimary": false,
+        "displayOrder": 2
+      },
+      {
+        "imageId": 19,
+        "imageUrl": "https://media-assets.grailed.com/prd/listing/temp/84073d60304e4cfebe44406faafb2f80",
+        "isPrimary": false,
+        "displayOrder": 3
+      },
+      {
+        "imageId": 20,
+        "imageUrl": "https://i.redd.it/dice-keychain-finally-v0-9i0gdy5km1vd1.jpg?width=3024&format=pjpg&auto=webp&s=66aea9bd28e101a848b8b5eac4514ce17c63f111",
+        "isPrimary": false,
+        "displayOrder": 4
+      }
+    ],
+    "discountPercentage": 20,
+    "hasDiscount": true
+  },
+  {
+    "productId": 5,
+    "slug": "geobasket-rick-owens-sneakers",
+    "title": "Geobasket Mega Bumper Leather ",
+    "price": 12000000,
+    "condition": "NEW",
+    "brandName": "Rick Owens",
+    "categoryName": "Sneakers",
+    "primaryImageUrl": "https://marais.com.au/cdn/shop/files/RR02C7868LOO911-B-marais.com.jpg?v=1733673368",
+    "viewsCount": 2340,
+    "likesCount": 156,
+    "status": "ACTIVE",
+    "color": "Black",
+    "size": "42",
+    "images": [
+      {
+        "imageId": 5,
+        "imageUrl": "https://marais.com.au/cdn/shop/files/RR02C7868LOO911-B-marais.com.jpg?v=1733673368",
+        "isPrimary": true,
+        "displayOrder": 1
+      },
+      {
+        "imageId": 6,
+        "imageUrl": "https://u-mercari-images.mercdn.net/photos/m12112443697_1.jpg",
+        "isPrimary": false,
+        "displayOrder": 2
+      }
+    ],
+    "discountPercentage": 5,
+    "hasDiscount": true
+  },
+  {
+    "productId": 6,
+    "slug": "black-leather-dr-martens-x-rick-owens-boots",
+    "title": "Black Leather Dr. Martens x Rick Owens Boots",
+    "price": 10000000,
+    "condition": "USED_GOOD",
+    "brandName": "Rick Owens",
+    "categoryName": "Boots",
+    "primaryImageUrl": "https://marais.com.au/cdn/shop/products/DW02B3803700109-A-marais.com.jpg?v=1733587517",
+    "viewsCount": 3567,
+    "likesCount": 234,
+    "status": "ACTIVE",
+    "color": "Black",
+    "size": "42",
+    "images": [
+      {
+        "imageId": 9,
+        "imageUrl": "https://marais.com.au/cdn/shop/products/DW02B3803700109-A-marais.com.jpg?v=1733587517",
+        "isPrimary": true,
+        "displayOrder": 1
+      },
+      {
+        "imageId": 10,
+        "imageUrl": "https://eu.kith.com/cdn/shop/products/DM02B3803_09_01_1_1_51df824a-8ae5-4472-a025-dc90f2b805d3.jpg?v=1669907947&width=1920",
+        "isPrimary": false,
+        "displayOrder": 2
+      }
+    ],
+    "discountPercentage": 0,
+    "hasDiscount": false
+  },
+  {
+    "productId": 7,
+    "slug": "fc-barcelona-retro-2000-home-skeleton-jersey",
+    "title": "FC Barcelona Retro x Travis Scott Home Skeleton Jersey",
+    "price": 2400000,
+    "condition": "LIKE_NEW",
+    "brandName": "Nike",
+    "categoryName": "Jerseys",
+    "primaryImageUrl": "https://sneakerdaily.vn/wp-content/uploads/2025/05/Ao-Travis-Scott-x-Nike-x-FC-Barcelona-Retro-2000_01-Home-Skeleton-Jersey.jpg",
+    "viewsCount": 2156,
+    "likesCount": 178,
+    "status": "ACTIVE",
+    "color": "Red",
+    "size": "L",
+    "images": [
+      {
+        "imageId": 21,
+        "imageUrl": "https://sneakerdaily.vn/wp-content/uploads/2025/05/Ao-Travis-Scott-x-Nike-x-FC-Barcelona-Retro-2000_01-Home-Skeleton-Jersey.jpg",
+        "isPrimary": true,
+        "displayOrder": 1
+      },
+      {
+        "imageId": 22,
+        "imageUrl": "https://sneakerdaily.vn/wp-content/uploads/2025/05/Ao-Travis-Scott-x-Nike-x-FC-Barcelona-Retro-2000_01-Home-Skeleton-Jersey-2.jpg",
+        "isPrimary": false,
+        "displayOrder": 2
+      }
+    ],
+    "discountPercentage": 5,
+    "hasDiscount": true
+  },
+  {
+    "productId": 8,
+    "slug": "cdg-tote-plastic-bag",
+    "title": "CDG Tote Plastic Bag",
+    "price": 1500000,
+    "condition": "NEW",
+    "brandName": "Off-White",
+    "categoryName": "Bags",
+    "primaryImageUrl": "https://images.onthelook.co.kr/z/2022080192793778530.jpeg",
+    "viewsCount": 3890,
+    "likesCount": 267,
+    "status": "ACTIVE",
+    "color": "Yellow",
+    "size": "32",
+    "images": [
+      {
+        "imageId": 25,
+        "imageUrl": "https://images.onthelook.co.kr/z/2022080192793778530.jpeg",
+        "isPrimary": true,
+        "displayOrder": 1
+      },
+      {
+        "imageId": 26,
+        "imageUrl": "https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full//89/MTA-11175272/comme_des_garcons_comme_des_garcons_shirt_pvc_kraft_paper_messenger_tote_bag_full02_cxi6a5l5.jpg",
+        "isPrimary": false,
+        "displayOrder": 2
+      }
+    ],
+    "discountPercentage": 19,
+    "hasDiscount": true
+  },
+  {
+    "productId": 9,
+    "slug": "maison-margiela-tabi-black",
+    "title": "Maison Margiela Tabi",
+    "price": 15000000,
+    "condition": "USED_EXCELLENT",
+    "brandName": "Maison Margiela",
+    "categoryName": "Dress Shoes",
+    "primaryImageUrl": "https://authentic-shoes.com/wp-content/uploads/2023/04/s97wr0021_p3292_h8396_0320220630_d1ca3c94f30e4629ae311fd97ca23300.png",
+    "viewsCount": 1234,
+    "likesCount": 89,
+    "status": "ACTIVE",
+    "color": "Black",
+    "size": "42",
+    "images": [
+      {
+        "imageId": 29,
+        "imageUrl": "https://authentic-shoes.com/wp-content/uploads/2023/04/s97wr0021_p3292_h8396_0120220630_9d8dbe61bdec417eb92f7e7e1ef0e59b.png",
+        "isPrimary": true,
+        "displayOrder": 1
+      }
+    ],
+    "discountPercentage": 19,
+    "hasDiscount": true
+  },
+  {
+    "productId": 10,
+    "slug": "adidas-thug-club-jacket",
+    "title": "Adidas Thug Club Jacket",
+    "price": 2600000,
+    "condition": "USED_GOOD",
+    "brandName": "Adidas",
+    "categoryName": "Jackets",
+    "primaryImageUrl": "https://www.overkillshop.com/cdn/shop/files/KC2210_1.jpg?v=1760425213&width=2000",
+    "viewsCount": 1567,
+    "likesCount": 112,
+    "status": "ACTIVE",
+    "color": "Red",
+    "size": "L",
+    "images": [
+      {
+        "imageId": 33,
+        "imageUrl": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=500",
+        "isPrimary": true,
+        "displayOrder": 1
+      },
+      {
+        "imageId": 34,
+        "imageUrl": "https://www.overkillshop.com/cdn/shop/files/KC2210_4.jpg?v=1760425214&width=2000",
+        "isPrimary": false,
+        "displayOrder": 2
+      },
+      {
+        "imageId": 35,
+        "imageUrl": "https://cdn.shopify.com/s/files/1/0603/3031/1875/files/Thug_Club_Teamgeist_Hooded_Zip_Up_Burgundy_KC2210_21_model_converted_1080x.jpg?=75&v=1760946187",
+        "isPrimary": false,
+        "displayOrder": 3
+      }
+    ],
+    "discountPercentage": 20,
+    "hasDiscount": true
+  },
+  {
+    "productId": 11,
+    "slug": "rick-owens-mega-laced-worker-jacket",
+    "title": "Rick Owens Mega Laced Worker Jacket",
+    "price": 17500000,
+    "condition": "NEW",
+    "brandName": "Rick Owens",
+    "categoryName": "Jackets",
+    "primaryImageUrl": "https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/080/952/006/original/596126_01.jpg.jpeg?width=750",
+    "viewsCount": 1678,
+    "likesCount": 134,
+    "status": "ACTIVE",
+    "color": "Black",
+    "size": "One Size",
+    "images": [
+      {
+        "imageId": 41,
+        "imageUrl": "https://image.goat.com/transform/v1/attachments/product_template_additional_pictures/images/080/952/006/original/596126_01.jpg.jpeg?width=750",
+        "isPrimary": true,
+        "displayOrder": 1
+      }
+    ],
+    "discountPercentage": 15,
+    "hasDiscount": true
+  },
+  {
+    "productId": 12,
+    "slug": "raf-simons-riot-bomber",
+    "title": "AW01 Raf Simons Riot Bomber",
+    "price": 999999999,
+    "condition": "LIKE_NEW",
+    "brandName": "Raf Simons",
+    "categoryName": "Jackets",
+    "primaryImageUrl": "https://media-assets.grailed.com/prd/listing/temp/cda32ea9b90743e0922505486907c4fa",
+    "viewsCount": 987,
+    "likesCount": 76,
+    "status": "ACTIVE",
+    "color": "Green",
+    "size": "One Size",
+    "images": [
+      {
+        "imageId": 45,
+        "imageUrl": "https://media-assets.grailed.com/prd/listing/temp/cda32ea9b90743e0922505486907c4fa",
+        "isPrimary": true,
+        "displayOrder": 1
+      },
+      {
+        "imageId": 46,
+        "imageUrl": "https://media-photos.depop.com/b0/33428547/1134267955_edb7e9406a2641598520c7ec9d582897/P0.jpg",
+        "isPrimary": false,
+        "displayOrder": 2
+      }
+    ],
+    "discountPercentage": 20,
+    "hasDiscount": true
+  },
+  {
+    "productId": 13,
+    "slug": "number-nine-belt",
+    "title": "Number (N)ine Belt",
+    "price": 3000000,
+    "condition": "NEW",
+    "brandName": "Number (N)ine",
+    "categoryName": "Belts",
+    "primaryImageUrl": "https://media-photos.depop.com/b0/13544351/509245506_6fOJTcob9r/P0.jpg",
+    "viewsCount": 1456,
+    "likesCount": 102,
+    "status": "ACTIVE",
+    "color": "Black",
+    "size": "M",
+    "images": [
+      {
+        "imageId": 49,
+        "imageUrl": "https://media-photos.depop.com/b0/13544351/509245506_6fOJTcob9r/P0.jpg",
+        "isPrimary": true,
+        "displayOrder": 1
+      }
+    ],
+    "discountPercentage": 20,
+    "hasDiscount": true
+  },
+  {
+    "productId": 14,
+    "slug": "supreme-red-zippo",
+    "title": "Supreme Red Zippo",
+    "price": 6000000,
+    "condition": "NEW",
+    "brandName": "Supreme",
+    "categoryName": "Accessories",
+    "primaryImageUrl": "https://soleygrail.com/cdn/shop/collections/supreme-accessories-865353.jpg?v=1762620128",
+    "viewsCount": 1456,
+    "likesCount": 102,
+    "status": "ACTIVE",
+    "color": "Red",
+    "size": "One Size",
+    "images": [
+      {
+        "imageId": 50,
+        "imageUrl": "https://soleygrail.com/cdn/shop/collections/supreme-accessories-865353.jpg?v=1762620128",
+        "isPrimary": true,
+        "displayOrder": 1
+      }
+    ],
+    "discountPercentage": 3,
+    "hasDiscount": true
+  },
+  {
+    "productId": 15,
+    "slug": "louis-vuitton-x-takashi-murakami-speedy-handbag",
+    "title": "LV X Takashi Murakami Speedy handbag",
+    "price": 40000000,
+    "condition": "NEW",
+    "brandName": "Louis Vuitton",
+    "categoryName": "Bags",
+    "primaryImageUrl": "https://assets.thenodmag.com/website-assets/Louis_Vuitton_X_Takashi_Murakami_Speedy_The_Nod_a7fea08e0c.jpg",
+    "viewsCount": 1456,
+    "likesCount": 102,
+    "status": "ACTIVE",
+    "color": "White",
+    "size": "M",
+    "images": [
+      {
+        "imageId": 49,
+        "imageUrl": "https://assets.thenodmag.com/website-assets/Louis_Vuitton_X_Takashi_Murakami_Speedy_The_Nod_a7fea08e0c.jpg",
+        "isPrimary": true,
+        "displayOrder": 1
+      },
+      {
+        "imageId": 51,
+        "imageUrl": "https://luckyvintageseattle.com/cdn/shop/products/IMG_2225_2000x.jpg?v=1623278983jpg",
+        "isPrimary": false,
+        "displayOrder": 2
+      }
+    ],
+    "discountPercentage": 7,
+    "hasDiscount": true
+  }
+]

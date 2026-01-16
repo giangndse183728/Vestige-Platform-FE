@@ -116,11 +116,11 @@ export function MembershipPlanCard({ plan }: MembershipPlanCardProps) {
             disabled={subscribeToPlan.isPending}
             className={`w-full font-gothic py-6 text-lg border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${
               plan.requiredTrustTier === "RISING_SELLER" 
-                ? "bg-red-600 hover:bg-red-700 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]" 
+                ? "bg-red-900 hover:bg-red-700 text-white hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]" 
                 : plan.requiredTrustTier === "PRO_SELLER"
-                  ? "bg-red-800 hover:bg-red-900 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
+                  ? "bg-red-900 hover:bg-red-700 text-white hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
                   : plan.requiredTrustTier === "NEW_SELLER"
-                    ? "bg-gray-200 text-black hover:bg-gray-300 "
+                    ? "bg-gray-900 text-white hover:bg-gray-300 "
                   : "bg-red-900 hover:bg-red-950"
             } transition-all duration-300`}
           >

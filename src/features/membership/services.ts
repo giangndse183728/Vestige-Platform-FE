@@ -1,10 +1,12 @@
 import axios from "@/libs/axios";
 import { MembershipPlansResponse, membershipPlansResponseSchema, SubscriptionPaymentResponse, subscriptionPaymentResponseSchema, CurrentSubscriptionResponse, currentSubscriptionResponseSchema, mySubscriptionResponseSchema, MySubscriptionResponse } from "./schema";
+import membershipPlansData from "@/mock/membership.json";
 
 export const membershipService = {
   async getPlans(): Promise<MembershipPlansResponse> {
-    const response = await axios.get("/memberships/plans");
-    return membershipPlansResponseSchema.parse(response.data);
+    // Using mock data
+    return membershipPlansResponseSchema.parse(membershipPlansData);
+    
   },
 
   async subscribeToPlan(planId: number): Promise<SubscriptionPaymentResponse> {

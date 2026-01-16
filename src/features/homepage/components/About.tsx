@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card} from "@/components/ui/card";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Instagram, Facebook, ShoppingBag, UserPlus } from "lucide-react";
+import { Instagram, Facebook, ShoppingBag, UserPlus, Check, Lock, Users, Gem } from "lucide-react";
 import { FeedbackSection } from '@/features/feedback/components/FeedbackSection';
 import { useInView } from 'react-intersection-observer';
 
@@ -83,15 +83,14 @@ function About() {
           <div className="border-2 border-black bg-gradient-to-br from-red-50 via-white to-red-50 p-8 mb-6">
             <div className="text-center mb-6">
               <h3 className="text-3xl font-metal text-red-800 mb-2">PLATFORM HIGHLIGHTS</h3>
-              <div className="w-24 h-1 bg-red-800 mx-auto"></div>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="group">
-                <div className="border-2 border-black bg-white p-6 h-full hover:shadow-[6px_6px_0px_0px_rgba(220,38,38,0.2)] transition-all duration-300">
+                <div className="border-l-2 border-red-900 bg-white p-6 h-full hover:shadow-[6px_6px_0px_0px_rgba(220,38,38,0.2)] transition-all duration-300">
                   <div className="flex items-center mb-4">
                     <div className="w-12 h-12 bg-red-800 border-2 border-black flex items-center justify-center mr-4">
-                      <span className="text-white font-metal text-xl">✓</span>
+                      <Check className="w-6 h-6 text-white" />
                     </div>
                     <h4 className="font-metal text-lg text-black">AUTHENTICATED LUXURY</h4>
                   </div>
@@ -105,7 +104,7 @@ function About() {
                 <div className="border-2 border-black bg-white p-6 h-full hover:shadow-[6px_6px_0px_0px_rgba(220,38,38,0.2)] transition-all duration-300">
                   <div className="flex items-center mb-4">
                     <div className="w-12 h-12 bg-red-800 border-2 border-black flex items-center justify-center mr-4">
-                      <span className="text-white font-metal text-xl">🔒</span>
+                      <Lock className="w-6 h-6 text-white" />
                     </div>
                     <h4 className="font-metal text-lg text-black">SECURE TRANSACTIONS</h4>
                   </div>
@@ -119,7 +118,7 @@ function About() {
                 <div className="border-2 border-black bg-white p-6 h-full hover:shadow-[6px_6px_0px_0px_rgba(220,38,38,0.2)] transition-all duration-300">
                   <div className="flex items-center mb-4">
                     <div className="w-12 h-12 bg-red-800 border-2 border-black flex items-center justify-center mr-4">
-                      <span className="text-white font-metal text-xl">👥</span>
+                      <Users className="w-6 h-6 text-white" />
                     </div>
                     <h4 className="font-metal text-lg text-black">COMMUNITY DRIVEN</h4>
                   </div>
@@ -130,10 +129,10 @@ function About() {
               </div>
 
               <div className="group">
-                <div className="border-2 border-black bg-white p-6 h-full hover:shadow-[6px_6px_0px_0px_rgba(220,38,38,0.2)] transition-all duration-300">
+                <div className="border-r-2 border-red-900 bg-white p-6 h-full hover:shadow-[6px_6px_0px_0px_rgba(220,38,38,0.2)] transition-all duration-300">
                   <div className="flex items-center mb-4">
                     <div className="w-12 h-12 bg-red-800 border-2 border-black flex items-center justify-center mr-4">
-                      <span className="text-white font-metal text-xl">💎</span>
+                      <Gem className="w-6 h-6 text-white" />
                     </div>
                     <h4 className="font-metal text-lg text-black">CURATED COLLECTIONS</h4>
                   </div>
@@ -181,7 +180,7 @@ function About() {
             <div className="space-y-3 mb-6">
               <Button 
                 onClick={handleJoinRevolution}
-                className="w-full bg-red-800 hover:bg-red-900 font-gothic border-2 border-red-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all" 
+                className="w-full bg-red-900 hover:bg-red-600 font-gothic border-2 border-red-900 text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all" 
                 size="lg"
               >
                 <UserPlus className="w-5 h-5 mr-2" />

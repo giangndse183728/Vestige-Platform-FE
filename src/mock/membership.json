@@ -1,0 +1,44 @@
+{
+  "message": "Membership plans retrieved successfully",
+  "data": [
+    {
+      "planId": 1,
+      "name": "Professional",
+      "description": "Ideal for growing sellers with consistent sales",
+      "price": 199000,
+      "boostsPerMonth": 15,
+      "payosPriceId": "price_professional_001",
+      "requiredTrustTier": "RISING_SELLER",
+      "feeTier": {
+        "tierId": 2,
+        "name": "Reduced Fee",
+        "feePercentage": 0.08,
+        "createdAt": "2024-01-15T10:00:00Z",
+        "updatedAt": "2024-01-15T10:00:00Z"
+      },
+      "createdAt": "2024-01-15T10:00:00Z",
+      "updatedAt": "2024-01-15T10:00:00Z",
+      "active": true
+    },
+    {
+      "planId": 2,
+      "name": "Elite",
+      "description": "Maximum benefits for top-performing sellers",
+      "price": 399000,
+      "boostsPerMonth": 50,
+      "payosPriceId": "price_elite_001",
+      "requiredTrustTier": "PRO_SELLER",
+      "feeTier": {
+        "tierId": 3,
+        "name": "Premium Fee",
+        "feePercentage": 0.05,
+        "createdAt": "2024-01-15T10:00:00Z",
+        "updatedAt": "2024-01-15T10:00:00Z"
+      },
+      "createdAt": "2024-01-15T10:00:00Z",
+      "updatedAt": "2024-01-15T10:00:00Z",
+      "active": true
+    }
+  ]
+}
+

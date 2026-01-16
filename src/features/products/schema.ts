@@ -45,6 +45,9 @@ export const productSchema = z.object({
   viewsCount: z.number(),
   likesCount: z.number(),
   status: z.string().optional(),
+  color: z.string().optional(),
+  size: z.string().optional(),
+  images: z.array(productImageSchema).optional(),
 });
 
 
