@@ -1,0 +1,137 @@
+[
+  {
+    "brandId": 1,
+    "name": "Rick Owens",
+    "logoUrl": "/rickowen.png",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-15T10:00:00Z"
+  },
+  {
+    "brandId": 2,
+    "name": "Maison Margiela",
+    "logoUrl": "https://mdc.rinascente.it/pub/media/aw_sbb/brand_image/MaisonMargiela.png",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-15T10:00:00Z"
+  },
+  {
+    "brandId": 3,
+    "name": "MSCHF",
+    "logoUrl": "https://file.hstatic.net/200000608471/file/mschf_7e5f25d08a1d4a7e95bdea5e8be1a42b_grande.png",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-15T10:00:00Z"
+  },
+  {
+    "brandId": 4,
+    "name": "Balenciaga",
+    "logoUrl": "https://static.cdnlogo.com/logos/b/12/balenciaga.png",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-15T10:00:00Z"
+  },
+  {
+    "brandId": 5,
+    "name": "Raf Simons",
+    "logoUrl": "https://nubiantokyo.com/cdn/shop/collections/RAF-SIMONS.jpg?v=1709630278",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-15T10:00:00Z"
+  },
+  {
+    "brandId": 6,
+    "name": "Comme des Garçons",
+    "logoUrl": "https://i.pinimg.com/736x/03/23/03/032303d2c5dda5b8297f00ea20034dd2.jpg",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-15T10:00:00Z"
+  },
+  {
+    "brandId": 7,
+    "name": "Vetements",
+    "logoUrl": "https://i.pinimg.com/564x/36/79/70/3679709eb0b173d725fb861daa3e90b1.jpg",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-15T10:00:00Z"
+  },
+  {
+    "brandId": 8,
+    "name": "Yohji Yamamoto",
+    "logoUrl": "https://www.ontimeshow.com/sites/default/files/%E8%9E%A2%E5%B9%95%E5%BF%AB%E7%85%A7%202019-03-22%20%E4%B8%8B%E5%8D%8812.06.18_1.png",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-15T10:00:00Z"
+  },
+  {
+    "brandId": 9,
+    "name": "Undercover",
+    "logoUrl": "https://cotwohk.com/cdn/shop/collections/undercover_1200x1200.jpg?v=1562923416",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-15T10:00:00Z"
+  },
+  {
+    "brandId": 10,
+    "name": "Nike",
+    "logoUrl": "https://img.icons8.com/ios_filled/1200/nike.jpg",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-15T10:00:00Z"
+  },
+  {
+    "brandId": 12,
+    "name": "Adidas",
+    "logoUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_b3M0acukjai1wfFgI-m5bReeYKKIoN5YtA&s",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-15T10:00:00Z"
+  },
+  {
+    "brandId": 13,
+    "name": "Issey Miyake",
+    "logoUrl": "https://cdn.worldvectorlogo.com/logos/issey-miyake.svg",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-15T10:00:00Z"
+  },
+  {
+    "brandId": 15,
+    "name": "Prada",
+    "logoUrl": "https://www.fashionphile.com/cdn/shop/files/9b2270d41449edf8ac2539183d24553d.jpg?v=1749796992",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-15T10:00:00Z"
+  },
+  {
+    "brandId": 16,
+    "name": "Gucci",
+    "logoUrl": "https://brandlogos.net/wp-content/uploads/2014/10/gucci-logo_brandlogos.net_3dblq-512x512.png",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-15T10:00:00Z"
+  },
+  {
+    "brandId": 17,
+    "name": "Saint Laurent",
+    "logoUrl": "https://www.elleman.vn/wp-content/uploads/2020/03/01/oldlogo-logo-thuong-hieu-elle-man-0220-pinterest.jpg",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-15T10:00:00Z"
+  },
+  {
+    "brandId": 18,
+    "name": "Louis Vuitton",
+    "logoUrl": "https://i.pinimg.com/736x/1f/f5/aa/1ff5aa84b9614f97a5a097cda1f35045.jpg",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-15T10:00:00Z"
+  },
+  {
+    "brandId": 19,
+    "name": "Supreme",
+    "logoUrl": "https://thumbs.dreamstime.com/b/red-logo-supreme-brand-limited-editions-branding-product-143139244.jpg",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-15T10:00:00Z"
+  },
+  {
+    "brandId": 20,
+    "name": "Chrome Hearts",
+    "logoUrl": "https://cdn.worldvectorlogo.com/logos/chrome-hearts-1.svg",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-15T10:00:00Z"
+  },
+  {
+    "brandId": 21,
+    "name": "Number (N)ine",
+    "logoUrl": "https://ih1.redbubble.net/image.2595666675.9318/st,small,507x507-pad,600x600,f8f8f8.jpg",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-15T10:00:00Z"
+  }
+  
+]
+

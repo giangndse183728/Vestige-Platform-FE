@@ -1,0 +1,590 @@
+[
+  {
+    "categoryId": 1,
+    "name": "Tops",
+    "description": "T-shirts, shirts, sweaters, and more",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": null,
+    "level": 0,
+    "hasChildren": true,
+    "childrenCount": 5,
+    "children": [
+      {
+        "categoryId": 2,
+        "name": "T-Shirts",
+        "description": "Short and long sleeve t-shirts",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "parent": { "categoryId": 1, "name": "Tops" },
+        "level": 1,
+        "hasChildren": false,
+        "childrenCount": 0,
+        "children": []
+      },
+      {
+        "categoryId": 3,
+        "name": "Shirts",
+        "description": "Dress shirts and casual shirts",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "parent": { "categoryId": 1, "name": "Tops" },
+        "level": 1,
+        "hasChildren": false,
+        "childrenCount": 0,
+        "children": []
+      },
+      {
+        "categoryId": 4,
+        "name": "Sweaters",
+        "description": "Knit sweaters and cardigans",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "parent": { "categoryId": 1, "name": "Tops" },
+        "level": 1,
+        "hasChildren": false,
+        "childrenCount": 0,
+        "children": []
+      },
+      {
+        "categoryId": 5,
+        "name": "Hoodies",
+        "description": "Hooded sweatshirts",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "parent": { "categoryId": 1, "name": "Tops" },
+        "level": 1,
+        "hasChildren": false,
+        "childrenCount": 0,
+        "children": []
+      },
+      {
+        "categoryId": 6,
+        "name": "Tank Tops",
+        "description": "Sleeveless tops and vests",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "parent": { "categoryId": 1, "name": "Tops" },
+        "level": 1,
+        "hasChildren": false,
+        "childrenCount": 0,
+        "children": []
+      },
+      {
+        "categoryId": 7,
+        "name": "Jerseys",
+        "description": "Jerseys and team uniforms",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "parent": { "categoryId": 1, "name": "Tops" },
+        "level": 1,
+        "hasChildren": false,
+        "childrenCount": 0,
+        "children": []
+      }
+    ]
+  },
+  {
+    "categoryId": 2,
+    "name": "T-Shirts",
+    "description": "Short and long sleeve t-shirts",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": { "categoryId": 1, "name": "Tops" },
+    "level": 1,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 3,
+    "name": "Shirts",
+    "description": "Dress shirts and casual shirts",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": { "categoryId": 1, "name": "Tops" },
+    "level": 1,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 4,
+    "name": "Sweaters",
+    "description": "Knit sweaters and cardigans",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": { "categoryId": 1, "name": "Tops" },
+    "level": 1,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 5,
+    "name": "Hoodies",
+    "description": "Hooded sweatshirts",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": { "categoryId": 1, "name": "Tops" },
+    "level": 1,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 6,
+    "name": "Tank Tops",
+    "description": "Sleeveless tops and vests",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": { "categoryId": 1, "name": "Tops" },
+    "level": 1,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 7,
+    "name": "Bottoms",
+    "description": "Pants, jeans, shorts, and more",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": null,
+    "level": 0,
+    "hasChildren": true,
+    "childrenCount": 4,
+    "children": [
+      {
+        "categoryId": 8,
+        "name": "Jeans",
+        "description": "Denim jeans in all fits",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "parent": { "categoryId": 7, "name": "Bottoms" },
+        "level": 1,
+        "hasChildren": false,
+        "childrenCount": 0,
+        "children": []
+      },
+      {
+        "categoryId": 9,
+        "name": "Trousers",
+        "description": "Dress pants and casual trousers",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "parent": { "categoryId": 7, "name": "Bottoms" },
+        "level": 1,
+        "hasChildren": false,
+        "childrenCount": 0,
+        "children": []
+      },
+      {
+        "categoryId": 10,
+        "name": "Shorts",
+        "description": "Casual and athletic shorts",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "parent": { "categoryId": 7, "name": "Bottoms" },
+        "level": 1,
+        "hasChildren": false,
+        "childrenCount": 0,
+        "children": []
+      },
+      {
+        "categoryId": 11,
+        "name": "Sweatpants",
+        "description": "Joggers and sweatpants",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "parent": { "categoryId": 7, "name": "Bottoms" },
+        "level": 1,
+        "hasChildren": false,
+        "childrenCount": 0,
+        "children": []
+      }
+    ]
+  },
+  {
+    "categoryId": 8,
+    "name": "Jeans",
+    "description": "Denim jeans in all fits",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": { "categoryId": 7, "name": "Bottoms" },
+    "level": 1,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 9,
+    "name": "Trousers",
+    "description": "Dress pants and casual trousers",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": { "categoryId": 7, "name": "Bottoms" },
+    "level": 1,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 10,
+    "name": "Shorts",
+    "description": "Casual and athletic shorts",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": { "categoryId": 7, "name": "Bottoms" },
+    "level": 1,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 11,
+    "name": "Sweatpants",
+    "description": "Joggers and sweatpants",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": { "categoryId": 7, "name": "Bottoms" },
+    "level": 1,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 12,
+    "name": "Outerwear",
+    "description": "Jackets, coats, and more",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": null,
+    "level": 0,
+    "hasChildren": true,
+    "childrenCount": 4,
+    "children": [
+      {
+        "categoryId": 13,
+        "name": "Jackets",
+        "description": "Light jackets and bombers",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "parent": { "categoryId": 12, "name": "Outerwear" },
+        "level": 1,
+        "hasChildren": false,
+        "childrenCount": 0,
+        "children": []
+      },
+      {
+        "categoryId": 14,
+        "name": "Coats",
+        "description": "Heavy coats and overcoats",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "parent": { "categoryId": 12, "name": "Outerwear" },
+        "level": 1,
+        "hasChildren": false,
+        "childrenCount": 0,
+        "children": []
+      },
+      {
+        "categoryId": 15,
+        "name": "Leather Jackets",
+        "description": "Leather and faux leather jackets",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "parent": { "categoryId": 12, "name": "Outerwear" },
+        "level": 1,
+        "hasChildren": false,
+        "childrenCount": 0,
+        "children": []
+      },
+      {
+        "categoryId": 16,
+        "name": "Parkas",
+        "description": "Winter parkas and puffer jackets",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "parent": { "categoryId": 12, "name": "Outerwear" },
+        "level": 1,
+        "hasChildren": false,
+        "childrenCount": 0,
+        "children": []
+      }
+    ]
+  },
+  {
+    "categoryId": 13,
+    "name": "Jackets",
+    "description": "Light jackets and bombers",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": { "categoryId": 12, "name": "Outerwear" },
+    "level": 1,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 14,
+    "name": "Coats",
+    "description": "Heavy coats and overcoats",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": { "categoryId": 12, "name": "Outerwear" },
+    "level": 1,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 15,
+    "name": "Leather Jackets",
+    "description": "Leather and faux leather jackets",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": { "categoryId": 12, "name": "Outerwear" },
+    "level": 1,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 16,
+    "name": "Parkas",
+    "description": "Winter parkas and puffer jackets",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": { "categoryId": 12, "name": "Outerwear" },
+    "level": 1,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 17,
+    "name": "Footwear",
+    "description": "Shoes, boots, and sneakers",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": null,
+    "level": 0,
+    "hasChildren": true,
+    "childrenCount": 4,
+    "children": [
+      {
+        "categoryId": 18,
+        "name": "Sneakers",
+        "description": "Athletic and casual sneakers",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "parent": { "categoryId": 17, "name": "Footwear" },
+        "level": 1,
+        "hasChildren": false,
+        "childrenCount": 0,
+        "children": []
+      },
+      {
+        "categoryId": 19,
+        "name": "Boots",
+        "description": "Ankle boots and high boots",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "parent": { "categoryId": 17, "name": "Footwear" },
+        "level": 1,
+        "hasChildren": false,
+        "childrenCount": 0,
+        "children": []
+      },
+      {
+        "categoryId": 20,
+        "name": "Dress Shoes",
+        "description": "Formal and dress shoes",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "parent": { "categoryId": 17, "name": "Footwear" },
+        "level": 1,
+        "hasChildren": false,
+        "childrenCount": 0,
+        "children": []
+      },
+      {
+        "categoryId": 21,
+        "name": "Sandals",
+        "description": "Sandals and slides",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "parent": { "categoryId": 17, "name": "Footwear" },
+        "level": 1,
+        "hasChildren": false,
+        "childrenCount": 0,
+        "children": []
+      }
+    ]
+  },
+  {
+    "categoryId": 18,
+    "name": "Sneakers",
+    "description": "Athletic and casual sneakers",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": { "categoryId": 17, "name": "Footwear" },
+    "level": 1,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 19,
+    "name": "Boots",
+    "description": "Ankle boots and high boots",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": { "categoryId": 17, "name": "Footwear" },
+    "level": 1,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 20,
+    "name": "Dress Shoes",
+    "description": "Formal and dress shoes",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": { "categoryId": 17, "name": "Footwear" },
+    "level": 1,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 21,
+    "name": "Sandals",
+    "description": "Sandals and slides",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": { "categoryId": 17, "name": "Footwear" },
+    "level": 1,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 22,
+    "name": "Accessories",
+    "description": "Bags, belts, hats, and more",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": null,
+    "level": 0,
+    "hasChildren": true,
+    "childrenCount": 5,
+    "children": [
+      {
+        "categoryId": 23,
+        "name": "Bags",
+        "description": "Backpacks, totes, and shoulder bags",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "parent": { "categoryId": 22, "name": "Accessories" },
+        "level": 1,
+        "hasChildren": false,
+        "childrenCount": 0,
+        "children": []
+      },
+      {
+        "categoryId": 24,
+        "name": "Belts",
+        "description": "Leather and fabric belts",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "parent": { "categoryId": 22, "name": "Accessories" },
+        "level": 1,
+        "hasChildren": false,
+        "childrenCount": 0,
+        "children": []
+      },
+      {
+        "categoryId": 25,
+        "name": "Hats",
+        "description": "Caps, beanies, and bucket hats",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "parent": { "categoryId": 22, "name": "Accessories" },
+        "level": 1,
+        "hasChildren": false,
+        "childrenCount": 0,
+        "children": []
+      },
+      {
+        "categoryId": 26,
+        "name": "Jewelry",
+        "description": "Necklaces, rings, and bracelets",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "parent": { "categoryId": 22, "name": "Accessories" },
+        "level": 1,
+        "hasChildren": false,
+        "childrenCount": 0,
+        "children": []
+      },
+      {
+        "categoryId": 27,
+        "name": "Sunglasses",
+        "description": "Designer sunglasses and eyewear",
+        "createdAt": "2024-01-15T10:00:00Z",
+        "parent": { "categoryId": 22, "name": "Accessories" },
+        "level": 1,
+        "hasChildren": false,
+        "childrenCount": 0,
+        "children": []
+      }
+    ]
+  },
+  {
+    "categoryId": 23,
+    "name": "Bags",
+    "description": "Backpacks, totes, and shoulder bags",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": { "categoryId": 22, "name": "Accessories" },
+    "level": 1,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 24,
+    "name": "Belts",
+    "description": "Leather and fabric belts",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": { "categoryId": 22, "name": "Accessories" },
+    "level": 1,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 25,
+    "name": "Hats",
+    "description": "Caps, beanies, and bucket hats",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": { "categoryId": 22, "name": "Accessories" },
+    "level": 1,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 26,
+    "name": "Jewelry",
+    "description": "Necklaces, rings, and bracelets",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": { "categoryId": 22, "name": "Accessories" },
+    "level": 1,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 27,
+    "name": "Sunglasses",
+    "description": "Designer sunglasses and eyewear",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": { "categoryId": 22, "name": "Accessories" },
+    "level": 1,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 28,
+    "name": "Suits",
+    "description": "Full suits and blazers",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": null,
+    "level": 0,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 29,
+    "name": "Swimwear",
+    "description": "Swim trunks and board shorts",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": null,
+    "level": 0,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  },
+  {
+    "categoryId": 30,
+    "name": "Activewear",
+    "description": "Athletic and sportswear",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "parent": null,
+    "level": 0,
+    "hasChildren": false,
+    "childrenCount": 0,
+    "children": []
+  }
+]

@@ -1,11 +1,15 @@
 import api from '@/libs/axios';
 import { ApiResponse } from '@/libs/axios';
 import { BrandsResponse, Brand, CreateBrandRequest } from './schema';
+import brandsData from '@/mock/brands.json';
 
 export const getBrands = async (): Promise<BrandsResponse> => {
-  console.log('Fetching brands...');
-  const response = await api.get<ApiResponse<BrandsResponse>>('/brands');
-  return response.data.data;
+  // console.log('Fetching brands...');
+  // const response = await api.get<ApiResponse<BrandsResponse>>('/brands');
+  // return response.data.data;
+
+  // Using mock data
+  return brandsData as BrandsResponse;
 };
 
 export const createBrand = async (data: CreateBrandRequest): Promise<Brand> => {

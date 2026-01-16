@@ -122,7 +122,7 @@ export default function DesignersPage() {
                           <img
                             src={featuredBrand.logoUrl}
                             alt={featuredBrand.name}
-                            className="w-full h-full object-contain p-12"
+                            className="w-full h-full object-contain "
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-gray-400">

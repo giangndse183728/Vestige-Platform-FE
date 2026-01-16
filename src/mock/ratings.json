@@ -1,0 +1,195 @@
+{
+  "message": "Ratings retrieved successfully",
+  "data": {
+    "content": [
+      {
+        "id": 1,
+        "rating": 5,
+        "comment": "Amazing platform! Found my dream Rick Owens boots here. The authentication process is top-notch.",
+        "userId": 101,
+        "username": "fashion_lover_99",
+        "createdAt": "2024-12-15T10:30:00Z",
+        "updatedAt": "2024-12-15T10:30:00Z"
+      },
+      {
+        "id": 2,
+        "rating": 5,
+        "comment": "Best marketplace for streetwear! Fast shipping and authentic items. Highly recommend!",
+        "userId": 102,
+        "username": "streetwear_collector",
+        "createdAt": "2024-12-14T15:20:00Z",
+        "updatedAt": "2024-12-14T15:20:00Z"
+      },
+      {
+        "id": 3,
+        "rating": 4,
+        "comment": "Great selection of brands. Wish there were more filters for size and condition.",
+        "userId": 103,
+        "username": "sneakerhead_vn",
+        "createdAt": "2024-12-13T09:15:00Z",
+        "updatedAt": "2024-12-13T09:15:00Z"
+      },
+      {
+        "id": 4,
+        "rating": 5,
+        "comment": "Love the community vibe here. Everyone is so helpful and the items are always as described.",
+        "userId": 104,
+        "username": "vintage_hunter",
+        "createdAt": "2024-12-12T14:45:00Z",
+        "updatedAt": "2024-12-12T14:45:00Z"
+      },
+      {
+        "id": 5,
+        "rating": 4,
+        "comment": "Solid platform with good authentication. Shipping could be faster but overall satisfied.",
+        "userId": 105,
+        "username": "luxury_buyer",
+        "createdAt": "2024-12-11T11:30:00Z",
+        "updatedAt": "2024-12-11T11:30:00Z"
+      },
+      {
+        "id": 6,
+        "rating": 5,
+        "comment": "Found rare pieces I couldn't find anywhere else. The seller communication was excellent!",
+        "userId": 106,
+        "username": "rare_finds_only",
+        "createdAt": "2024-12-10T16:20:00Z",
+        "updatedAt": "2024-12-10T16:20:00Z"
+      },
+      {
+        "id": 7,
+        "rating": 3,
+        "comment": "Platform is okay but needs better search functionality. Items are authentic though.",
+        "userId": 107,
+        "username": "casual_shopper",
+        "createdAt": "2024-12-09T13:10:00Z",
+        "updatedAt": "2024-12-09T13:10:00Z"
+      },
+      {
+        "id": 8,
+        "rating": 5,
+        "comment": "Perfect for Gen Z fashion enthusiasts! The UI is clean and easy to navigate.",
+        "userId": 108,
+        "username": "genz_style",
+        "createdAt": "2024-12-08T10:00:00Z",
+        "updatedAt": "2024-12-08T10:00:00Z"
+      },
+      {
+        "id": 9,
+        "rating": 4,
+        "comment": "Great marketplace! Prices are fair and items arrive in good condition. Would use again.",
+        "userId": 109,
+        "username": "fashion_forward",
+        "createdAt": "2024-12-07T14:30:00Z",
+        "updatedAt": "2024-12-07T14:30:00Z"
+      },
+      {
+        "id": 10,
+        "rating": 5,
+        "comment": "Best place to buy and sell designer items. The authentication gives me peace of mind!",
+        "userId": 110,
+        "username": "designer_only",
+        "createdAt": "2024-12-06T09:45:00Z",
+        "updatedAt": "2024-12-06T09:45:00Z"
+      },
+      {
+        "id": 11,
+        "rating": 4,
+        "comment": "Love browsing the collections here. Found some amazing deals on premium brands.",
+        "userId": 111,
+        "username": "bargain_hunter",
+        "createdAt": "2024-12-05T12:15:00Z",
+        "updatedAt": "2024-12-05T12:15:00Z"
+      },
+      {
+        "id": 12,
+        "rating": 5,
+        "comment": "Incredible platform! The community is amazing and everyone is so knowledgeable about fashion.",
+        "userId": 112,
+        "username": "fashion_expert",
+        "createdAt": "2024-12-04T15:50:00Z",
+        "updatedAt": "2024-12-04T15:50:00Z"
+      },
+      {
+        "id": 13,
+        "rating": 2,
+        "comment": "Had some issues with a seller but customer service helped resolve it. Could be better.",
+        "userId": 113,
+        "username": "honest_reviewer",
+        "createdAt": "2024-12-03T11:20:00Z",
+        "updatedAt": "2024-12-03T11:20:00Z"
+      },
+      {
+        "id": 14,
+        "rating": 5,
+        "comment": "Perfect for finding unique pieces! The curation is excellent and items are always authentic.",
+        "userId": 114,
+        "username": "unique_style",
+        "createdAt": "2024-12-02T13:40:00Z",
+        "updatedAt": "2024-12-02T13:40:00Z"
+      },
+      {
+        "id": 15,
+        "rating": 4,
+        "comment": "Great platform overall. The membership plans are worth it for serious sellers.",
+        "userId": 115,
+        "username": "pro_seller",
+        "createdAt": "2024-12-01T10:10:00Z",
+        "updatedAt": "2024-12-01T10:10:00Z"
+      },
+      {
+        "id": 16,
+        "rating": 5,
+        "comment": "Amazing experience from start to finish. Fast shipping, authentic items, great prices!",
+        "userId": 116,
+        "username": "happy_customer",
+        "createdAt": "2024-11-30T16:25:00Z",
+        "updatedAt": "2024-11-30T16:25:00Z"
+      },
+      {
+        "id": 17,
+        "rating": 3,
+        "comment": "Platform is decent but needs more payment options. Items are authentic which is good.",
+        "userId": 117,
+        "username": "payment_preference",
+        "createdAt": "2024-11-29T14:15:00Z",
+        "updatedAt": "2024-11-29T14:15:00Z"
+      },
+      {
+        "id": 18,
+        "rating": 5,
+        "comment": "Love this platform! Found my grail piece here after searching for months.",
+        "userId": 118,
+        "username": "grail_seeker",
+        "createdAt": "2024-11-28T09:30:00Z",
+        "updatedAt": "2024-11-28T09:30:00Z"
+      },
+      {
+        "id": 19,
+        "rating": 4,
+        "comment": "Solid marketplace with good variety. The feedback system helps build trust.",
+        "userId": 119,
+        "username": "trust_builder",
+        "createdAt": "2024-11-27T12:50:00Z",
+        "updatedAt": "2024-11-27T12:50:00Z"
+      },
+      {
+        "id": 20,
+        "rating": 5,
+        "comment": "Best fashion marketplace I've used! The authentication process is thorough and reliable.",
+        "userId": 120,
+        "username": "reliable_buyer",
+        "createdAt": "2024-11-26T15:05:00Z",
+        "updatedAt": "2024-11-26T15:05:00Z"
+      }
+    ],
+    "pagination": {
+      "currentPage": 0,
+      "pageSize": 20,
+      "totalPages": 1,
+      "totalElements": 20
+    },
+    "filters": null
+  }
+}
+

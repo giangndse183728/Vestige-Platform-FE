@@ -1,15 +1,16 @@
 import axios from '@/libs/axios';
 import { ratingStatsSchema, ratingsAllResponseSchema, RatingStats, RatingsAllResponse, submitRatingBodySchema, submitRatingResponseSchema, SubmitRatingBody, SubmitRatingResponse } from './schema';
+import ratingStatsData from '@/mock/ratingStats.json';
+import ratingsData from '@/mock/ratings.json';
 
 export const feedbackService = {
   async getRatingStats(): Promise<RatingStats> {
-    const response = await axios.get('/ratings/stats');
-    return ratingStatsSchema.parse(response.data);
+    return ratingStatsSchema.parse(ratingStatsData);
+    
   },
 
   async getAllRatings(): Promise<RatingsAllResponse> {
-    const response = await axios.get('/ratings/all');
-    return ratingsAllResponseSchema.parse(response.data);
+    return ratingsAllResponseSchema.parse(ratingsData);
   },
 
   async submitRating(body: SubmitRatingBody): Promise<SubmitRatingResponse> {
