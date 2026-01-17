@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Vestige Platform – Frontend
 
-## Getting Started
+## Overview
 
-First, run the development server:
+**Vestige** is a fashion marketplace platform focused on **avant-garde fashion products**, blending commerce with a strong editorial and artistic identity. The platform is designed to support buying and selling fashion items while emphasizing visual storytelling and a bold aesthetic inspired by **fashion editorials** and **punk rock culture**.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+This repository contains the **Frontend architecture and implementation**, where I was responsible for **overall FE architecture, feature organization, and state/data handling strategy**.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Key Responsibilities
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+* Designed and maintained the **Frontend architecture** following the **Feature-First** approach
+* Implemented scalable UI components and layout system
+* Managed global and server state efficiently
+* Ensured consistency between design, UX, and technical implementation
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Core
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+* **Next.js** – App Router architecture
+* **TypeScript** – Type-safe development
 
-## Deploy on Vercel
+### Styling & UI
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+* **Tailwind CSS** – Utility-first styling
+* **shadcn/ui** – Accessible and reusable UI components
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### State & Data Management
+
+* **TanStack Query (React Query)** – Server state, caching, and data synchronization
+* **Zustand** – Lightweight global state management (UI state, local interactions)
+
+
+---
+
+## Design Philosophy
+
+Vestige’s UI combines:
+
+* **Avant-garde fashion aesthetics**
+* **Editorial-style layouts** (bold typography, asymmetry, strong visual hierarchy)
+* **Punk rock influences** for attitude and contrast
+
+The goal is not just usability, but **expressing fashion identity through interface design**.
+
+---
+
+## Performance & Best Practices
+
+* Optimized component rendering
+* Reusable and composable UI components
+* Strict typing for API responses
+* Clean separation between UI, logic, and data layers
+
